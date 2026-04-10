@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "prelint": "pnpm generate:type",
+    "lint:css": "stylelint \"./app/**/*.css\"",
     "generate:type": "graphql-codegen --require dotenv/config --config codegen.ts"
   },
   "dependencies": {

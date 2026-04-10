@@ -11,11 +11,62 @@ const home: RouteConfig = {
     index: true,
     path: '/',
     load: () => import('#views/Home'),
+    visibility: 'is-anything',
+};
+
+const preparedness: RouteConfig = {
+    index: true,
+    path: '/preparedness',
+    load: () => import('#views/Home'),
+    visibility: 'is-anything',
+};
+const dataAndReport: RouteConfig = {
+    index: true,
+    path: '/data-and-report',
+    load: () => import('#views/Home'),
+    visibility: 'is-anything',
+};
+const capacityAndResources: RouteConfig = {
+    index: true,
+    path: '/capacity-and-resources',
+    load: () => import('#views/Home'),
+    visibility: 'is-anything',
+};
+const ourWork: RouteConfig = {
+    index: true,
+    path: '/our-work',
+    load: () => import('#views/Home'),
+    visibility: 'is-anything',
+};
+const galleries: RouteConfig = {
+    index: true,
+    path: '/galleries',
+    load: () => import('#views/Home'),
     visibility: 'is-authenticated',
+};
+
+const termsAndConditions: RouteConfig = {
+    index: true,
+    path: '/terms-and-conditions',
+    load: () => import('#views/Home'),
+    visibility: 'is-anything',
+};
+const cookie: RouteConfig = {
+    index: true,
+    path: '/cookies-policy',
+    load: () => import('#views/Home'),
+    visibility: 'is-anything',
 };
 
 const routes = {
     home,
+    ourWork,
+    preparedness,
+    dataAndReport,
+    galleries,
+    capacityAndResources,
+    termsAndConditions,
+    cookie
 };
 
 
