@@ -17,7 +17,7 @@ const home: RouteConfig = {
 const preparedness: RouteConfig = {
     index: true,
     path: '/preparedness',
-    load: () => import('#views/Home'),
+    load: () => import('#views/Preparedness'),
     visibility: 'is-anything',
 };
 const dataAndReport: RouteConfig = {
@@ -35,13 +35,13 @@ const capacityAndResources: RouteConfig = {
 const ourWork: RouteConfig = {
     index: true,
     path: '/our-work',
-    load: () => import('#views/Home'),
+    load: () => import('#views/OurWork'),
     visibility: 'is-anything',
 };
 const galleries: RouteConfig = {
     index: true,
     path: '/galleries',
-    load: () => import('#views/Home'),
+    load: () => import('#views/Galleries'),
     visibility: 'is-authenticated',
 };
 
@@ -56,6 +56,13 @@ const cookie: RouteConfig = {
     path: '/cookies-policy',
     load: () => import('#views/Home'),
     visibility: 'is-anything',
+
+};
+const team: RouteConfig = {
+    index: true,
+    path: '/team/:id',
+    load: () => import('#views/Team'),
+    visibility: 'is-authenticated',
 };
 
 const routes = {
@@ -66,9 +73,9 @@ const routes = {
     galleries,
     capacityAndResources,
     termsAndConditions,
-    cookie
+    cookie,
+    team,
 };
-
 
 export type RouteKeys = keyof typeof routes;
 

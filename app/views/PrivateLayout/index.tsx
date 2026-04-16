@@ -1,10 +1,8 @@
-import { Outlet } from "react-router";
+import { Outlet } from 'react-router';
 
 function PrivateLayout() {
     return (
-        <>
-            <Outlet />
-        </>
+        <Outlet />
     );
 }
 

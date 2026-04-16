@@ -4,8 +4,8 @@ import {
 } from 'react-router';
 import {
     ButtonLayout,
-    type ButtonLayoutProps
-} from '@ifrc-go/ui'
+    type ButtonLayoutProps,
+} from '@ifrc-go/ui';
 import { _cs } from '@togglecorp/fujs';
 
 import type { RouteKeys } from '#root/config/routes';

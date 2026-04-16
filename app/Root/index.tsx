@@ -1,7 +1,7 @@
 import {
     Suspense,
-    useState
-} from "react"
+    useState,
+} from 'react';
 import { Cookies } from 'react-cookie';
 import { Outlet } from 'react-router';
 import { AlertContainer } from '@ifrc-go/ui';
@@ -14,8 +14,8 @@ import {
 } from 'urql';
 
 import UserContext, { type UserContextInterface } from '#contexts/UserContext';
-import type { MeQuery } from "#generated/types/graphql";
-import useAlertContextProviderValue from "#hooks/useAlertContextProviderValue";
+import type { MeQuery } from '#generated/types/graphql';
+import useAlertContextProviderValue from '#hooks/useAlertContextProviderValue';
 
 const COOKIE_NAME = `ERCS-${import.meta.env.APP_ENVIRONMENT}-CSRFTOKEN`;
 const GRAPHQL_ENDPOINT = `${import.meta.env.APP_GRAPHQL_ENDPOINT}/graphql/`;
@@ -38,14 +38,14 @@ const gqlClient = new Client({
 });
 
 function Root() {
-    const [user, setUser] = useState<MeQuery["me"] | undefined>();
+    const [user, setUser] = useState<MeQuery['me'] | undefined>();
     const authenticated = !!user;
     const userContext: UserContextInterface = {
         authenticated,
         user,
         setUser,
 
-    }
+    };
     const alertContextValue = useAlertContextProviderValue();
 
     return (

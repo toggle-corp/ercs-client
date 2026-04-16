@@ -20,6 +20,9 @@ importers:
       '@togglecorp/fujs':
         specifier: ^2.2.0
         version: 2.2.0
+      '@togglecorp/toggle-form':
+        specifier: ^2.0.4
+        version: 2.0.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@urql/exchange-graphcache':
         specifier: ^9.0.0
         version: 9.0.0(@urql/core@6.0.1(graphql@16.13.2))(graphql@16.13.2)
@@ -1563,6 +1566,12 @@ packages:
 
   '@togglecorp/fujs@2.2.0':
     resolution: {integrity: sha512-OuoQ9Bj7SiI2sTLpaM/HivU6HpSbZ3ANBIn7f9KUz5eFcfwBBEDvjI+4ah6WktJEYTUKY4RxX37z64qOrTJSwA==}
+
+  '@togglecorp/toggle-form@2.0.4':
+    resolution: {integrity: sha512-+EzRzXK/PKlisu44yARpxOkoeowz+0oKk2Rl3CdhxtBfTVfzG28aHAklDTubTBssS8hneGBTav2aInCqmwChfg==}
+    peerDependencies:
+      react: ^18.2.0
+      react-dom: ^18.2.0
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
@@ -6356,6 +6365,13 @@ snapshots:
   '@togglecorp/fujs@2.2.0':
     dependencies:
       '@babel/runtime-corejs3': 7.29.2
+
+  '@togglecorp/toggle-form@2.0.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      '@babel/runtime-corejs3': 7.29.2
+      '@togglecorp/fujs': 2.2.0
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
 
   '@tybys/wasm-util@0.10.1':
     dependencies:

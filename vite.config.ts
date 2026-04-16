@@ -3,7 +3,6 @@ import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import tsconfigPaths from "vite-tsconfig-paths";
 import babel from '@rolldown/plugin-babel'
 
-
 export default defineConfig(({ mode }) => {
   const isProd = mode === "production";
   return {

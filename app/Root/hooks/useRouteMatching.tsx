@@ -14,7 +14,7 @@ function useRouteMatching(routeKey: RouteKeys, attrs?: Attrs) {
 
     const route = routes[routeKey];
 
-    if(!route){
+    if (!route) {
         return undefined;
     }
 

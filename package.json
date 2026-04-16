@@ -17,6 +17,7 @@
     "@ifrc-go/icons": "^2.0.1",
     "@ifrc-go/ui": "2.0.0-beta.2",
     "@togglecorp/fujs": "^2.2.0",
+    "@togglecorp/toggle-form": "^2.0.4",
     "@urql/exchange-graphcache": "^9.0.0",
     "graphql": "^16.13.2",
     "knip": "^6.3.0",

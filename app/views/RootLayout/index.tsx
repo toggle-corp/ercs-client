@@ -1,7 +1,7 @@
 import {
     use,
     useEffect,
-} from 'react'
+} from 'react';
 import { Outlet } from 'react-router';
 import { isDefined } from '@togglecorp/fujs';
 import { gql } from 'urql';
@@ -46,16 +46,16 @@ function RootLayout() {
         }
         if (isDefined(data?.me)) {
             setUser(data.me);
-        } 
-    }, [ fetching, data, setUser]);
+        }
+    }, [fetching, data, setUser]);
 
     return (
         <div className={styles.root}>
-            <Navbar/>
+            <Navbar />
             <div className={styles.pageContent}>
                 <Outlet />
             </div>
-            <GlobalFooter/>
+            <GlobalFooter />
         </div>
     );
 }

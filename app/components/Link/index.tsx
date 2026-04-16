@@ -4,12 +4,12 @@ import {
 } from 'react-router';
 import {
     ArrowRightUpLineIcon,
-    ChevronRightLineIcon
-} from '@ifrc-go/icons'
+    ChevronRightLineIcon,
+} from '@ifrc-go/icons';
 import {
     ButtonLayout,
-    type ButtonLayoutProps
-} from '@ifrc-go/ui'
+    type ButtonLayoutProps,
+} from '@ifrc-go/ui';
 import { _cs } from '@togglecorp/fujs';
 
 import type { RouteKeys } from '#root/config/routes';
@@ -31,14 +31,12 @@ interface ExternalLinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorEl
     attrs?: never
 }
 
-
-export type CommonLinkProps =  ButtonLayoutProps & {
+export type CommonLinkProps = ButtonLayoutProps & {
     withLinkIcon?: boolean
-    withUnderline?: boolean 
+    withUnderline?: boolean
 };
 
 export type Props = CommonLinkProps & (InternalLinkProps | ExternalLinkProps);
-
 
 function Link(props: Props) {
     const {
@@ -69,10 +67,10 @@ function Link(props: Props) {
     const content = (
         <ButtonLayout
             className={_cs(
-                className, 
+                className,
                 styles.layout,
-                withUnderline && 
-                styles.withUnderline
+                withUnderline
+                && styles.withUnderline,
             )}
             before={before}
             childrenContainerClassName={childrenContainerClassName}
@@ -84,7 +82,7 @@ function Link(props: Props) {
             withoutPadding={withoutPadding}
             withFullWidth={withFullWidth}
             disabled={disabled}
-            textSize={textSize} 
+            textSize={textSize}
             after={(
                 <>
                     {after}
@@ -99,13 +97,15 @@ function Link(props: Props) {
         >
             {children}
         </ButtonLayout>
-    )
+    );
 
     if (external) {
         return (
-            <a href={href} 
-                target="_blank" 
+            <a
+                href={href}
+                target="_blank"
                 rel="noreferrer noopener"
+                className={styles.link}
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...otherProps}
             >
@@ -124,7 +124,7 @@ function Link(props: Props) {
             {...otherProps}
             className={styles.link}
             to={routeData.to}
-            
+
         >
             {content}
         </RouterLink>

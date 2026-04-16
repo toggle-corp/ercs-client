@@ -11,7 +11,7 @@ import {
 import { _cs } from '@togglecorp/fujs';
 
 import Link from '#components/Link';
-;
+
 import styles from './styles.module.css';
 
 const date = new Date();
@@ -30,7 +30,7 @@ function GlobalFooter(props: Props) {
             className={_cs(styles.footer, className)}
             contentClassName={styles.content}
             containerAs="footer"
-        >   
+        >
             <ListView
                 layout="grid"
                 numPreferredGridColumns={5}
@@ -51,7 +51,9 @@ function GlobalFooter(props: Props) {
                             needs with the right response.
                         </div>
                         <div className={styles.copyright}>
-                            © IFRC {year}
+                            © IFRC
+                            {' '}
+                            {year}
                         </div>
                     </ListView>
                 </Container>

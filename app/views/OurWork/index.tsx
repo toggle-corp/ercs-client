@@ -1,5 +1,4 @@
 import {
-    AlarmWarningFillIcon,
     AlertLineIcon,
     HeartAddLineIcon,
     InformationFillIcon,
@@ -12,19 +11,12 @@ import {
 
 import Page from '#components/Page';
 
-function Home() {
+function OurWork() {
     const keyFigures = (
         <ListView
             layout="grid"
-            numPreferredGridColumns={4}
+            numPreferredGridColumns={3}
         >
-            <KeyFigureView
-                icon={<AlarmWarningFillIcon />}
-                value={12}
-                valueType="number"
-                size="lg"
-                label="Emergencies in last 30 days"
-            />
             <KeyFigureView
                 icon={<HeartAddLineIcon />}
                 value={250}
@@ -51,8 +43,8 @@ function Home() {
     );
     return (
         <Page
-            heading="ERCS Emergency Operations Centre"
-            description="Real-time operational intelligence and situational awareness for emergency response"
+            heading="National EOC Operations"
+            description="Comprehensive operational intelligence and emergency coordination dashboards"
             info={(
                 <Container>
                     {keyFigures}
@@ -62,4 +54,4 @@ function Home() {
     );
 }
 
-export default Home;
+export default OurWork;

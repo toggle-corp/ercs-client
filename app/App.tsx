@@ -1,22 +1,22 @@
 import {
     createBrowserRouter,
-    RouterProvider
-} from "react-router"
+    RouterProvider,
+} from 'react-router';
 
-import type { RouteConfig } from "#root/config/routes.ts";
-import routes from "#root/config/routes.ts";
-import PageError from "#views/PageError/index.tsx";
+import type { RouteConfig } from '#root/config/routes.ts';
+import routes from '#root/config/routes.ts';
+import PageError from '#views/PageError/index.tsx';
 
 const privateRoutes = Object.values(routes).filter(
-    ({ visibility }) => visibility === "is-authenticated",
+    ({ visibility }) => visibility === 'is-authenticated',
 );
 
 const publicRoutes = Object.values(routes).filter(
-    ({ visibility }) => visibility === "is-anything",
+    ({ visibility }) => visibility === 'is-anything',
 );
 
 const guestRoutes = Object.values(routes).filter(
-    ({ visibility }) => visibility === "is-not-authenticated",
+    ({ visibility }) => visibility === 'is-not-authenticated',
 );
 
 function mapRoute(routeConfig: RouteConfig) {
@@ -34,37 +34,33 @@ const router = createBrowserRouter([
     {
         errorElement: <PageError />,
         lazy: async () => {
-            const { default: Component } = await import("./Root/index.tsx");
+            const { default: Component } = await import('./Root/index.tsx');
             return { Component };
         },
         children: [
             {
                 lazy: async () => {
-                    const { default: Component } =
-            await import("./views/RootLayout/index.tsx");
+                    const { default: Component } = await import('./views/RootLayout/index.tsx');
                     return { Component };
                 },
                 children: [
                     {
                         lazy: async () => {
-                            const { default: Component } =
-                await import("./views/GuestLayout/index.tsx");
+                            const { default: Component } = await import('./views/GuestLayout/index.tsx');
                             return { Component };
                         },
                         children: guestRoutes.map(mapRoute),
                     },
                     {
                         lazy: async () => {
-                            const { default: Component } =
-                await import("./views/PrivateLayout/index.tsx");
+                            const { default: Component } = await import('./views/PrivateLayout/index.tsx');
                             return { Component };
                         },
                         children: privateRoutes.map(mapRoute),
                     },
                     {
                         lazy: async () => {
-                            const { default: Component } =
-                await import("./views/PublicLayout/index.tsx");
+                            const { default: Component } = await import('./views/PublicLayout/index.tsx');
                             return { Component };
                         },
                         children: publicRoutes.map(mapRoute),

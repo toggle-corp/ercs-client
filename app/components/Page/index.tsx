@@ -15,7 +15,6 @@ import {
 
 import styles from './styles.module.css';
 
-
 interface Props {
     className?: string;
     title?: string;
@@ -52,7 +51,6 @@ function Page(props: Props) {
         blockingContent,
         beforeHeaderContent,
     } = props;
-
 
     useEffect(() => {
         if (isDefined(title)) {
@@ -119,5 +117,3 @@ function Page(props: Props) {
 }
 
 export default Page;
-
-

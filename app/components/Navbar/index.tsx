@@ -1,5 +1,4 @@
-
-import { use, } from "react";
+import { use } from 'react';
 import {
     Button,
     DropdownMenu,
@@ -7,20 +6,34 @@ import {
     Image,
     ListView,
     NavigationTabList,
-    PageContainer
-} from "@ifrc-go/ui"
+    PageContainer,
+} from '@ifrc-go/ui';
+import { gql } from 'urql';
 
-import Link from "#components/Link";
-import NavLink from "#components/NavLink";
-import UserContext from "#contexts/UserContext";
-import Logo from "#resources/image/logo.png"
+import DropdownMenuItem from '#components/DropdownMenuItem';
+import Link from '#components/Link';
+import NavLink from '#components/NavLink';
+import UserContext from '#contexts/UserContext';
+import { useTeamListQuery } from '#generated/types/graphql';
+import Logo from '#resources/image/logo.png';
 
 import styles from './styles.module.css';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const TEAMS_QUERY = gql`
+ query TeamList {
+  teams {
+    results {
+      id
+      name
+    }
+  }
+}
+`;
 
-const Navbar = () => {
+function Navbar() {
     const { authenticated } = use(UserContext);
-
+    const [{ fetching, data }] = useTeamListQuery();
     return (
         <nav className={styles.navbar}>
             <PageContainer
@@ -61,8 +74,7 @@ const Navbar = () => {
                             >
                                 Logout
                             </Button>
-                        )
-                    }
+                        )}
                 </ListView>
             </PageContainer>
             <PageContainer
@@ -97,16 +109,31 @@ const Navbar = () => {
                     >
                         Capacity & Resources
                     </NavLink>
-                    {authenticated &&
-                        <DropdownMenu
-                            label={"Team"}
-                            labelStyleVariant="action"
-                            persistent
-                            labelSpacing="sm"
-                        >
-                            Cyrus Shrestha
-                        </DropdownMenu>
-                    }
+                    {authenticated
+                        && (
+                            <DropdownMenu
+                                label="Team"
+                                labelStyleVariant="action"
+                                persistent
+                                labelSpacing="sm"
+                            >
+                                {data?.teams.results.map((info) => (
+                                    <DropdownMenuItem
+                                        route="team"
+                                        attrs={{
+                                            id: info.id,
+                                        }}
+                                        styleVariant="transparent"
+                                        type="link"
+                                        spacing="2xs"
+
+                                    >
+                                        {info.name}
+                                    </DropdownMenuItem>
+                                ))}
+
+                            </DropdownMenu>
+                        )}
                     <NavLink
                         route="galleries"
                     >
@@ -115,7 +142,7 @@ const Navbar = () => {
                 </NavigationTabList>
             </PageContainer>
         </nav>
-    )
+    );
 }
 
-export default Navbar
+export default Navbar;
