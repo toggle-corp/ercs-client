@@ -5,10 +5,10 @@ import {
 } from '@ifrc-go/icons';
 import {
     Container,
-    KeyFigureView,
     ListView,
 } from '@ifrc-go/ui';
 
+import KeyCard from '#components/KeyCard';
 import Page from '#components/Page';
 
 function OurWork() {
@@ -17,26 +17,31 @@ function OurWork() {
             layout="grid"
             numPreferredGridColumns={3}
         >
-            <KeyFigureView
+            <KeyCard
                 icon={<HeartAddLineIcon />}
                 value={250}
                 valueType="number"
                 size="lg"
-                label="People reached in last 30 days"
+                label="People reached"
+                info="in last 30 days"
+
             />
-            <KeyFigureView
+            <KeyCard
                 icon={<AlertLineIcon />}
                 value={18}
                 valueType="number"
                 size="lg"
                 valueOptions={{ compact: true }}
-                label="population Affected in last 30 days"
+                label="population Affected"
+                info="in last 30 days"
+
             />
-            <KeyFigureView
+            <KeyCard
                 icon={<InformationFillIcon />}
                 value={18}
                 valueType="number"
-                label="People in Need in last 30 days"
+                label="People in Need"
+                info="in last 30 days"
                 size="lg"
             />
         </ListView>

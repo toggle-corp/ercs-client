@@ -1,4 +1,5 @@
 import { use } from 'react';
+import { useNavigate } from 'react-router';
 import {
     Button,
     DropdownMenu,
@@ -33,7 +34,12 @@ const TEAMS_QUERY = gql`
 
 function Navbar() {
     const { authenticated } = use(UserContext);
-    const [{ fetching, data }] = useTeamListQuery();
+    const navigate = useNavigate();
+    const [{ data }] = useTeamListQuery();
+
+    const handleLogin = () => {
+        navigate('/login');
+    };
     return (
         <nav className={styles.navbar}>
             <PageContainer
@@ -63,6 +69,7 @@ function Navbar() {
                             <Button
                                 name="login"
                                 styleVariant="filled"
+                                onClick={handleLogin}
                             >
 
                                 Login
@@ -71,6 +78,7 @@ function Navbar() {
                         : (
                             <Button
                                 name="login"
+
                             >
                                 Logout
                             </Button>

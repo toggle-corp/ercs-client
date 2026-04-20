@@ -1,0 +1,19 @@
+.key-card {
+     .icon {
+        line-height: 1;
+        color: var(--go-ui-color-primary-red);
+        font-size: var(--go-ui-height-key-figure-icon);
+    }
+    .icon-with-background {
+        border-radius: var(--go-ui-spacing-sm);
+        background-color: var(--go-ui-color-red-10);
+        padding: var(--go-ui-spacing-sm);;
+        width: var(--go-ui-spacing-3xl);
+        height: var(--go-ui-spacing-3xl);
+    }
+    .pill{
+        border-radius: var(--go-ui-spacing-md);
+        padding: var(--go-ui-spacing-3xs) var(--go-ui-spacing-sm) ;
+        font-weight: 500;
+    }
+}

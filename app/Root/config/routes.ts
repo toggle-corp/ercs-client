@@ -23,7 +23,7 @@ const preparedness: RouteConfig = {
 const dataAndReport: RouteConfig = {
     index: true,
     path: '/data-and-report',
-    load: () => import('#views/Home'),
+    load: () => import('#views/DataAndReport'),
     visibility: 'is-anything',
 };
 const capacityAndResources: RouteConfig = {
@@ -56,13 +56,20 @@ const cookie: RouteConfig = {
     path: '/cookies-policy',
     load: () => import('#views/Home'),
     visibility: 'is-anything',
-
 };
+
 const team: RouteConfig = {
     index: true,
     path: '/team/:id',
     load: () => import('#views/Team'),
     visibility: 'is-authenticated',
+};
+
+const login: RouteConfig = {
+    index: true,
+    path: '/login',
+    load: () => import('#views/Login'),
+    visibility: 'is-not-authenticated',
 };
 
 const routes = {
@@ -75,6 +82,7 @@ const routes = {
     termsAndConditions,
     cookie,
     team,
+    login,
 };
 
 export type RouteKeys = keyof typeof routes;

@@ -155,6 +155,8 @@ function GlobalFooter(props: Props) {
                             styleVariant="filled"
                             external
                             withLinkIcon
+                            textSize="sm"
+                            spacing="xs"
                         >
                             im@ifrc.org
                         </Link>

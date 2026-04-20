@@ -1,15 +1,17 @@
 import {
     AlarmWarningFillIcon,
     AlertLineIcon,
+    DashboardFillIcon,
     HeartAddLineIcon,
     InformationFillIcon,
 } from '@ifrc-go/icons';
 import {
     Container,
-    KeyFigureView,
     ListView,
 } from '@ifrc-go/ui';
 
+import InfoCard from '#components/InfoCard';
+import KeyCard from '#components/KeyCard';
 import Page from '#components/Page';
 
 function Home() {
@@ -18,34 +20,41 @@ function Home() {
             layout="grid"
             numPreferredGridColumns={4}
         >
-            <KeyFigureView
+            <KeyCard
                 icon={<AlarmWarningFillIcon />}
                 value={12}
                 valueType="number"
                 size="lg"
-                label="Emergencies in last 30 days"
+                label="Emergencies"
+                info="in last 30 days"
+
             />
-            <KeyFigureView
+            <KeyCard
                 icon={<HeartAddLineIcon />}
                 value={250}
                 valueType="number"
                 size="lg"
-                label="People reached in last 30 days"
+                label="People reached"
+                info="in last 30 days"
+
             />
-            <KeyFigureView
+            <KeyCard
                 icon={<AlertLineIcon />}
                 value={18}
                 valueType="number"
                 size="lg"
                 valueOptions={{ compact: true }}
-                label="population Affected in last 30 days"
+                label="population Affected"
+                info="in last 30 days"
+
             />
-            <KeyFigureView
+            <KeyCard
                 icon={<InformationFillIcon />}
                 value={18}
                 valueType="number"
-                label="People in Need in last 30 days"
+                label="People in Need"
                 size="lg"
+                info="in last 30 days"
             />
         </ListView>
     );
@@ -58,7 +67,85 @@ function Home() {
                     {keyFigures}
                 </Container>
             )}
-        />
+        >
+            <ListView
+                layout="block"
+            >
+                <InfoCard
+                    icon={<DashboardFillIcon />}
+                    title="Operational Dashboards"
+                    description="Real-time emergency alerts and early warning system monitoring across regions"
+                />
+                <ListView layout="grid" numPreferredGridColumns={3}>
+                    <KeyCard
+                        icon={<AlertLineIcon />}
+                        value="Emergency Response Dashboard"
+                        valueType="text"
+                        info=" Real-time overview of all active emergency operations"
+                        size="sm"
+                        pillText="Operation"
+                        withIconBackground
+                        withShadow
+                        viewButton
+                    />
+                    <KeyCard
+                        icon={<AlertLineIcon />}
+                        value="Emergency Response Dashboard"
+                        valueType="text"
+                        info=" Real-time overview of all active emergency operations"
+                        size="sm"
+                        pillText="Operation"
+                        withIconBackground
+                        withShadow
+                        viewButton
+                    />
+                    <KeyCard
+                        icon={<AlertLineIcon />}
+                        value="Emergency Response Dashboard"
+                        valueType="text"
+                        info=" Real-time overview of all active emergency operations"
+                        size="sm"
+                        pillText="Operation"
+                        withIconBackground
+                        withShadow
+                        viewButton
+                    />
+                    <KeyCard
+                        icon={<AlertLineIcon />}
+                        value="Emergency Response Dashboard"
+                        valueType="text"
+                        info=" Real-time overview of all active emergency operations"
+                        size="sm"
+                        pillText="Operation"
+                        withIconBackground
+                        withShadow
+                        viewButton
+                    />
+                    <KeyCard
+                        icon={<AlertLineIcon />}
+                        value="Emergency Response Dashboard"
+                        valueType="text"
+                        info=" Real-time overview of all active emergency operations"
+                        size="sm"
+                        pillText="Operation"
+                        withIconBackground
+                        withShadow
+                        viewButton
+                    />
+                    <KeyCard
+                        icon={<AlertLineIcon />}
+                        value="Emergency Response Dashboard"
+                        valueType="text"
+                        info=" Real-time overview of all active emergency operations"
+                        size="sm"
+                        pillText="Operation"
+                        withIconBackground
+                        withShadow
+                        viewButton
+                    />
+                </ListView>
+            </ListView>
+        </Page>
     );
 }
 

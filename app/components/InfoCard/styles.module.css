@@ -1,0 +1,8 @@
+.icon {
+    line-height: 1;
+    color: var(--go-ui-color-primary-red);
+}
+.infoCard{
+    border-bottom: 1px solid var(--go-ui-color-gray-30)  ;
+    border-radius: 0 !important;
+}
