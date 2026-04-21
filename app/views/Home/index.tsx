@@ -10,6 +10,7 @@ import {
     ListView,
 } from '@ifrc-go/ui';
 
+import ActiveOperation from '#components/ActiveOperation';
 import InfoCard from '#components/InfoCard';
 import KeyCard from '#components/KeyCard';
 import Page from '#components/Page';
@@ -71,12 +72,16 @@ function Home() {
             <ListView
                 layout="block"
             >
+                <ActiveOperation />
                 <InfoCard
                     icon={<DashboardFillIcon />}
                     title="Operational Dashboards"
                     description="Real-time emergency alerts and early warning system monitoring across regions"
                 />
-                <ListView layout="grid" numPreferredGridColumns={3}>
+                <ListView
+                    layout="grid"
+                    numPreferredGridColumns={3}
+                >
                     <KeyCard
                         icon={<AlertLineIcon />}
                         value="Emergency Response Dashboard"

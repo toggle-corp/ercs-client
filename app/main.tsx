@@ -1,4 +1,5 @@
 import '@ifrc-go/ui/index.css';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import './index.css';
 
 import { StrictMode } from 'react';
