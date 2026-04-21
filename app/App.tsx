@@ -2,6 +2,7 @@ import {
     createBrowserRouter,
     RouterProvider,
 } from 'react-router';
+import mapboxgl from 'mapbox-gl';
 
 import type { RouteConfig } from '#root/config/routes.ts';
 import routes from '#root/config/routes.ts';
@@ -29,6 +30,14 @@ function mapRoute(routeConfig: RouteConfig) {
         },
     };
 }
+
+mapboxgl.accessToken = import.meta.env.APP_MAPBOX_TOKEN;
+mapboxgl.setRTLTextPlugin(
+    'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js',
+    // eslint-disable-next-line no-console
+    (err) => { console.error(err); },
+    true,
+);
 
 const router = createBrowserRouter([
     {
