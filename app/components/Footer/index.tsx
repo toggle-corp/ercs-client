@@ -98,13 +98,13 @@ function GlobalFooter(props: Props) {
                     >
                         <Link
                             colorVariant="text-on-dark"
-                            route="cookie"
+                            to="cookie"
                         >
                             Cookie Policy
                         </Link>
                         <Link
                             colorVariant="text-on-dark"
-                            route="termsAndConditions"
+                            to="termsAndConditions"
                         >
                             Terms and Conditions
                         </Link>

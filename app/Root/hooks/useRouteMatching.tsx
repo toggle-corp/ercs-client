@@ -12,16 +12,16 @@ export interface Attrs {
 function useRouteMatching(routeKey: RouteKeys, attrs?: Attrs) {
     const { authenticated } = use(UserContext);
 
-    const route = routes[routeKey];
+    const to = routes[routeKey];
 
-    if (!route) {
+    if (!to) {
         return undefined;
     }
 
     const {
         visibility,
         path,
-    } = route;
+    } = to;
 
     if (visibility === 'is-not-authenticated' && authenticated) {
         return undefined;

@@ -14,14 +14,14 @@ import useRouteMatching, { type Attrs } from '#root/hooks/useRouteMatching';
 import styles from './styles.module.css';
 
 export type Props = Omit<NavLinkProps, 'to'> & ButtonLayoutProps & {
-    route: RouteKeys;
+    to: RouteKeys;
     attrs?: Attrs;
     activeClassName?: string;
 };
 
 function NavLink(props: Props) {
     const {
-        route,
+        to,
         attrs,
         className,
         before,
@@ -36,7 +36,7 @@ function NavLink(props: Props) {
         ...otherProps
     } = props;
 
-    const routeData = useRouteMatching(route, attrs);
+    const routeData = useRouteMatching(to, attrs);
     if (!routeData) {
         return null;
     }

@@ -3,8 +3,6 @@ import { DownloadTwoFillIcon } from '@ifrc-go/icons';
 import {
     Button,
     Container,
-    Description,
-    Heading,
     ListView,
     SelectInput,
     Table,
@@ -23,8 +21,6 @@ import {
     useTeamQuery,
 } from '#generated/types/graphql';
 import useFilterState from '#hooks/useFilterState';
-
-import styles from './styles.module.css';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TEAM_QUERY = gql`
@@ -45,6 +41,9 @@ const TEAM_QUERY = gql`
     }
   }
 `;
+function idSelector<T>(item: { id: T }) {
+    return item.id;
+}
 
 type MemberList = NonNullable<TeamQuery['team']['members']>[number];
 
@@ -65,7 +64,7 @@ function NameEmailCell({
     );
 }
 
-function Team() {
+function Members() {
     const { id } = useParams<{ id: string }>();
 
     const [{ fetching, data }] = useTeamQuery({
@@ -105,69 +104,49 @@ function Team() {
             { sortable: true },
         ),
     ];
-    function idSelector<T>(item: { id: T }) {
-        return item.id;
-    }
 
     return (
         <Page
-            heading="Teams"
-            description="A dedicated team committed to delivering impactful solutions."
-            info={(
-                <ListView withCenteredContents>
-                    <Description>
-                        <i>5 Teams • 85 Members • 81 Active</i>
-                    </Description>
-                </ListView>
+            heading={data?.team.name}
+            description={(
+                <i>
+                    {data?.team.members?.length}
+                    {' '}
+                    Members
+                </i>
             )}
         >
-            <ListView layout="block" className={styles.container}>
-                <ListView
-                    withDarkBackground
-                    withSpaceBetweenContents
-                    withFullWidth
-                    withPadding
-                    className={styles.header}
-                >
-                    <ListView layout="block" spacing="2xs">
-                        <Heading level={4} className={styles.teamName}>
-                            {data?.team.name}
-                        </Heading>
-                        <Description>
-                            <i>123 Members • 5 Regions • 21 Active</i>
-                        </Description>
-                    </ListView>
+            <Container
+                pending={fetching}
+                withPadding
+                headerActions={(
                     <Button name="export" before={<DownloadTwoFillIcon />}>
                         Export
                     </Button>
-                </ListView>
-                <Container
-                    pending={fetching}
-                    withPadding
-                    filters={(
-                        <SelectInput
-                            name="sex"
-                            options={[]}
-                            keySelector={(option) => option}
-                            labelSelector={(option) => option}
-                            value="Temp"
-                            onChange={() => { }}
-                        />
-                    )}
-                >
-                    <SortContext.Provider value={sortState}>
-                        <Table
-                            keySelector={idSelector}
-                            columns={columns}
-                            data={data?.team.members}
-                            filtered={false}
-                            pending={fetching}
-                        />
-                    </SortContext.Provider>
-                </Container>
-            </ListView>
+                )}
+                filters={(
+                    <SelectInput
+                        name="sex"
+                        options={[]}
+                        keySelector={(option) => option}
+                        labelSelector={(option) => option}
+                        value="Temp"
+                        onChange={() => { }}
+                    />
+                )}
+            >
+                <SortContext.Provider value={sortState}>
+                    <Table
+                        keySelector={idSelector}
+                        columns={columns}
+                        data={data?.team.members}
+                        filtered={false}
+                        pending={fetching}
+                    />
+                </SortContext.Provider>
+            </Container>
         </Page>
     );
 }
 
-export default Team;
+export default Members;

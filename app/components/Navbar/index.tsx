@@ -2,40 +2,23 @@ import { use } from 'react';
 import { useNavigate } from 'react-router';
 import {
     Button,
-    DropdownMenu,
     Heading,
     Image,
     ListView,
     NavigationTabList,
     PageContainer,
 } from '@ifrc-go/ui';
-import { gql } from 'urql';
 
-import DropdownMenuItem from '#components/DropdownMenuItem';
 import Link from '#components/Link';
 import NavLink from '#components/NavLink';
 import UserContext from '#contexts/UserContext';
-import { useTeamListQuery } from '#generated/types/graphql';
 import Logo from '#resources/image/logo.png';
 
 import styles from './styles.module.css';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const TEAMS_QUERY = gql`
- query TeamList {
-  teams {
-    results {
-      id
-      name
-    }
-  }
-}
-`;
-
 function Navbar() {
     const { authenticated } = use(UserContext);
     const navigate = useNavigate();
-    const [{ data }] = useTeamListQuery();
 
     const handleLogin = () => {
         navigate('/login');
@@ -50,7 +33,7 @@ function Navbar() {
                     withSpaceBetweenContents
                 >
                     <Link
-                        route="home"
+                        to="home"
                     >
                         <ListView spacing="sm">
                             <Image
@@ -93,57 +76,40 @@ function Navbar() {
                     spacing="2xl"
                 >
                     <NavLink
-                        route="home"
+                        to="home"
                     >
                         Home
                     </NavLink>
                     <NavLink
-                        route="ourWork"
+                        to="ourWork"
                     >
                         Our work
                     </NavLink>
                     <NavLink
-                        route="preparedness"
+                        to="preparedness"
                     >
                         Preparedness
                     </NavLink>
                     <NavLink
-                        route="dataAndReport"
+                        to="dataAndReport"
                     >
                         Data & Report
                     </NavLink>
                     <NavLink
-                        route="capacityAndResources"
+                        to="capacityAndResources"
                     >
                         Capacity & Resources
                     </NavLink>
-                    {authenticated
-                        && (
-                            <DropdownMenu
-                                label="Team"
-                                labelStyleVariant="action"
-                                persistent
-                                labelSpacing="sm"
-                            >
-                                {data?.teams.results.map((info) => (
-                                    <DropdownMenuItem
-                                        route="team"
-                                        attrs={{
-                                            id: info.id,
-                                        }}
-                                        styleVariant="transparent"
-                                        type="link"
-                                        spacing="2xs"
+                    {authenticated && (
+                        <NavLink
+                            to="teamList"
+                        >
+                            Teams
+                        </NavLink>
+                    )}
 
-                                    >
-                                        {info.name}
-                                    </DropdownMenuItem>
-                                ))}
-
-                            </DropdownMenu>
-                        )}
                     <NavLink
-                        route="galleries"
+                        to="galleries"
                     >
                         Galleries
                     </NavLink>

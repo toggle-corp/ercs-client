@@ -61,7 +61,14 @@ const cookie: RouteConfig = {
 const team: RouteConfig = {
     index: true,
     path: '/team/:id',
-    load: () => import('#views/Team'),
+    load: () => import('#views/Members'),
+    visibility: 'is-authenticated',
+};
+
+const teamList: RouteConfig = {
+    index: true,
+    path: '/teams',
+    load: () => import('#views/TeamList'),
     visibility: 'is-authenticated',
 };
 
@@ -82,6 +89,7 @@ const routes = {
     termsAndConditions,
     cookie,
     team,
+    teamList,
     login,
 };
 

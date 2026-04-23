@@ -20,14 +20,14 @@ import styles from './styles.module.css';
 interface InternalLinkProps extends Omit<LinkProps, 'to'> {
     external?: never;
     href?: never;
-    route: RouteKeys;
+    to: RouteKeys;
     attrs?: Attrs
 }
 
 interface ExternalLinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
     external: true;
     href: string | undefined | null;
-    route?: never;
+    to?: never;
     attrs?: never
 }
 
@@ -40,7 +40,7 @@ export type Props = CommonLinkProps & (InternalLinkProps | ExternalLinkProps);
 
 function Link(props: Props) {
     const {
-        route,
+        to,
         attrs,
         className,
         before,
@@ -63,7 +63,7 @@ function Link(props: Props) {
         ...otherProps
     } = props;
 
-    const routeData = useRouteMatching(route as RouteKeys, attrs);
+    const routeData = useRouteMatching(to as RouteKeys, attrs);
     const content = (
         <ButtonLayout
             className={_cs(
@@ -100,6 +100,13 @@ function Link(props: Props) {
     );
 
     if (external) {
+        if (!href) {
+            return (
+                <span className={styles.link}>
+                    {content}
+                </span>
+            );
+        }
         return (
             <a
                 href={href}
