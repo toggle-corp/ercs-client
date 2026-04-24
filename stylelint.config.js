@@ -1,5 +1,6 @@
 import path from 'path';
 
+// eslint-disable-next-line no-undef
 const __filename = new URL(import.meta.url).pathname;
 const __dirname = path.dirname(__filename);
 

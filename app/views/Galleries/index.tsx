@@ -142,6 +142,7 @@ function Galleries() {
 
     useEffect(() => {
         if (data?.galleryAlbums?.results?.length && !activeId) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setActiveId(data?.galleryAlbums.results[0].id);
         }
     }, [data, activeId]);

@@ -40,6 +40,7 @@ const gqlClient = new Client({
 function Root() {
     const [user, setUser] = useState<MeQuery['me'] | undefined>();
     const authenticated = !!user;
+    // eslint-disable-next-line react/jsx-no-constructed-context-values
     const userContext: UserContextInterface = {
         authenticated,
         user,

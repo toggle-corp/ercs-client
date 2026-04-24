@@ -12,6 +12,7 @@ const UserContext = createContext<UserContextInterface>({
     authenticated: false,
     user: undefined,
     setUser: (value: unknown) => {
+        // eslint-disable-next-line no-console
         console.error('setUser called on UserContext without a provider', value);
     },
 });

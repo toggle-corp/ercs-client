@@ -6,7 +6,7 @@ import type { RouteKeys } from '#root/config/routes';
 import routes from '#root/config/routes';
 
 export interface Attrs {
-    [key: string]: string | number | undefined;
+    [key: string]: string | undefined;
 }
 
 function useRouteMatching(routeKey: RouteKeys, attrs?: Attrs) {

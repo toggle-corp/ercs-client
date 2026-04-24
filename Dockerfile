@@ -1,41 +1,41 @@
 FROM node:22-bookworm AS dev
 
 RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends \
-        git bash g++ make \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN corepack enable
+    && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/* \
+    # NOTE: yarn > 1.22.19 breaks yarn-install invoked by pnpm
+    && npm install -g pnpm@10.33.0 yarn@1.22.19 --force \
+    && git config --global --add safe.directory /code
 
 WORKDIR /code
-RUN git config --global --add safe.directory /code
-
-COPY package.json pnpm-lock.yaml /code/
-RUN corepack prepare pnpm@latest --activate
 
 # -------------------------- Nginx - Builder --------------------------------
-FROM dev AS nginx-build
+FROM dev AS web-app-serve-build
 
-RUN pnpm install --frozen-lockfile
+COPY ./package.json ./pnpm-lock.yaml /code/
 
-COPY . .
+RUN pnpm install
 
-ENV APP_TITLE=APP_TITLE_PLACEHOLDER
-ENV APP_GRAPHQL_ENDPOINT=APP_GRAPHQL_ENDPOINT_PLACEHOLDER
+COPY . /code/
+
+# # Build variables (Requires backend pulled)
+ENV APP_TITLE=ercs-eoc
+ENV APP_ENVIRONMENT=production
+ENV APP_GRAPHQL_ENDPOINT=http://localhost:8000
 ENV APP_GRAPHQL_CODEGEN_ENDPOINT=./backend/schema.graphql
+ENV APP_MAPBOX_TOKEN=APP_MAPBOX_TOKEN_PLACEHOLDER
+ENV APP_GO_API=WEB_APP_SERVE_PLACEHOLDER__APP_GO_API_PLACEHOLDER
+ENV APP_GO_URL=WEB_APP_SERVE_PLACEHOLDER__APP_GO_URL_PLACEHOLDER  
 
-RUN pnpm generate:type && pnpm build
+RUN pnpm generate:type && WEB_APP_SERVE_ENABLED=true pnpm build
 
 # ---------------------------------------------------------------------------
-FROM nginx:1 AS nginx-serve
+FROM ghcr.io/toggle-corp/web-app-serve:v0.1.2 AS web-app-serve
 
 LABEL maintainer="Togglecorp Dev"
 LABEL org.opencontainers.image.source="https://github.com/ToogleCorp/ercs-client"
 
-COPY ./nginx-serve/apply-config.sh /docker-entrypoint.d/
-COPY ./nginx-serve/nginx.conf.template /etc/nginx/templates/default.conf.template
-COPY --from=nginx-build /code/build /code/build
-
+# Env for apply-config script
 ENV APPLY_CONFIG__SOURCE_DIRECTORY=/code/build/
-ENV APPLY_CONFIG__DESTINATION_DIRECTORY=/usr/share/nginx/html/
-ENV APPLY_CONFIG__OVERWRITE_DESTINATION=true
+
+COPY --from=web-app-serve-build /code/build "$APPLY_CONFIG__SOURCE_DIRECTORY"

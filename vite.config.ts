@@ -4,8 +4,7 @@ import { execSync } from 'child_process';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import svgr from 'vite-plugin-svgr';
-import tsconfigPaths from 'vite-tsconfig-paths';
-
+import { ValidateEnv as validateEnv } from '@togglecorp/vite-plugin-validate-env';
 /* Get commit hash */
 function getCommitHash(): string {
     if (process.env.APP_COMMIT_HASH) {
@@ -42,10 +41,15 @@ export default defineConfig(({ mode }) => {
                 })
                 : undefined,
             svgr(),
+            validateEnv({
+                configFile: 'env',
+            }),
             react(),
-            tsconfigPaths(),
             babel({ presets: [reactCompilerPreset()] }),
-        ],
+        ],  
+        resolve: {
+            tsconfigPaths: true  // Add this instead
+        },
         css: {
             devSourcemap: isProd,
             modules: {
