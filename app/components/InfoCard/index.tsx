@@ -16,43 +16,48 @@ interface InfoCardProps extends Omit<ContainerProps, 'children'> {
   description: string;
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({
-    icon,
-    title,
-    description,
-    withDarkBackground = true,
-    ...containerProps
-}) => (
-    <Container
-        className={styles.infoCard}
-        withDarkBackground={withDarkBackground}
-        withPadding
-        // eslint-disable-next-line react/jsx-props-no-spreading
-        {...containerProps}
-    >
-        <ListView
-            layout="block"
-            spacing="2xs"
+function InfoCard(
+    props:InfoCardProps,
+) {
+    const {
+        icon,
+        title,
+        description,
+        withDarkBackground = true,
+        ...containerProps
+    } = props;
+    return (
+        <Container
+            className={styles.infoCard}
+            withDarkBackground={withDarkBackground}
+            withPadding
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...containerProps}
         >
-            <InlineLayout
-                before={(
-                    <div className={styles.icon}>
-                        {icon}
-                    </div>
-                )}
+            <ListView
+                layout="block"
                 spacing="2xs"
             >
-                <Heading
-                    level={4}
+                <InlineLayout
+                    before={(
+                        <div className={styles.icon}>
+                            {icon}
+                        </div>
+                    )}
+                    spacing="2xs"
                 >
-                    {title}
-                </Heading>
-            </InlineLayout>
-            <Description>
-                {description}
-            </Description>
-        </ListView>
-    </Container>
-);
+                    <Heading
+                        level={4}
+                    >
+                        {title}
+                    </Heading>
+                </InlineLayout>
+                <Description>
+                    {description}
+                </Description>
+            </ListView>
+        </Container>
+    );
+}
 
 export default InfoCard;

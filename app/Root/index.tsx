@@ -15,6 +15,7 @@ import {
     Provider as UrqlProvider,
 } from 'urql';
 
+import PreloadMessage from '#components/PreloadMessage';
 import UserContext, { type UserContextInterface } from '#contexts/UserContext';
 import type { MeQuery } from '#generated/types/graphql';
 import useAlertContextProviderValue from '#hooks/useAlertContextProviderValue';
@@ -68,7 +69,13 @@ function Root() {
                 <UserContext.Provider value={userContext}>
                     <AlertContext.Provider value={alertContextValue}>
                         <AlertContainer />
-                        <Suspense fallback="loading....">
+                        <Suspense
+                            fallback={(
+                                <PreloadMessage>
+                                    loading...
+                                </PreloadMessage>
+                            )}
+                        >
                             <Outlet />
                         </Suspense>
                     </AlertContext.Provider>

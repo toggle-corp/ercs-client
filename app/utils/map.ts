@@ -5,7 +5,7 @@ import type {
     NavigationControl,
 } from 'mapbox-gl';
 
-import type { CountryDataType } from '#components/ActiveOperation/type';
+import type { CountryDataType } from '#views/Home/ActiveOperation/type';
 
 export const defaultMapStyle = 'mapbox://styles/go-ifrc/ckrfe16ru4c8718phmckdfjh0';
 export const localUnitMapStyle = 'mapbox://styles/go-ifrc/clvvgugzh00x501pc1n00b8cz';
