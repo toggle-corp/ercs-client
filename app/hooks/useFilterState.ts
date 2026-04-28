@@ -73,7 +73,7 @@ function useFilterState<FILTER extends object>(options: {
         ordering = defaultOrdering,
         page = 1,
         pageSize = 10,
-        debounceTime = 200,
+        debounceTime = 300,
     } = options;
 
     const [state, dispatch] = useReducer<FilterState<FILTER>, [FilterActions<FILTER>]>(

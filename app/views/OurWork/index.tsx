@@ -1,7 +1,7 @@
 import {
     AlertLineIcon,
     HeartAddLineIcon,
-    InformationFillIcon,
+    ShieldUserLineIcon,
 } from '@ifrc-go/icons';
 import {
     Container,
@@ -37,7 +37,7 @@ function OurWork() {
 
             />
             <KeyCard
-                icon={<InformationFillIcon />}
+                icon={<ShieldUserLineIcon />}
                 value={18}
                 valueType="number"
                 label="People in Need"

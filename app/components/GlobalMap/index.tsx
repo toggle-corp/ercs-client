@@ -23,7 +23,7 @@ export interface AdminZeroFeatureProperties {
     name_ar: string;
     name_es: string;
     name_fr: string;
-    record_type: any;
+    record_type: string;
 
     // NOTE: we check for undefined iso3 before triggering
     // onClick and onHover

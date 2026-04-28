@@ -1,19 +1,19 @@
 import {
-    AlarmWarningFillIcon,
+    AlarmWarningLineIcon,
     AlertLineIcon,
     DashboardFillIcon,
     HeartAddLineIcon,
-    InformationFillIcon,
+    ShieldUserLineIcon,
 } from '@ifrc-go/icons';
 import {
     Container,
     ListView,
 } from '@ifrc-go/ui';
 
-import ActiveOperation from '#components/ActiveOperation';
 import InfoCard from '#components/InfoCard';
 import KeyCard from '#components/KeyCard';
 import Page from '#components/Page';
+import ActiveOperation from '#views/Home/ActiveOperation';
 
 function Home() {
     const keyFigures = (
@@ -22,7 +22,7 @@ function Home() {
             numPreferredGridColumns={4}
         >
             <KeyCard
-                icon={<AlarmWarningFillIcon />}
+                icon={<AlarmWarningLineIcon />}
                 value={12}
                 valueType="number"
                 size="lg"
@@ -50,7 +50,7 @@ function Home() {
 
             />
             <KeyCard
-                icon={<InformationFillIcon />}
+                icon={<ShieldUserLineIcon />}
                 value={18}
                 valueType="number"
                 label="People in Need"

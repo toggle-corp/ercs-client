@@ -26,6 +26,13 @@ const dataAndReport: RouteConfig = {
     load: () => import('#views/DataAndReport'),
     visibility: 'is-anything',
 };
+
+const reportDetail: RouteConfig = {
+    index: true,
+    path: '/data-and-report/:id',
+    load: () => import('#views/DataAndReport/ReportDetail'),
+    visibility: 'is-anything',
+};
 const capacityAndResources: RouteConfig = {
     index: true,
     path: '/capacity-and-resources',
@@ -61,7 +68,7 @@ const cookie: RouteConfig = {
 const team: RouteConfig = {
     index: true,
     path: '/team/:id',
-    load: () => import('#views/Members'),
+    load: () => import('#views/TeamList/Members'),
     visibility: 'is-authenticated',
 };
 
@@ -91,6 +98,7 @@ const routes = {
     team,
     teamList,
     login,
+    reportDetail,
 };
 
 export type RouteKeys = keyof typeof routes;

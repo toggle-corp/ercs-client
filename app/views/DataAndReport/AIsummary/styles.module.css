@@ -1,0 +1,6 @@
+.aiSummary{
+    background: var(--go-ui-color-primary-red) ;
+    padding-top: var(--go-ui-spacing-4xl) !important;
+    height: 100%;
+    color: var(--go-ui-color-white);
+}

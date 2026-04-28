@@ -115,69 +115,6 @@ export function optionLabelSelector(option: ScaleOption) {
     return option.label;
 }
 
-export const EthiopiaCountryData = {
-    iso: 'ET',
-    iso3: 'ETH',
-    society_url: 'http://www.redcrosseth.org/',
-    region: 0,
-    key_priorities: null,
-    inform_score: null,
-    id: 65,
-    url_ifrc: 'https://www.ifrc.org/national-societies-directory/ethiopian-red-cross-society',
-    record_type: 1,
-    record_type_display: 'Country',
-    bbox: {
-        type: 'Polygon',
-        coordinates: [
-            [
-                [
-                    41.08749389076502,
-                    0.021048236623353,
-                ],
-                [
-                    48.00201415347367,
-                    8.006641317439508,
-                ],
-                [
-                    38.340911859897744,
-                    16.34780593622264,
-                ],
-                [
-                    31.42501830617139,
-                    8.339226238130758,
-                ],
-                [
-                    41.08749389076502,
-                    0.021048236623353,
-                ],
-            ],
-        ],
-    },
-    centroid: {
-        type: 'Point',
-        coordinates: [
-            39.655151361666455,
-            8.559294026448153,
-        ],
-    },
-    independent: true,
-    is_deprecated: false,
-    fdrs: 'DET001',
-    links: [],
-    address_1: 'Ras Desta Damtew Avenue',
-    address_2: 'P.O. Box 195',
-    city_code: 'Addis Ababa',
-    phone: '(251) 115 15 90 74 / 115 51 91 44 / 115 51 91 71',
-    website: 'http://www.redcrosseth.org',
-    emails: [
-        'ercsinfo@redcrosseth.org',
-    ],
-    society_name: 'Ethiopian Red Cross Society',
-    name: 'Ethiopia',
-    overview: null,
-    translation_module_original_language: 'en',
-};
-
 export const appealKeySelector = (option: AppealListItem) => option.id;
 export const appealTypeKeySelector = (option: AppealTypeOption) => option.key;
 export const appealTypeLabelSelector = (option: AppealTypeOption) => option.value;
