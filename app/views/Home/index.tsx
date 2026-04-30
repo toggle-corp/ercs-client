@@ -83,7 +83,6 @@ function Home() {
                     numPreferredGridColumns={3}
                 >
                     <KeyCard
-                        icon={<AlertLineIcon />}
                         value="Emergency Response Dashboard"
                         valueType="text"
                         info=" Real-time overview of all active emergency operations"
@@ -94,7 +93,6 @@ function Home() {
                         viewButton
                     />
                     <KeyCard
-                        icon={<AlertLineIcon />}
                         value="Emergency Response Dashboard"
                         valueType="text"
                         info=" Real-time overview of all active emergency operations"
@@ -105,7 +103,6 @@ function Home() {
                         viewButton
                     />
                     <KeyCard
-                        icon={<AlertLineIcon />}
                         value="Emergency Response Dashboard"
                         valueType="text"
                         info=" Real-time overview of all active emergency operations"
@@ -116,7 +113,6 @@ function Home() {
                         viewButton
                     />
                     <KeyCard
-                        icon={<AlertLineIcon />}
                         value="Emergency Response Dashboard"
                         valueType="text"
                         info=" Real-time overview of all active emergency operations"
@@ -127,7 +123,6 @@ function Home() {
                         viewButton
                     />
                     <KeyCard
-                        icon={<AlertLineIcon />}
                         value="Emergency Response Dashboard"
                         valueType="text"
                         info=" Real-time overview of all active emergency operations"
@@ -138,7 +133,6 @@ function Home() {
                         viewButton
                     />
                     <KeyCard
-                        icon={<AlertLineIcon />}
                         value="Emergency Response Dashboard"
                         valueType="text"
                         info=" Real-time overview of all active emergency operations"

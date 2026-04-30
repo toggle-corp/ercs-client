@@ -104,7 +104,7 @@ function DataAndReport() {
         pageSize: 6,
     });
 
-    const [{ data: reportsData }] = useReportsQuery({
+    const [{ data: reportsData, fetching }] = useReportsQuery({
         variables: {
             thematicAreaId: rawFilter.thematicAreaId,
             // search: rawFilter.search,
@@ -121,6 +121,7 @@ function DataAndReport() {
             description="Explore historical data, research findings and operational reports to support informed decision-making and planning."
         >
             <Container
+                pending={fetching}
                 footerActions={(
                     <Pager
                         activePage={page}
@@ -129,6 +130,8 @@ function DataAndReport() {
                         onActivePageChange={setPage}
                     />
                 )}
+                empty={reportDetails.length === 0}
+
             >
                 <ListView layout="block">
                     <ListView withSpaceBetweenContents>
