@@ -1,7 +1,12 @@
 import {
     Button,
     Container,
+    Description,
+    Heading,
+    Image,
+    InlineLayout,
     ListView,
+    PageContainer,
     PasswordInput,
     TextInput,
 } from '@ifrc-go/ui';
@@ -13,7 +18,10 @@ import {
     useForm,
 } from '@togglecorp/toggle-form';
 
-import Page from '#components/Page';
+import BackGroundImage from '#resources/image/loginbackground.jpg';
+import Logo from '#resources/image/logo.png';
+
+import styles from './styles.module.css';
 
 interface FormFields {
     username?: string;
@@ -58,57 +66,92 @@ function Login() {
     );
 
     return (
-        <Page
-            heading="Login"
-            description="If you are staff, member or volunteer of the Ethiopia Red Cross login with you email and password."
-        >
-            <form onSubmit={handleFormSubmit}>
-                <Container
-                    spacing="lg"
-                    withCenteredContent
-                    withPadding
-                >
-                    <ListView
-                        layout="block"
-                        spacing="xl"
+        <PageContainer>
+            <ListView
+                withSidebar
+                layout="grid"
+            >
+                <Image
+                    src={BackGroundImage}
+                    className={styles.image}
+                />
+                <form onSubmit={handleFormSubmit}>
+                    <Container
+                        spacing="lg"
+                        withCenteredContent
+                        withPadding
+                        className={styles.container}
                     >
-                        <ListView
-                            layout="block"
-                            spacing="lg"
+                        <InlineLayout
+                            contentAlignment="center"
+                            contentJustification="center"
+                            className={styles.login}
                         >
-                            <TextInput
-                                name="username"
-                                label="Username"
-                                value={formValue.username}
-                                onChange={setFieldValue}
-                                error={fieldError?.username}
-                                withAsterisk
-                                autoFocus
-                            />
-                            <PasswordInput
-                                name="password"
-                                label="Password"
-                                value={formValue.password}
-                                onChange={setFieldValue}
-                                error={fieldError?.password}
-                                withAsterisk
-                            />
-                        </ListView>
-                        <ListView
-                            layout="block"
-                            withCenteredContents
-                        >
-                            <Button
-                                name={undefined}
-                                type="submit"
+                            <ListView
+                                layout="block"
+                                spacing="md"
                             >
-                                Login
-                            </Button>
-                        </ListView>
-                    </ListView>
-                </Container>
-            </form>
-        </Page>
+                                <ListView>
+                                    <Image
+                                        withoutBackground
+                                        src={Logo}
+                                        alt="logo"
+                                        className={styles.logo}
+                                    />
+                                    <ListView
+                                        layout="block"
+                                        spacing="2xs"
+                                    >
+                                        <Heading>
+                                            ERCS EOC
+                                        </Heading>
+                                        <Description withLightText textSize="sm">
+                                            Login with
+                                            your ERCS email and password.
+                                        </Description>
+                                    </ListView>
+                                </ListView>
+                                <ListView
+                                    layout="block"
+                                    spacing="lg"
+                                >
+                                    <TextInput
+                                        name="username"
+                                        label="Email/Username"
+                                        value={formValue.username}
+                                        onChange={setFieldValue}
+                                        error={fieldError?.username}
+                                        withAsterisk
+                                        autoFocus
+                                    />
+                                    <PasswordInput
+                                        name="password"
+                                        label="Password"
+                                        value={formValue.password}
+                                        onChange={setFieldValue}
+                                        error={fieldError?.password}
+                                        withAsterisk
+                                    />
+                                </ListView>
+                                <span className={styles.separator} />
+                                <ListView
+                                    layout="block"
+                                    withCenteredContents
+                                >
+                                    <Button
+                                        name={undefined}
+                                        type="submit"
+                                        styleVariant="filled"
+                                    >
+                                        Login
+                                    </Button>
+                                </ListView>
+                            </ListView>
+                        </InlineLayout>
+                    </Container>
+                </form>
+            </ListView>
+        </PageContainer>
     );
 }
 

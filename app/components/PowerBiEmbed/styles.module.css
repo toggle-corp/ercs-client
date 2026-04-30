@@ -1,0 +1,7 @@
+.embed {
+    aspect-ratio: 5 / 3;
+
+    iframe {
+        border: none;
+    }
+}

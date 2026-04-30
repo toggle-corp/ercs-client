@@ -50,36 +50,32 @@ function KeyCard(props : KeyCardProps) {
                 spacing="xs"
             >
                 {(isDefined(icon) || isDefined(pillText)) && (
-                    <InlineLayout
-                        after={(pillText
-                            && (
-                                <ListView
-                                    withDarkBackground
-                                    withPadding
-                                    spacing="3xs"
-                                    className={styles.pill}
-                                >
-                                    <Description textSize="md">
-                                        {pillText}
-                                    </Description>
-                                </ListView>
-                            )
+                    <ListView withSpaceBetweenContents>
+                        {icon && (
+                            <ListView
+                                withCenteredContents
+                                className={_cs(
+                                    styles.icon,
+                                    withIconBackground && styles.iconWithBackground,
+                                )}
+                            >
+                                {icon}
+                            </ListView>
                         )}
-                        contentAlignment="start"
-                        before={(icon
-                            && (
-                                <ListView
-                                    withCenteredContents
-                                    className={_cs(
-                                        styles.icon,
-                                        withIconBackground && styles.iconWithBackground,
-                                    )}
-                                >
-                                    {icon}
-                                </ListView>
-                            )
+                        {pillText && (
+                            <ListView
+                                withDarkBackground
+                                withPadding
+                                spacing="3xs"
+                                className={styles.pill}
+                            >
+                                <Description textSize="md">
+                                    {pillText}
+                                </Description>
+                            </ListView>
                         )}
-                    />
+
+                    </ListView>
                 )}
                 <ListView
                     layout="block"
