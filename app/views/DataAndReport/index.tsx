@@ -17,6 +17,7 @@ import { gql } from 'urql';
 
 import Link from '#components/Link';
 import Page from '#components/Page';
+import RegionSelectInput from '#components/RegionSelectInput';
 import {
     useReportsQuery,
     useThematicAreasQuery,
@@ -117,51 +118,62 @@ function DataAndReport() {
 
     return (
         <Page
+            actions={(
+                <RegionSelectInput
+                    name="regin"
+                    value={undefined}
+                    onChange={() => {}}
+                />
+            )}
             heading="Dataset Overview"
             description="Explore historical data, research findings and operational reports to support informed decision-making and planning."
         >
-            <Container
-                pending={fetching}
-                footerActions={(
-                    <Pager
-                        activePage={page}
-                        itemsCount={reportsData?.reports?.totalCount ?? 0}
-                        maxItemsPerPage={limit}
-                        onActivePageChange={setPage}
-                    />
-                )}
-                empty={reportDetails.length === 0}
-
+            <ListView
+                layout="block"
             >
-                <ListView layout="block">
-                    <ListView withSpaceBetweenContents>
-                        <SelectInput
-                            placeholder="Thematic Areas"
-                            name="thematicAreaId"
-                            value={rawFilter.thematicAreaId}
-                            onChange={setFilterField}
-                            keySelector={keySelector}
-                            labelSelector={labelSelector}
-                            options={thematicAreaOptions}
+                <ListView
+                    withSpaceBetweenContents
+                >
+                    <SelectInput
+                        placeholder="Thematic Areas"
+                        name="thematicAreaId"
+                        value={rawFilter.thematicAreaId}
+                        onChange={setFilterField}
+                        keySelector={keySelector}
+                        labelSelector={labelSelector}
+                        options={thematicAreaOptions}
+                    />
+                    <TextInput
+                        name="searchText"
+                        placeholder="Search"
+                        value={rawFilter.searchText}
+                        onChange={setFilterField}
+                        icons={<SearchLineIcon />}
+                    />
+                </ListView>
+                <Description
+                    withLightText
+                >
+                    Showing all
+                    {' '}
+                    <strong>{reportsData?.reports.totalCount}</strong>
+                    {' '}
+                    Data & Reports
+                </Description>
+                <Container
+                    withLargeBreakpointInHeader
+                    pending={fetching}
+                    footerActions={(
+                        <Pager
+                            activePage={page}
+                            itemsCount={reportsData?.reports?.totalCount ?? 0}
+                            maxItemsPerPage={limit}
+                            onActivePageChange={setPage}
                         />
-                        <TextInput
-                            name="searchText"
-                            placeholder="Search"
-                            value={rawFilter.searchText}
-                            onChange={setFilterField}
-                            icons={<SearchLineIcon />}
-                        />
-                    </ListView>
-                    <Description
-                        withLightText
-                    >
-                        Showing all
-                        {' '}
-                        <strong>{reportsData?.reports.totalCount}</strong>
-                        {' '}
-                        Data & Reports
+                    )}
+                    empty={reportDetails.length === 0}
+                >
 
-                    </Description>
                     {reportDetails.map((report) => (
                         <Link
                             to="reportDetail"
@@ -206,8 +218,8 @@ function DataAndReport() {
                             </InlineLayout>
                         </Link>
                     ))}
-                </ListView>
-            </Container>
+                </Container>
+            </ListView>
         </Page>
     );
 }

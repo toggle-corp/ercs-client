@@ -37,7 +37,7 @@ const TEAM_MEMBERS_QUERY = gql`
     $teamId: ID!
     $regionId: ID
   ) {
-    team(pk: $teamId) {
+    team(id: $teamId) {
       id
       name
       description

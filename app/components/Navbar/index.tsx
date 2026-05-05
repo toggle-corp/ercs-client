@@ -39,6 +39,7 @@ function Navbar() {
                             <Image
                                 src={Logo}
                                 className={styles.icon}
+                                withoutBackground
                             />
                             <Heading
                                 level={4}
@@ -82,11 +83,13 @@ function Navbar() {
                     </NavLink>
                     <NavLink
                         to="ourWork"
+                        navigateTo="emergencyResponse"
                     >
                         Our work
                     </NavLink>
                     <NavLink
                         to="preparedness"
+                        navigateTo="emergencyAlert"
                     >
                         Preparedness
                     </NavLink>
@@ -101,18 +104,20 @@ function Navbar() {
                         Capacity & Resources
                     </NavLink>
                     {authenticated && (
-                        <NavLink
-                            to="teamList"
-                        >
-                            Teams
-                        </NavLink>
+                        <>
+                            <NavLink
+                                to="teamList"
+                            >
+                                Teams
+                            </NavLink>
+                            <NavLink
+                                to="galleries"
+                            >
+                                Galleries
+                            </NavLink>
+                        </>
                     )}
 
-                    <NavLink
-                        to="galleries"
-                    >
-                        Galleries
-                    </NavLink>
                 </NavigationTabList>
             </PageContainer>
         </nav>

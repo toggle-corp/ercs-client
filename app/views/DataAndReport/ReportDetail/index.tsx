@@ -18,8 +18,8 @@ import styles from './styles.module.css';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const REPORT_QUERY = gql`
-  query Report($pk: ID!) {
-    report(pk: $pk) {
+  query Report($id: ID!) {
+    report(id: $id) {
         contentType
         description
         disasterType
@@ -42,7 +42,7 @@ function ReportDetail() {
     const { id } = useParams<{ id: string }>();
 
     const [{ fetching, data }] = useReportQuery({
-        variables: { pk: id! },
+        variables: { id: id! },
         pause: !id,
     });
 

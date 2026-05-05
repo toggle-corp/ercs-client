@@ -5,6 +5,7 @@ export interface RouteConfig {
     path?: string;
     load: () => Promise<{ default: () => React.JSX.Element | null }>;
     visibility: Visibility;
+    children?: RouteConfig[];
 }
 
 const home: RouteConfig = {
@@ -19,7 +20,30 @@ const preparedness: RouteConfig = {
     path: '/preparedness',
     load: () => import('#views/Preparedness'),
     visibility: 'is-anything',
+    children: [
+        {
+            path: 'emergency-alert',
+            load: () => import('#views/Preparedness/EmergencyAlert'),
+            visibility: 'is-anything',
+        },
+        {
+            path: 'ercs-disaster-response',
+            load: () => import('#views/Preparedness/ErcsDisasterResponse'),
+            visibility: 'is-anything',
+        },
+        {
+            path: 'pmer',
+            load: () => import('#views/Preparedness/ErcsDisasterResponse'),
+            visibility: 'is-anything',
+        },
+        {
+            path: 'risk-analysis',
+            load: () => import('#views/Preparedness/ErcsDisasterResponse'),
+            visibility: 'is-anything',
+        },
+    ],
 };
+
 const dataAndReport: RouteConfig = {
     index: true,
     path: '/data-and-report',
@@ -36,14 +60,33 @@ const reportDetail: RouteConfig = {
 const capacityAndResources: RouteConfig = {
     index: true,
     path: '/capacity-and-resources',
-    load: () => import('#views/Home'),
+    load: () => import('#views/CapacityAndResources'),
     visibility: 'is-anything',
 };
+const capacityAndResourcesDetails: RouteConfig = {
+    index: true,
+    path: '/capacity-and-resources/:id',
+    load: () => import('#views/CapacityAndResources/CapacityAndResourcesDetails'),
+    visibility: 'is-anything',
+};
+
 const ourWork: RouteConfig = {
     index: true,
     path: '/our-work',
     load: () => import('#views/OurWork'),
     visibility: 'is-anything',
+    children: [
+        {
+            path: 'emergency-response',
+            load: () => import('#views/OurWork/EmergencyResponse'),
+            visibility: 'is-anything',
+        },
+        {
+            path: 'project-mapping',
+            load: () => import('#views/OurWork/ProjectMapping'),
+            visibility: 'is-anything',
+        },
+    ],
 };
 const galleries: RouteConfig = {
     index: true,
@@ -86,6 +129,15 @@ const login: RouteConfig = {
     visibility: 'is-not-authenticated',
 };
 
+function child(route: RouteConfig, path: string): RouteConfig {
+    const found = route.children?.find((c) => c.path === path);
+    if (!found) throw new Error(`Child route "${path}" not found in "${route.path}"`);
+    return {
+        ...found,
+        path: `${route.path}/${path}`,
+    };
+}
+
 const routes = {
     home,
     ourWork,
@@ -99,7 +151,16 @@ const routes = {
     teamList,
     login,
     reportDetail,
-};
+    capacityAndResourcesDetails,
+    // child routes
+    emergencyAlert: child(preparedness, 'emergency-alert'),
+    disasterResponse: child(preparedness, 'ercs-disaster-response'),
+    pmer: child(preparedness, 'pmer'),
+    riskAnalysis: child(preparedness, 'risk-analysis'),
+    emergencyResponse: child(ourWork, 'emergency-response'),
+    projectMapping: child(ourWork, 'project-mapping'),
+
+} satisfies Record<string, RouteConfig>;
 
 export type RouteKeys = keyof typeof routes;
 

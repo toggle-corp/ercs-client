@@ -1,6 +1,7 @@
 import {
     NavLink as RouterNavLink,
     type NavLinkProps,
+    useNavigate,
 } from 'react-router';
 import {
     ButtonLayout,
@@ -15,6 +16,7 @@ import styles from './styles.module.css';
 
 export type Props = Omit<NavLinkProps, 'to'> & ButtonLayoutProps & {
     to: RouteKeys;
+    navigateTo?: RouteKeys;
     attrs?: Attrs;
     activeClassName?: string;
 };
@@ -22,6 +24,7 @@ export type Props = Omit<NavLinkProps, 'to'> & ButtonLayoutProps & {
 function NavLink(props: Props) {
     const {
         to,
+        navigateTo,
         attrs,
         className,
         before,
@@ -33,19 +36,29 @@ function NavLink(props: Props) {
         withoutPadding,
         spacing,
         activeClassName,
+        onClick,
         ...otherProps
     } = props;
-
+    const navigate = useNavigate();
     const routeData = useRouteMatching(to, attrs);
-    if (!routeData) {
-        return null;
-    }
+    const navigateRouteData = useRouteMatching(navigateTo ?? to, attrs);
+
+    if (!routeData || !navigateRouteData) return null;
+
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (navigateTo) {
+            e.preventDefault();
+            navigate(navigateRouteData.to);
+        }
+        onClick?.(e);
+    };
 
     return (
         <RouterNavLink
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...otherProps}
             to={routeData.to}
+            onClick={handleClick}
             className={({ isActive }) => _cs(
                 styles.smartNavLink,
                 isActive && styles.active,

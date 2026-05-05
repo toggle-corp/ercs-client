@@ -1,5 +1,6 @@
 import {
     createBrowserRouter,
+    type RouteObject,
     RouterProvider,
 } from 'react-router';
 import mapboxgl from 'mapbox-gl';
@@ -20,14 +21,25 @@ const guestRoutes = Object.values(routes).filter(
     ({ visibility }) => visibility === 'is-not-authenticated',
 );
 
-function mapRoute(routeConfig: RouteConfig) {
+function mapRoute(routeConfig: RouteConfig): RouteObject {
+    // Only truly index routes: no path, index: true
+    if (routeConfig.index && !routeConfig.path) {
+        return {
+            index: true,
+            lazy: async () => {
+                const { default: Component } = await routeConfig.load();
+                return { Component };
+            },
+        };
+    }
+
     return {
-        index: routeConfig.index,
         path: routeConfig.path,
         lazy: async () => {
             const { default: Component } = await routeConfig.load();
             return { Component };
         },
+        children: routeConfig.children?.map(mapRoute),
     };
 }
 
