@@ -1,31 +1,44 @@
 import { AlertLineIcon } from '@ifrc-go/icons';
-import { ListView } from '@ifrc-go/ui';
+import {
+    Container,
+    ListView,
+} from '@ifrc-go/ui';
 
 import InfoCard from '#components/InfoCard';
 import PowerBIEmbed from '#components/PowerBiEmbed';
-
-const powerBIReports = [
-    {
-        id: 1,
-        embedUrl: 'https://app.powerbi.com/view?r=eyJrIjoiZGNlNjQxMTgtN2EzZS00NmE2LWExZTMtOTY3NTRmYjllYjczIiwidCI6ImY2NmI3ZDQ2LTA0OTktNDM1Mi1iOTc3LTIwNWJjOTgzNzI2MCIsImMiOjh9&cacheUpdate=1777448420443',
-    },
-];
+import { useExternalDashboardsQuery } from '#generated/types/graphql';
 
 function EmergencyAlert() {
+    //  Todo:Region filter
+    const [{ data: emergencyAlert, fetching }] = useExternalDashboardsQuery({
+        variables: {
+            page: '50',
+            isActive: true,
+        },
+
+    });
     return (
-        <ListView layout="block">
-            <InfoCard
-                icon={<AlertLineIcon />}
-                title="Alerts Dashboard"
-                description="Real-time emergency alerts and early warning system monitoring across regions"
-            />
-            {powerBIReports.map((report) => (
-                <PowerBIEmbed
-                    key={report.id}
-                    embedUrl={report.embedUrl}
+        <Container
+            pending={fetching}
+            empty={emergencyAlert?.externalDashboards.results.length === 0}
+        >
+            <ListView
+                layout="block"
+                spacing="2xl"
+            >
+                <InfoCard
+                    icon={<AlertLineIcon />}
+                    title="Alerts Dashboard"
+                    description="Real-time emergency alerts and early warning system monitoring across regions"
                 />
-            ))}
-        </ListView>
+                {emergencyAlert?.externalDashboards.results.map((report) => (
+                    <PowerBIEmbed
+                        key={report.id}
+                        embedUrl={report.url}
+                    />
+                ))}
+            </ListView>
+        </Container>
     );
 }
 export default EmergencyAlert;

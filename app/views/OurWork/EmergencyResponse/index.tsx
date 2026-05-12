@@ -42,7 +42,7 @@ const ExternalDashboards_QUERY = gql`
 
 function EmergencyResponse() {
     //  Todo:Region filter
-    const [{ data: emergencyAlert, fetching }] = useExternalDashboardsQuery({
+    const [{ data: emergencyResponse, fetching }] = useExternalDashboardsQuery({
         variables: {
             page: '70',
             isActive: true,
@@ -52,7 +52,7 @@ function EmergencyResponse() {
     return (
         <Container
             pending={fetching}
-            empty={emergencyAlert?.externalDashboards.results.length === 0}
+            empty={emergencyResponse?.externalDashboards.results.length === 0}
         >
             <ListView
                 layout="block"
@@ -63,7 +63,7 @@ function EmergencyResponse() {
                     title="Emergency Response Overview Dashboard"
                     description="Real-time emergency alerts and early warning system monitoring across regions"
                 />
-                {emergencyAlert?.externalDashboards.results.map((report) => (
+                {emergencyResponse?.externalDashboards.results.map((report) => (
                     <PowerBIEmbed
                         key={report.id}
                         embedUrl={report.url}

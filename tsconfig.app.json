@@ -6,7 +6,7 @@
       "#generated/*": ["./generated/*"],
       "#views/*": ["app/views/*"],
       "#utils/*": ["app/utils/*"],
-      "#configs/*": ["app/configs/*"],
+      "#config": ["./app/config"],
       "#contexts/*": ["app/contexts/*"],
       "#components/*": ["app/components/*"],
       "#hooks/*": ["app/hooks/*"],

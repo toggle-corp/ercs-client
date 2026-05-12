@@ -5,10 +5,11 @@ import type {
     NavigationControl,
 } from 'mapbox-gl';
 
-import type { CountryDataType } from '#views/Home/ActiveOperation/type';
+import type { GoApiResponse } from './restRequest';
 
 export const defaultMapStyle = 'mapbox://styles/go-ifrc/ckrfe16ru4c8718phmckdfjh0';
 export const localUnitMapStyle = 'mapbox://styles/go-ifrc/clvvgugzh00x501pc1n00b8cz';
+type CountryResponse = GoApiResponse<'/api/v2/country/{id}/'>
 
 type NavControlOptions = NonNullable<ConstructorParameters<typeof NavigationControl>[0]>;
 export const defaultNavControlOptions: NavControlOptions = {
@@ -32,7 +33,7 @@ export const defaultMapOptions: Omit<mapboxgl.MapboxOptions, 'style' | 'containe
     // interactive: false,
 };
 
-export function getCountryListBoundingBox(countryList:CountryDataType[]) {
+export function getCountryListBoundingBox(countryList:CountryResponse[]) {
     if (countryList.length < 1) {
         return undefined;
     }

@@ -1,4 +1,8 @@
 import { useParams } from 'react-router';
+import {
+    Container,
+    ListView,
+} from '@ifrc-go/ui';
 import { gql } from 'urql';
 
 import Page from '#components/Page';
@@ -14,12 +18,11 @@ const CAPACITY_AND_RESOURCES_DETAIL_QUERY = gql`
             title
             id
             description
-            iframeUrls {
-                dashboard {
-                    url
-                    title
-                    description
-                }
+            dashboards {
+                url
+                id
+                title
+                description
             }
         }
     }
@@ -28,7 +31,7 @@ const CAPACITY_AND_RESOURCES_DETAIL_QUERY = gql`
 export default function CapacityAndResourcesDetails() {
     const { id } = useParams<{ id: string }>();
 
-    const [{ data }] = useCapacityAndResourceQuery({
+    const [{ data, fetching: pending }] = useCapacityAndResourceQuery({
         variables: { id: id! },
         pause: !id,
     });
@@ -40,12 +43,21 @@ export default function CapacityAndResourcesDetails() {
             heading={resourceData?.title}
             description={resourceData?.description}
         >
-            {resourceData?.iframeUrls.map((items) => (
-                <PowerBIEmbed
-                    key={resourceData.id}
-                    embedUrl={items.dashboard.url ?? ''}
-                />
-            ))}
+            <Container
+                pending={pending}
+            >
+                <ListView
+                    layout="block"
+                >
+                    {resourceData?.dashboards && resourceData?.dashboards.map((items) => (
+                        <PowerBIEmbed
+                            key={items.id}
+                            embedUrl={items.url ?? ''}
+                        />
+                    ))}
+
+                </ListView>
+            </Container>
         </Page>
     );
 }

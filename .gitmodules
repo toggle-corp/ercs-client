@@ -1,3 +1,9 @@
 [submodule "backend"]
 	path = backend
 	url = https://github.com/toggle-corp/ercs-backend.git
+[submodule "go-risk-module-api"]
+	path = go-risk-module-api
+	url = git@github.com:IFRCGo/go-risk-module-api.git
+[submodule "go-api"]
+	path = go-api
+	url = https://github.com/IFRCGo/go-api.git

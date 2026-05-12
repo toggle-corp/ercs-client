@@ -5,6 +5,7 @@ import {
 } from 'react-router';
 import mapboxgl from 'mapbox-gl';
 
+import { mapboxToken } from '#config';
 import type { RouteConfig } from '#root/config/routes.ts';
 import routes from '#root/config/routes.ts';
 import PageError from '#views/PageError/index.tsx';
@@ -43,7 +44,7 @@ function mapRoute(routeConfig: RouteConfig): RouteObject {
     };
 }
 
-mapboxgl.accessToken = import.meta.env.APP_MAPBOX_TOKEN ?? '';
+mapboxgl.accessToken = mapboxToken ?? '';
 mapboxgl.setRTLTextPlugin(
     'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js',
     // eslint-disable-next-line no-console

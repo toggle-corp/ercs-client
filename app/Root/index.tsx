@@ -16,18 +16,22 @@ import {
 } from 'urql';
 
 import PreloadMessage from '#components/PreloadMessage';
+import {
+    api,
+    environment,
+} from '#config';
 import UserContext, { type UserContextInterface } from '#contexts/UserContext';
 import type { MeQuery } from '#generated/types/graphql';
 import useAlertContextProviderValue from '#hooks/useAlertContextProviderValue';
 import {
-    processError,
-    processOptions,
-    processResponse,
-    processUrls,
-} from '#utils/requestHelper';
+    processGoError,
+    processGoOptions,
+    processGoResponse,
+    processGoUrls,
+} from '#utils/restRequest/go';
 
-const COOKIE_NAME = `ERCS-${import.meta.env.APP_ENVIRONMENT}-CSRFTOKEN`;
-const GRAPHQL_ENDPOINT = `${import.meta.env.APP_GRAPHQL_ENDPOINT}/graphql/`;
+const COOKIE_NAME = `ERCS-${environment}-CSRFTOKEN`;
+const GRAPHQL_ENDPOINT = `${api}/graphql/`;
 
 const cookies = new Cookies();
 const gqlClient = new Client({
@@ -56,10 +60,10 @@ function Root() {
     }), [authenticated, user]);
 
     const requestContextValue = useMemo(() => ({
-        transformUrl: processUrls,
-        transformOptions: processOptions,
-        transformResponse: processResponse,
-        transformError: processError,
+        transformUrl: processGoUrls,
+        transformOptions: processGoOptions,
+        transformResponse: processGoResponse,
+        transformError: processGoError,
     }), []);
     const alertContextValue = useAlertContextProviderValue();
 

@@ -3,6 +3,7 @@ import type {
     CirclePaint,
 } from 'mapbox-gl';
 
+import type { AdminZeroFeatureProperties } from '#components/GlobalMap';
 import {
     COLOR_BLACK,
     COLOR_BLUE,
@@ -10,11 +11,10 @@ import {
     COLOR_RED,
     COLOR_YELLOW,
 } from '#utils/constants';
+import type { GoApiResponse } from '#utils/restRequest';
 
-import type {
-    AppealListItem,
-    AppealTypeOption,
-} from './type';
+type GlobalEnumsResponse = GoApiResponse<'/api/v2/global-enums/'>;
+type AppealTypeOption = NonNullable<GlobalEnumsResponse['api_appeal_type']>[number];
 
 export const COLOR_EMERGENCY_APPEAL = COLOR_RED;
 export const COLOR_DREF = COLOR_YELLOW;
@@ -115,6 +115,22 @@ export function optionLabelSelector(option: ScaleOption) {
     return option.label;
 }
 
-export const appealKeySelector = (option: AppealListItem) => option.id;
 export const appealTypeKeySelector = (option: AppealTypeOption) => option.key;
 export const appealTypeLabelSelector = (option: AppealTypeOption) => option.value;
+
+export interface ClickedPoint {
+    featureProperties: AdminZeroFeatureProperties;
+    lngLat: mapboxgl.LngLatLike;
+}
+
+export type DisasterTypeItem = {
+    id: number;
+    name: string | null | undefined;
+}
+
+export function keySelector(type: DisasterTypeItem) {
+    return type.id;
+}
+export function labelSelector(type: DisasterTypeItem) {
+    return type.name ?? '?';
+}

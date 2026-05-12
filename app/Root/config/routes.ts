@@ -27,18 +27,18 @@ const preparedness: RouteConfig = {
             visibility: 'is-anything',
         },
         {
-            path: 'ercs-disaster-response',
-            load: () => import('#views/Preparedness/ErcsDisasterResponse'),
+            path: 'disaster-response',
+            load: () => import('#views/Preparedness/DisasterResponse'),
             visibility: 'is-anything',
         },
         {
             path: 'pmer',
-            load: () => import('#views/Preparedness/ErcsDisasterResponse'),
+            load: () => import('#views/Preparedness/DisasterResponse'),
             visibility: 'is-anything',
         },
         {
             path: 'risk-analysis',
-            load: () => import('#views/Preparedness/ErcsDisasterResponse'),
+            load: () => import('#views/Preparedness/RiskAnalysis'),
             visibility: 'is-anything',
         },
     ],
@@ -154,7 +154,7 @@ const routes = {
     capacityAndResourcesDetails,
     // child routes
     emergencyAlert: child(preparedness, 'emergency-alert'),
-    disasterResponse: child(preparedness, 'ercs-disaster-response'),
+    disasterResponse: child(preparedness, 'disaster-response'),
     pmer: child(preparedness, 'pmer'),
     riskAnalysis: child(preparedness, 'risk-analysis'),
     emergencyResponse: child(ourWork, 'emergency-response'),

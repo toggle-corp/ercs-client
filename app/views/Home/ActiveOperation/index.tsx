@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import {
+    use,
+    useState,
+} from 'react';
 import {
     Button,
     Container,
@@ -33,19 +36,26 @@ import {
     MapLayer,
     MapSource,
 } from '@togglecorp/re-map';
-import { useRequest } from '@togglecorp/toggle-request';
+import type { LngLatBoundsLike } from 'mapbox-gl';
 
 import GlobalMap, { type AdminZeroFeatureProperties } from '#components/GlobalMap';
 import GoMapContainer from '#components/GoMapContainer';
 import Link from '#components/Link';
 import MapPopup from '#components/MapPopup';
+import { goUrl } from '#config';
+import CountryContext from '#contexts/CountryContext';
 import useFilterState from '#hooks/useFilterState';
 import useInputState from '#hooks/useInputState';
 import {
     DEFAULT_MAP_PADDING,
     DURATION_MAP_ZOOM,
 } from '#utils/constants';
-import { getCountryListBoundingBox } from '#utils/map';
+import { getGeoJsonBounds } from '#utils/geo';
+import {
+    type GoApiResponse,
+    type GoApiUrlQuery,
+    useRequest,
+} from '#utils/restRequest';
 import {
     createAppealCodeColumn,
     createBudgetColumn,
@@ -53,33 +63,37 @@ import {
     createEventColumn,
 } from '#utils/tableHelpers';
 
-import type {
-    AppealListItem,
-    AppealResponse,
-    AppealTypeOption,
-    ClickedPoint,
-    CountryDataTypeResponse,
-    EmergencyTypeListResponse,
-} from './type';
 import {
     APPEAL_TYPE_DREF,
     APPEAL_TYPE_EAP,
     APPEAL_TYPE_EMERGENCY,
     APPEAL_TYPE_MULTIPLE,
-    appealKeySelector,
     appealTypeKeySelector,
     appealTypeLabelSelector,
     basePointLayerOptions,
+    type ClickedPoint,
     COLOR_DREF,
     COLOR_EAP,
     COLOR_EMERGENCY_APPEAL,
     COLOR_MULTIPLE_TYPES,
+    type DisasterTypeItem,
+    keySelector,
+    labelSelector,
     optionKeySelector,
     optionLabelSelector,
     outerCircleLayerOptionsForFinancialRequirements,
     outerCircleLayerOptionsForPeopleTargeted,
     type ScaleOption,
 } from './utils';
+
+type GlobalEnumsResponse = GoApiResponse<'/api/v2/global-enums/'>;
+type AppealTypeOption = NonNullable<GlobalEnumsResponse['api_appeal_type']>[number];
+
+type AppealQueryParams = GoApiUrlQuery<'/api/v2/appeal/'>;
+type AppealResponse = GoApiResponse<'/api/v2/appeal/'>;
+type AppealListItem = NonNullable<AppealResponse['results']>[number];
+
+const appealKeySelector = (option: AppealListItem) => option.id;
 
 const sourceOptions: mapboxgl.GeoJSONSourceRaw = {
     type: 'geojson',
@@ -106,11 +120,8 @@ const appealTypeOptions : AppealTypeOption[] = [
 
 const now = new Date().toISOString();
 
-const IfrcGoUrl = import.meta.env.APP_GO_URL;
-
-const countryId = 65; // ethiopia
-
 function ActiveOperation() {
+    const { countryResponse: countryData, countryId } = use(CountryContext);
     const [scaleBy, setScaleBy] = useInputState<ScaleOption['value']>('peopleTargeted');
     const [presentationMode, setPresentationMode] = useState(false);
     const {
@@ -136,16 +147,8 @@ function ActiveOperation() {
     });
 
     const isFiltered = hasSomeDefinedValue(rawFilter);
-    const { response: countryData } = useRequest<CountryDataTypeResponse, unknown, unknown>(
-        {
-            url: '/api/v2/country/',
-            method: 'GET',
-            query: { id: countryId },
-            pathVariables: {},
-        },
-    );
 
-    const queryParams = {
+    const queryParams: AppealQueryParams = {
         atype: filter.appeal,
         dtype: filter.displacement,
         district: hasSomeDefinedValue(filter.district) ? filter.district : undefined,
@@ -155,33 +158,32 @@ function ActiveOperation() {
         limit,
         offset,
         region: undefined,
-        country: countryId,
+        country: [countryId],
     };
     const [
         clickedPoint,
         setClickedPoint,
     ] = useState<ClickedPoint| undefined>();
 
-    const { response, pending, error } = useRequest<AppealResponse, unknown, unknown>(
-        {
-            url: '/api/v2/appeal/',
-            method: 'GET',
-            query: queryParams,
-            skip: isNotDefined(countryData),
-            pathVariables: {},
-        },
-    );
+    const {
+        pending: appealsPending,
+        response: appealsResponse,
+        error: appealsResponseError,
+    } = useRequest({
+        url: '/api/v2/appeal/',
+        preserveResponse: true,
+        query: queryParams,
+    });
 
-    const { response: disasterResponse } = useRequest<EmergencyTypeListResponse, unknown, unknown>(
+    const { response: disasterResponse } = useRequest(
         {
             url: '/api/v2/disaster_type/',
             method: 'GET',
-            pathVariables: {},
         },
     );
 
     const countryGroupedAppeal = listToGroupList(
-        response?.results ?? [],
+        appealsResponse?.results ?? [],
         (appeal) => appeal.country.iso3 ?? '<no-key>',
     );
 
@@ -217,15 +219,15 @@ function ActiveOperation() {
             },
         );
 
-        const iso3 = countryData?.results[0].iso3;
+        const iso3 = countryData?.iso3;
         const operation = iso3 ? countryToOperationTypeMap[iso3] : undefined;
 
         return {
             type: 'FeatureCollection' as const,
-            features: (countryData?.results[0] ? [countryData.results[0]] : [])
+            features: (countryData ? [countryData] : [])
                 ?.map((country) => {
                     if (
-                        (!country.independent && isNotDefined(country.record_type))
+                        (!country.independent)
                             || isNotDefined(country.centroid)
                             || isNotDefined(country.iso3)
                     ) {
@@ -281,11 +283,12 @@ function ActiveOperation() {
         },
     ]);
 
-    const bbox = getCountryListBoundingBox(countryData?.results ?? []);
-
+    const countryBounds :LngLatBoundsLike | undefined = (countryData && countryData.bbox)
+        ? getGeoJsonBounds(countryData.bbox)
+        : undefined;
     const heading = resolveToComponent(
         'Active Operations Map ({numAppeals})',
-        { numAppeals: response?.count ?? 0 },
+        { numAppeals: appealsResponse?.count ?? 0 },
     );
 
     const popupDetails = clickedPoint
@@ -331,7 +334,7 @@ function ActiveOperation() {
             'operation',
             (item) => item.name,
             (item) => ({
-                href: `https://goadmin-stage.ifrc.org/emergencies/${item.event}/details`,
+                href: `${goUrl}/emergencies/${item.event}/details`,
                 external: true,
             }),
         ),
@@ -365,9 +368,9 @@ function ActiveOperation() {
         setFilter({});
     });
 
-    const disasterTypes = disasterResponse?.results.map((disaster) => ({
-        key: disaster.id,
-        value: disaster.name,
+    const disasterTypes: DisasterTypeItem[] = disasterResponse?.results.map((disaster) => ({
+        id: disaster.id,
+        name: disaster.name,
     })) ?? [];
 
     return (
@@ -377,7 +380,7 @@ function ActiveOperation() {
             withHeaderBorder={!presentationMode}
             headerActions={!presentationMode && (
                 <Link
-                    href={`${IfrcGoUrl}/emergencies/all?country=${countryId}`}
+                    href={`${goUrl}/emergencies/all?country=${countryId}`}
                     withLinkIcon
                     withUnderline
                     external
@@ -416,8 +419,8 @@ function ActiveOperation() {
                         name="displacement"
                         value={rawFilter.displacement}
                         onChange={setFilterField}
-                        keySelector={appealTypeKeySelector}
-                        labelSelector={appealTypeLabelSelector}
+                        keySelector={keySelector}
+                        labelSelector={labelSelector}
                         options={disasterTypes}
                     />
                     <Button
@@ -432,7 +435,7 @@ function ActiveOperation() {
             footerActions={(
                 <Pager
                     activePage={page}
-                    itemsCount={response?.count ?? 0}
+                    itemsCount={appealsResponse?.count ?? 0}
                     maxItemsPerPage={limit}
                     onActivePageChange={setPage}
                 />
@@ -543,22 +546,22 @@ function ActiveOperation() {
                         </ListView>
                     </MapPopup>
                 )}
-                {isDefined(bbox) && (
+                {isDefined(countryBounds) && (
                     <MapBounds
                         duration={DURATION_MAP_ZOOM}
-                        bounds={bbox}
+                        bounds={countryBounds}
                         padding={DEFAULT_MAP_PADDING}
                     />
                 )}
             </GlobalMap>
             <SortContext.Provider value={sortState}>
                 <Table
-                    pending={pending}
+                    pending={appealsPending}
                     filtered={isFiltered}
                     columns={columns}
                     keySelector={appealKeySelector}
-                    data={response?.results}
-                    errored={isDefined(error)}
+                    data={appealsResponse?.results}
+                    errored={isDefined(appealsResponseError)}
                 />
             </SortContext.Provider>
         </Container>

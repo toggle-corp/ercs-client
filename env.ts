@@ -36,6 +36,7 @@ export default defineConfig({
         APP_GRAPHQL_ENDPOINT: Schema.string(),
         APP_GO_URL: Schema.string.optional(),
         APP_GO_API: Schema.string.optional(),
+        APP_GO_RISK_API_ENDPOINT: Schema.string.optional(),
         APP_MAPBOX_TOKEN: Schema.string.optional(),
     },
 });

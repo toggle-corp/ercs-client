@@ -1,3 +1,12 @@
+import { listToMap } from '@togglecorp/fujs';
+
+export const NUM_X_AXIS_TICKS_MIN = 3;
+export const NUM_X_AXIS_TICKS_MAX = 12;
+
+export const DEFAULT_X_AXIS_HEIGHT = 26;
+export const DEFAULT_Y_AXIS_WIDTH = 46;
+export const DEFAULT_Y_AXIS_WIDTH_WITH_LABEL = 66;
+
 export const defaultChartMargin = {
     top: 0,
     right: 0,
@@ -67,3 +76,10 @@ export const COLOR_ACTIVE_REGION = '#7d8b9d';
 // Import template
 
 export const FONT_FAMILY_HEADER = 'Montserrat';
+
+export const monthKeyList = Array.from(Array(12).keys());
+export const multiMonthSelectDefaultValue = listToMap(
+    monthKeyList,
+    (key) => key,
+    () => false,
+);
