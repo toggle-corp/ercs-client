@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - develop
+      - feature-deploy
 
 permissions:
   packages: write
@@ -16,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
 
       - name: Publish web-app-serve
         uses: toggle-corp/web-app-serve-action@v0.1.1
