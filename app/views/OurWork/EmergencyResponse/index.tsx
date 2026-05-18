@@ -41,7 +41,7 @@ const ExternalDashboards_QUERY = gql`
 `;
 
 function EmergencyResponse() {
-    //  Todo:Region filter
+    //  Todo: Region filter
     const [{ data: emergencyResponse, fetching }] = useExternalDashboardsQuery({
         variables: {
             page: '70',

@@ -1,13 +1,15 @@
-.coverImage{
+.cover-image {
     width: 140px;
     height: 140px;
 }
-.defaultCoverImage{
+
+.default-cover-image {
     background-color: var(--go-ui-color-red-10);
     width: 140px;
     height: 140px;
     color: var(--go-ui-color-primary-red);
-    .dashboardIcon {
+
+    .dashboard-con {
         width: 44px;
         height:44px;
     }

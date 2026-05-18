@@ -11,6 +11,7 @@ import { encodeDate } from '@togglecorp/fujs';
 import { gql } from 'urql';
 
 import PdfViewer from '#components/PdfViewer';
+import PowerBIEmbed from '#components/PowerBiEmbed';
 import { useReportQuery } from '#generated/types/graphql';
 import AIsummary from '#views/DataAndReport/AIsummary';
 
@@ -18,24 +19,24 @@ import styles from './styles.module.css';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const REPORT_QUERY = gql`
-  query Report($id: ID!) {
-    report(id: $id) {
-        contentType
-        description
-        disasterType
-        file {
-          name
-          size
-          url
+    query Report($id: ID!) {
+        report(id: $id) {
+            contentType
+            description
+            disasterType
+            file {
+                name
+                size
+                url
+            }
+            publishedAt
+            owner
+            iframeUrl
+            id
+            title
+            regionId
         }
-        publishedAt
-        owner
-        iframeUrl
-        id
-        title
-        regionId
     }
-  }
 `;
 
 function ReportDetail() {
@@ -47,6 +48,8 @@ function ReportDetail() {
     });
 
     const reportData = data?.report;
+
+    // To do: add condition or ai summary
     const aiSummaryAvailable = !reportData?.iframeUrl;
 
     return (
@@ -113,14 +116,8 @@ function ReportDetail() {
                         {reportData?.file?.url
                             ? <PdfViewer file={reportData?.file?.url ?? ''} />
                             : (
-                                <iframe
-                                    width="100%"
-                                    height="800"
-                                    src={reportData?.iframeUrl ?? ''}
-                                    title={reportData?.title}
-                                    frameBorder={0}
-                                />
-                            ) }
+                                <PowerBIEmbed embedUrl={reportData?.iframeUrl ?? ''} />
+                            )}
                     </ListView>
                     {aiSummaryAvailable && (
                         <div className={styles.details}>

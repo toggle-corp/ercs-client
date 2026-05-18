@@ -9,7 +9,7 @@ import PowerBIEmbed from '#components/PowerBiEmbed';
 import { useExternalDashboardsQuery } from '#generated/types/graphql';
 
 function DisasterResponse() {
-    //  Todo:Region filter
+    //  Todo: Region filter
     const [{ data: disasterResponse, fetching }] = useExternalDashboardsQuery({
         variables: {
             page: '60',

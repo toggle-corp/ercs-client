@@ -48,7 +48,6 @@ function PdfViewer({
     return (
         <div
             ref={onContainerRef}
-            style={{ width: '100%' }}
         >
             {!allPagesLoaded && loadingMessage}
             <div

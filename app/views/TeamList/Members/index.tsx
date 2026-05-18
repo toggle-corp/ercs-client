@@ -29,47 +29,47 @@ import useFilterState from '#hooks/useFilterState';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TEAM_MEMBERS_QUERY = gql`
-  query TeamMembers(
-    $offset: Int
-    $limit: Int
-    $search: String
-    $woredaId: ID
-    $teamId: ID!
-    $regionId: ID
-  ) {
-    team(id: $teamId) {
-      id
-      name
-      description
-    }
-    teamMembers(
-      pagination: { limit: $limit, offset: $offset }
-      filters: {
-        search: $search
-        woredaId: $woredaId
-        teamId: $teamId
-        regionId: $regionId
-      }
+    query TeamMembers(
+        $offset: Int
+        $limit: Int
+        $search: String
+        $woredaId: ID
+        $teamId: ID!
+        $regionId: ID
     ) {
-      totalCount
-      results {
-        woredaId
-        updatedAt
-        training
-        teamId
-        sex
-        regionId
-        position
-        phoneNumber
-        order
-        name
-        id
-        fieldOfStudy
-        email
-        createdAt
-      }
+        team(id: $teamId) {
+            id
+            name
+            description
+        }
+        teamMembers(
+            pagination: { limit: $limit, offset: $offset }
+            filters: {
+                search: $search
+                woredaId: $woredaId
+                teamId: $teamId
+                regionId: $regionId
+            }
+        ) {
+            totalCount
+            results {
+                woredaId
+                updatedAt
+                training
+                teamId
+                sex
+                regionId
+                position
+                phoneNumber
+                order
+                name
+                id
+                fieldOfStudy
+                email
+                createdAt
+            }
+        }
     }
-  }
 `;
 function idSelector<T>(item: { id: T }) {
     return item.id;
@@ -144,40 +144,35 @@ function Members() {
                 fullName: member?.name,
                 email: member?.email,
             }),
-            { sortable: true },
         ),
         createStringColumn<MemberList, string | number >(
             'sex',
             'Gender',
             (dept) => dept?.sex?.toString(),
-            { sortable: true },
         ),
         createStringColumn<MemberList, string | number>(
             'phoneNumber',
             'Number',
             (dept) => dept?.phoneNumber,
-            { sortable: true },
         ),
         createStringColumn<MemberList, string | number>(
             'position',
             'Position',
             (dept) => dept?.position,
-            { sortable: true },
         ),
         createStringColumn<MemberList, string | number>(
             'training',
             'Training',
             (dept) => dept?.training,
-            { sortable: true },
         ),
         createStringColumn<MemberList, string | number>(
             'fieldOfStudy',
             'Field of study',
             (dept) => dept?.fieldOfStudy,
-            { sortable: true },
         ),
     ];
 
+    // Note: the value represents gender enum in query
     const genderOptions = [
         {
             key: 'MALE',

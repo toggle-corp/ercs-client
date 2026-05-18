@@ -31,20 +31,20 @@ import styles from './styles.module.css';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ALBUM_QUERY = gql`
-  query Albums($offset: Int, $limit: Int, $search: String) {
-    galleryAlbums(
-      pagination: { limit: $limit, offset: $offset }
-      filters: { search: $search }
-    ) {
-      results {
-        title
-        updatedAt
-        id
-        description
-      }
-      totalCount
+    query Albums($offset: Int, $limit: Int, $search: String) {
+        galleryAlbums(
+            pagination: { limit: $limit, offset: $offset }
+            filters: { search: $search }
+        ) {
+            results {
+                title
+                updatedAt
+                id
+                description
+            }
+            totalCount
+        }
     }
-  }
 `;
 interface ImageViewerProps {
   src: string;

@@ -111,7 +111,7 @@
         height: 1.5rem;
     }
 
-    @media screen and (max-width: 40rem) {
+    @media screen and (width <= 40rem) {
         flex-wrap: wrap;
 
         .separator {

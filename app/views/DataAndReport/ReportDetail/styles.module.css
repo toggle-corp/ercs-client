@@ -1,14 +1,16 @@
-.pageContainer {
+.page-container {
     padding-top: 0 !important;
-    .content{
+
+    .content {
         padding-top: var(--go-ui-spacing-md)
     }
 }
+
 .details {
     position: relative;
 }
 
-.stickyDetails {
+.sticky-details {
     position: sticky;
     top: 0;
     height: 100vh;

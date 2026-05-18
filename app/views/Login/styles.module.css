@@ -2,14 +2,16 @@
   filter: grayscale(100%);
 
 }
-.separator{
+
+.separator {
     border-bottom:var(--go-ui-width-separator-sm)  solid  var(--go-ui-color-gray-20);
 }
 
-.container{
+.container {
     justify-content: center;
     height: 100%;
-    .login{
+
+    .login {
           height: 100%;
 
     }

@@ -9,7 +9,7 @@ import PowerBIEmbed from '#components/PowerBiEmbed';
 import { useExternalDashboardsQuery } from '#generated/types/graphql';
 
 function EmergencyAlert() {
-    //  Todo:Region filter
+    //  Todo: Region filter
     const [{ data: emergencyAlert, fetching }] = useExternalDashboardsQuery({
         variables: {
             page: '50',

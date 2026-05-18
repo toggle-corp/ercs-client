@@ -41,7 +41,7 @@ const ExternalDashboards_QUERY = gql`
 `;
 
 function ProjectMapping() {
-    //  Todo:Region filter
+    //  Todo: Region filter
     const [{ data: projectMappingData, fetching }] = useExternalDashboardsQuery({
         variables: {
             page: '30',

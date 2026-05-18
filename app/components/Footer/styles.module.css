@@ -8,8 +8,4 @@
     .social-icon {
         font-size: var(--go-ui-height-social-icon);
     }
-
-    @media print {
-        display: none;
-    }
 }

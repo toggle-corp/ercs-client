@@ -20,24 +20,24 @@ import styles from './styles.module.css';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const IMAGES_QUERY = gql`
-  query Gallery($offset: Int, $limit: Int, $albumId: ID) {
-    galleryImages(
-      pagination: { limit: $limit, offset: $offset }
-      filters: { albumId: $albumId }
-    ) {
-      totalCount
-      results {
-        albumId
-        caption
-        id
-        image {
-          name
-          size
-          url
+    query Gallery($offset: Int, $limit: Int, $albumId: ID) {
+        galleryImages(
+            pagination: { limit: $limit, offset: $offset }
+            filters: { albumId: $albumId }
+        ) {
+            totalCount
+            results {
+                albumId
+                caption
+                id
+                image {
+                    name
+                    size
+                    url
+                }
+            }
         }
-      }
     }
-  }
 `;
 
 const toSafeSrc = (src: string) => (src.startsWith('http')

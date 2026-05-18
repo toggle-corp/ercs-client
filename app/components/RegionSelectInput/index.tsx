@@ -5,6 +5,7 @@ type RegionOption = {
   label: string;
 };
 
+// Note: This will dynamically fetch from server
 const ethiopiaRegions: RegionOption[] = [
     { key: 'AA', label: 'Addis Ababa' },
     { key: 'AF', label: 'Afar' },

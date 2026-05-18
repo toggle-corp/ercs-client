@@ -2,13 +2,13 @@
     height: 20rem;
 
     .point {
-        color: currentColor;
+        color: currentcolor;
     }
 
     .path {
         fill: none;
         stroke-width: 2;
-        stroke: currentColor;
+        stroke: currentcolor;
     }
 
     .historical-data {

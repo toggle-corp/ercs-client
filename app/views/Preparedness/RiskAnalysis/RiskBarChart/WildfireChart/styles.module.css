@@ -7,12 +7,12 @@
 
     .path {
         fill: none;
-        stroke: currentColor;
+        stroke: currentcolor;
         stroke-width: 2;
     }
 
     .point {
-        color: currentColor;
+        color: currentcolor;
     }
 
     .average {

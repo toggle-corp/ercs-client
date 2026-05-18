@@ -41,7 +41,7 @@ const CAPACITY_AND_RESOURCES_QUERY = gql`
         }
     }
 `;
-const teamKeySelector = (item: CapacityAndResourcesList) => item.id;
+const capacityKeySelector = (item: CapacityAndResourcesList) => item.id;
 
 type CapacityAndResourcesList = NonNullable<CapacityAndResourcesQuery['capacityAndResources']['results']>[number];
 
@@ -138,7 +138,7 @@ function CapacityAndResourcesList() {
                 empty={capacityAndResourcesData.length === 0}
             >
                 <Table
-                    keySelector={teamKeySelector}
+                    keySelector={capacityKeySelector}
                     columns={columns}
                     data={capacityAndResourcesData}
                     filtered={false}
