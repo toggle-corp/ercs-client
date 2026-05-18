@@ -133,7 +133,6 @@ function PossibleEarlyActionTable(props: Props) {
             sectors: filter.sector,
         },
     });
-
     if (!filtered && possibleEarlyActionResponse?.count === 0) {
         return null;
     }

@@ -54,12 +54,12 @@ function Link(props: Props) {
         external,
         href,
         withEllipsizedContent,
-        spacingOffset,
         withFullWidth,
         disabled,
         textSize,
         withLinkIcon,
         withUnderline,
+        spacingOffset = styleVariant === 'action' ? -5 : -3,
         ...otherProps
     } = props;
 
@@ -73,7 +73,10 @@ function Link(props: Props) {
                 && styles.withUnderline,
             )}
             before={before}
-            childrenContainerClassName={childrenContainerClassName}
+            childrenContainerClassName={_cs(
+                childrenContainerClassName,
+                styles.childrenContainer,
+            )}
             spacing={spacing}
             colorVariant={colorVariant}
             styleVariant={styleVariant}

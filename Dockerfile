@@ -20,7 +20,7 @@ COPY . /code/
 
 # # Build variables (Requires backend pulled)
 ENV APP_TITLE=ercs-eoc
-ENV APP_ENVIRONMENT=production
+ENV APP_ENVIRONMENT=development
 ENV APP_GRAPHQL_ENDPOINT=http://localhost:8000
 ENV APP_GRAPHQL_CODEGEN_ENDPOINT=./backend/schema.graphql
 ENV APP_MAPBOX_TOKEN=APP_MAPBOX_TOKEN_PLACEHOLDER

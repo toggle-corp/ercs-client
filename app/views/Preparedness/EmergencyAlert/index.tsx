@@ -12,6 +12,7 @@ function EmergencyAlert() {
     //  Todo: Region filter
     const [{ data: emergencyAlert, fetching }] = useExternalDashboardsQuery({
         variables: {
+            // NOTE: Page variable value based on page enum where 50 is emergency alert
             page: '50',
             isActive: true,
         },

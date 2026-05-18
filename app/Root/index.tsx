@@ -18,6 +18,7 @@ import {
 import PreloadMessage from '#components/PreloadMessage';
 import {
     api,
+    appTitle,
     environment,
 } from '#config';
 import UserContext, { type UserContextInterface } from '#contexts/UserContext';
@@ -76,6 +77,8 @@ function Root() {
                         <Suspense
                             fallback={(
                                 <PreloadMessage>
+                                    {appTitle}
+                                    {' '}
                                     loading...
                                 </PreloadMessage>
                             )}

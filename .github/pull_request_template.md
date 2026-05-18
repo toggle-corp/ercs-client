@@ -22,3 +22,4 @@
 ## This PR includes
 
 - [ ] Translation
+- [ ] Permission

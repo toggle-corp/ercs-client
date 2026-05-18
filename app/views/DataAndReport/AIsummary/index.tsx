@@ -9,6 +9,7 @@ import {
 import styles from './styles.module.css';
 
 function AIsummary() {
+    // TODO: fetch ai summary data from backend and display here
     return (
         <ListView
             layout="block"

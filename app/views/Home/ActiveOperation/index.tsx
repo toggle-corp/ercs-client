@@ -38,12 +38,13 @@ import {
 } from '@togglecorp/re-map';
 import type { LngLatBoundsLike } from 'mapbox-gl';
 
+import DisasterTypeSelectInput from '#components/DisasterTypeSelectInput';
 import GlobalMap, { type AdminZeroFeatureProperties } from '#components/GlobalMap';
 import GoMapContainer from '#components/GoMapContainer';
 import Link from '#components/Link';
 import MapPopup from '#components/MapPopup';
 import { goUrl } from '#config';
-import CountryContext from '#contexts/CountryContext';
+import GoContext from '#contexts/GoContext';
 import useFilterState from '#hooks/useFilterState';
 import useInputState from '#hooks/useInputState';
 import {
@@ -62,7 +63,6 @@ import {
     createDisasterTypeColumn,
     createEventColumn,
 } from '#utils/tableHelpers';
-
 import {
     APPEAL_TYPE_DREF,
     APPEAL_TYPE_EAP,
@@ -76,15 +76,12 @@ import {
     COLOR_EAP,
     COLOR_EMERGENCY_APPEAL,
     COLOR_MULTIPLE_TYPES,
-    type DisasterTypeItem,
-    keySelector,
-    labelSelector,
     optionKeySelector,
     optionLabelSelector,
     outerCircleLayerOptionsForFinancialRequirements,
     outerCircleLayerOptionsForPeopleTargeted,
     type ScaleOption,
-} from './utils';
+} from '#utils/utils';
 
 type GlobalEnumsResponse = GoApiResponse<'/api/v2/global-enums/'>;
 type AppealTypeOption = NonNullable<GlobalEnumsResponse['api_appeal_type']>[number];
@@ -99,29 +96,14 @@ const sourceOptions: mapboxgl.GeoJSONSourceRaw = {
     type: 'geojson',
 };
 
-const appealTypeOptions : AppealTypeOption[] = [
-    {
-        key: 0,
-        value: 'DREF',
-    },
-    {
-        key: 1,
-        value: 'Emergency Appeal',
-    },
-    {
-        key: 2,
-        value: 'International Appeal',
-    },
-    {
-        key: 3,
-        value: 'Forecast Based Action',
-    },
-];
-
 const now = new Date().toISOString();
 
 function ActiveOperation() {
-    const { countryResponse: countryData, countryId } = use(CountryContext);
+    const {
+        countryResponse: countryData,
+        countryId,
+        globalEnums,
+    } = use(GoContext);
     const [scaleBy, setScaleBy] = useInputState<ScaleOption['value']>('peopleTargeted');
     const [presentationMode, setPresentationMode] = useState(false);
     const {
@@ -174,13 +156,6 @@ function ActiveOperation() {
         preserveResponse: true,
         query: queryParams,
     });
-
-    const { response: disasterResponse } = useRequest(
-        {
-            url: '/api/v2/disaster_type/',
-            method: 'GET',
-        },
-    );
 
     const countryGroupedAppeal = listToGroupList(
         appealsResponse?.results ?? [],
@@ -367,12 +342,6 @@ function ActiveOperation() {
     const handleClearFiltersButtonClick = (() => {
         setFilter({});
     });
-
-    const disasterTypes: DisasterTypeItem[] = disasterResponse?.results.map((disaster) => ({
-        id: disaster.id,
-        name: disaster.name,
-    })) ?? [];
-
     return (
         <Container
             overlayPending
@@ -380,10 +349,9 @@ function ActiveOperation() {
             withHeaderBorder={!presentationMode}
             headerActions={!presentationMode && (
                 <Link
-                    href={`${goUrl}/emergencies/all?country=${countryId}`}
+                    to="emergencyAlert"
                     withLinkIcon
                     withUnderline
-                    external
                     spacing="4xs"
                 >
                     View all Emergencies
@@ -411,17 +379,14 @@ function ActiveOperation() {
                         onChange={setFilterField}
                         keySelector={appealTypeKeySelector}
                         labelSelector={appealTypeLabelSelector}
-                        options={appealTypeOptions}
+                        options={globalEnums?.api_appeal_type}
                     />
-                    <SelectInput
+                    <DisasterTypeSelectInput
                         placeholder="All Disaster Types"
                         label="Disaster Type"
                         name="displacement"
                         value={rawFilter.displacement}
                         onChange={setFilterField}
-                        keySelector={keySelector}
-                        labelSelector={labelSelector}
-                        options={disasterTypes}
                     />
                     <Button
                         name={undefined}

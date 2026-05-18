@@ -10,4 +10,8 @@
     .link-icon {
         font-size: var(--go-ui-height-icon-multiplier);
     }
+
+    .children-container {
+        display: inline-flex;
+    }
 }

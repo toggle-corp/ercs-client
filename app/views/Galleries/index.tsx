@@ -125,15 +125,13 @@ function Galleries() {
             heading="Galleries"
             description="Capturing moments of service, resilience, and community impact."
             info={(
-                <ListView withCenteredContents>
-                    <Description>
-                        <i>
-                            {data?.galleryAlbums.totalCount}
-                            {' '}
-                            Events
-                        </i>
-                    </Description>
-                </ListView>
+                <Description withCenteredContent>
+                    <i>
+                        {data?.galleryAlbums.totalCount}
+                        {' '}
+                        Events
+                    </i>
+                </Description>
             )}
         >
             <ListView

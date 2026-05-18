@@ -47,6 +47,8 @@ const ExternalDashboards_QUERY = gql`
     }
 `;
 
+// TODO: Fetch real data for key figures and operations
+
 const keyFigures = (
     <ListView
         layout="grid"
@@ -91,8 +93,9 @@ function OurWork() {
                 </Container>
             )}
             actions={(
+                // TODO: add region filter
                 <RegionSelectInput
-                    name="regin"
+                    name="region"
                     value={undefined}
                     onChange={() => {}}
                 />

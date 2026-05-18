@@ -95,6 +95,7 @@ const galleries: RouteConfig = {
     visibility: 'is-authenticated',
 };
 
+// TODO: add terms and conditions and cookie policy page
 const termsAndConditions: RouteConfig = {
     index: true,
     path: '/terms-and-conditions',

@@ -1,6 +1,7 @@
 import {
     use,
     useEffect,
+    useMemo,
 } from 'react';
 import { Outlet } from 'react-router';
 import { isDefined } from '@togglecorp/fujs';
@@ -8,12 +9,15 @@ import { gql } from 'urql';
 
 import GlobalFooter from '#components/Footer';
 import Navbar from '#components/Navbar';
+import { api } from '#config';
+import GoContext from '#contexts/GoContext';
 import UserContext from '#contexts/UserContext';
 import { useMeQuery } from '#generated/types/graphql';
+import { useRequest } from '#utils/restRequest';
 
 import styles from './styles.module.css';
 
-const fetchHealth = fetch(`${import.meta.env.APP_GRAPHQL_ENDPOINT}/health-check/?format=json`, {
+const fetchHealth = fetch(`${api}/health-check/?format=json`, {
     method: 'GET',
     credentials: 'include',
 })
@@ -34,11 +38,58 @@ const ME_QUERY = gql`
   }
     }
 `;
+const countryId = 65; // ethiopia
 
 function RootLayout() {
     use(fetchHealth);
     const { setUser } = use(UserContext);
     const [{ fetching, data }] = useMeQuery();
+
+    const {
+        pending: countryResponsePending,
+        response: countryResponse,
+    } = useRequest({
+        url: '/api/v2/country/{id}/',
+        preserveResponse: true,
+        pathVariables: {
+            id: Number(countryId),
+        },
+    });
+
+    const {
+        response: disasterTypes,
+        pending: disasterTypesPending,
+    } = useRequest(
+        {
+            url: '/api/v2/disaster_type/',
+            preserveResponse: true,
+        },
+    );
+
+    const {
+        response: globalEnums,
+        pending: globalEnumsPending,
+    } = useRequest({
+        url: '/api/v2/global-enums/',
+        preserveResponse: true,
+    });
+
+    const GoContextValue = useMemo(() => ({
+        countryId,
+        countryResponse,
+        countryResponsePending,
+        disasterTypes,
+        disasterTypesPending,
+        globalEnums,
+        globalEnumsPending,
+    }), [
+        countryResponse,
+        countryResponsePending,
+        disasterTypesPending,
+        disasterTypes,
+        globalEnums,
+        globalEnumsPending,
+    ]);
 
     useEffect(() => {
         if (fetching) {
@@ -50,13 +101,15 @@ function RootLayout() {
     }, [fetching, data, setUser]);
 
     return (
-        <div className={styles.root}>
-            <Navbar />
-            <div className={styles.pageContent}>
-                <Outlet />
+        <GoContext.Provider value={GoContextValue}>
+            <div className={styles.root}>
+                <Navbar />
+                <div className={styles.pageContent}>
+                    <Outlet />
+                </div>
+                <GlobalFooter />
             </div>
-            <GlobalFooter />
-        </div>
+        </GoContext.Provider>
     );
 }
 

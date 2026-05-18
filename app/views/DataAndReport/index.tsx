@@ -1,13 +1,7 @@
-import {
-    DashboardLineIcon,
-    SearchLineIcon,
-} from '@ifrc-go/icons';
+import { SearchLineIcon } from '@ifrc-go/icons';
 import {
     Container,
     Description,
-    Heading,
-    Image,
-    InlineLayout,
     ListView,
     Pager,
     SelectInput,
@@ -18,13 +12,12 @@ import { gql } from 'urql';
 import Link from '#components/Link';
 import Page from '#components/Page';
 import RegionSelectInput from '#components/RegionSelectInput';
+import ReportCard from '#components/ReportCard';
 import {
     useReportsQuery,
     useThematicAreasQuery,
 } from '#generated/types/graphql';
 import useFilterState from '#hooks/useFilterState';
-
-import styles from './styles.module.css';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ThematicAreas_QUERY = gql`
@@ -108,6 +101,7 @@ function DataAndReport() {
     const [{ data: reportsData, fetching }] = useReportsQuery({
         variables: {
             thematicAreaId: rawFilter.thematicAreaId,
+            // TODO: add search filter in backend and uncomment below line
             // search: rawFilter.search,
             limit,
             offset,
@@ -119,8 +113,9 @@ function DataAndReport() {
     return (
         <Page
             actions={(
+                // TODO: add region filter
                 <RegionSelectInput
-                    name="regin"
+                    name="region"
                     value={undefined}
                     onChange={() => {}}
                 />
@@ -173,49 +168,16 @@ function DataAndReport() {
                     )}
                     empty={reportDetails.length === 0}
                 >
-
                     {reportDetails.map((report) => (
                         <Link
                             to="reportDetail"
                             withFullWidth
                             attrs={{ id: report.id }}
                         >
-                            <InlineLayout
+                            <ReportCard
                                 key={report.id}
-                                before={report.coverImage?.url ? (
-                                    <Image
-                                        src={report.coverImage?.url}
-                                        alt="Report"
-                                        size="sm"
-                                        withContainedFit
-                                        className={styles.coverImage}
-                                    />
-                                ) : (
-                                    <ListView
-                                        withCenteredContents
-                                        className={styles.defaultCoverImage}
-                                    >
-                                        <DashboardLineIcon
-                                            className={styles.dashboardIcon}
-                                        />
-                                    </ListView>
-                                )}
-                                contentAlignment="start"
-                                spacing="lg"
-                            >
-                                <ListView layout="block">
-                                    <Heading
-                                        level={4}
-                                    >
-                                        {report.title}
-                                    </Heading>
-                                    <Description
-                                        withLightText
-                                    >
-                                        {report.description}
-                                    </Description>
-                                </ListView>
-                            </InlineLayout>
+                                report={report}
+                            />
                         </Link>
                     ))}
                 </Container>

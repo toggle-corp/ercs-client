@@ -7,12 +7,15 @@ import {
 import NavigationTab from '#components/NavigationTab';
 import Page from '#components/Page';
 
+import AllEmergency from './AllEmergencies';
+
 function Preparedness() {
     return (
         <Page
             heading="Preparedness -  Emergency Alerts"
             description="Use data-driven forecasts and community-level indicators to plan, prepare, and minimize disaster impact."
         >
+            <AllEmergency />
             <ListView
                 layout="block"
                 spacing="xl"
@@ -39,7 +42,6 @@ function Preparedness() {
                     >
                         Risk Analysis
                     </NavigationTab>
-
                 </NavigationTabList>
                 <Outlet />
             </ListView>

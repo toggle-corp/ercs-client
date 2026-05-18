@@ -172,7 +172,7 @@ function Members() {
         ),
     ];
 
-    // Note: the value represents gender enum in query
+    // NOTE: the value represents gender enum in query
     const genderOptions = [
         {
             key: 'MALE',

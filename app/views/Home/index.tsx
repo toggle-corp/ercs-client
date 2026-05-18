@@ -16,6 +16,7 @@ import Page from '#components/Page';
 import ActiveOperation from '#views/Home/ActiveOperation';
 
 function Home() {
+    // TODO: Fetch real data for key figures and operations
     const keyFigures = (
         <ListView
             layout="grid"

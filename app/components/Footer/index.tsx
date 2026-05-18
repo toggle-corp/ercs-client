@@ -1,6 +1,9 @@
 import {
     SocialFacebookIcon,
+    SocialInstagramIcon,
+    SocialLinkedinIcon,
     SocialMediumIcon,
+    SocialTwitterIcon,
     SocialYoutubeIcon,
 } from '@ifrc-go/icons';
 import {
@@ -51,7 +54,7 @@ function GlobalFooter(props: Props) {
                             needs with the right response.
                         </div>
                         <div className={styles.copyright}>
-                            © IFRC
+                            © ERCS EOC
                             {' '}
                             {year}
                         </div>
@@ -126,9 +129,7 @@ function GlobalFooter(props: Props) {
                             Dataset
                         </Link>
                         <Link
-                            href="https://github.com/ifrcgo/go-web-app"
-                            external
-                            colorVariant="text-on-dark"
+                            to="projectMapping"
                         >
                             Project Mapping
                         </Link>
@@ -150,7 +151,7 @@ function GlobalFooter(props: Props) {
                         withSpacingOpticalCorrection
                     >
                         <Link
-                            href="mailto:im@ifrc.org"
+                            href="mailto:ercsinfo@redcrosseth.org"
                             colorVariant="primary"
                             styleVariant="filled"
                             external
@@ -158,20 +159,21 @@ function GlobalFooter(props: Props) {
                             textSize="sm"
                             spacing="xs"
                         >
-                            im@ifrc.org
+                            ercsinfo@redcrosseth.org
                         </Link>
                         <ListView spacing="sm">
                             <Link
                                 className={styles.socialIcon}
-                                href="https://ifrcgoproject.medium.com"
+                                href="https://x.com/ethioredcross"
                                 external
                                 colorVariant="text-on-dark"
                             >
-                                <SocialMediumIcon />
+                                {/* TODO: change twitter icon in ifrc go icon to X */}
+                                <SocialTwitterIcon />
                             </Link>
                             <Link
                                 className={styles.socialIcon}
-                                href="https://www.facebook.com/IFRC"
+                                href="https://www.facebook.com/EthiopianRedCross"
                                 external
                                 colorVariant="text-on-dark"
                             >
@@ -179,12 +181,40 @@ function GlobalFooter(props: Props) {
                             </Link>
                             <Link
                                 className={styles.socialIcon}
-                                href="https://www.youtube.com/watch?v=dwPsQzla9A4"
+                                href="https://www.flickr.com/people/137615657@N05/"
+                                external
+                                colorVariant="text-on-dark"
+                            >
+                                {/* TODO: add flickr icon in ifrc go icon */}
+                                <SocialMediumIcon />
+                            </Link>
+                            <Link
+                                className={styles.socialIcon}
+                                href="https://www.linkedin.com/company/ethiopian-red-cross-society/"
+                                external
+                                colorVariant="text-on-dark"
+                            >
+                                <SocialLinkedinIcon />
+                            </Link>
+
+                            <Link
+                                className={styles.socialIcon}
+                                href="https://www.youtube.com/channel/UCpGN4FZcstRlR5PvhNWzCFw"
                                 external
                                 colorVariant="text-on-dark"
                             >
                                 <SocialYoutubeIcon />
                             </Link>
+
+                            <Link
+                                className={styles.socialIcon}
+                                href="https://www.instagram.com/ercs1935?igsh=cjJtbGhtcnFkNnMw"
+                                external
+                                colorVariant="text-on-dark"
+                            >
+                                <SocialInstagramIcon />
+                            </Link>
+
                         </ListView>
                     </ListView>
                 </Container>

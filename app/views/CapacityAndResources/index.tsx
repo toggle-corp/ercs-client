@@ -107,6 +107,7 @@ function CapacityAndResourcesList() {
     return (
         <Page
             actions={(
+                // TODO: add region filter
                 <RegionSelectInput
                     name="region"
                     value={undefined}

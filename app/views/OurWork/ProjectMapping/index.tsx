@@ -44,6 +44,7 @@ function ProjectMapping() {
     //  Todo: Region filter
     const [{ data: projectMappingData, fetching }] = useExternalDashboardsQuery({
         variables: {
+            // NOTE: Page variable value based on page enum where 30 is project mapping
             page: '30',
             isActive: true,
         },

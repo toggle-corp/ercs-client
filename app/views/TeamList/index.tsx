@@ -118,7 +118,7 @@ function TeamList() {
                 footerActions={(
                     <Pager
                         activePage={page}
-                        itemsCount={data?.teams.totalCount ?? 0}
+                        itemsCount={data?.teams?.totalCount ?? 0}
                         maxItemsPerPage={limit}
                         onActivePageChange={setPage}
                     />
@@ -128,7 +128,7 @@ function TeamList() {
                 <Table
                     keySelector={teamKeySelector}
                     columns={columns}
-                    data={data?.teams.results ?? []}
+                    data={teams}
                     filtered={false}
                     pending={fetching}
                 />

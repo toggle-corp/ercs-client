@@ -1,12 +1,13 @@
 import { SelectInput } from '@ifrc-go/ui';
 
-type RegionOption = {
-  key: string;
-  label: string;
-};
+import {
+    keySelector,
+    labelSelector,
+    type Selector,
+} from '#utils/utils';
 
 // Note: This will dynamically fetch from server
-const ethiopiaRegions: RegionOption[] = [
+const ethiopiaRegions: Selector[] = [
     { key: 'AA', label: 'Addis Ababa' },
     { key: 'AF', label: 'Afar' },
     { key: 'AM', label: 'Amhara' },
@@ -29,13 +30,14 @@ type Props = {
   onChange: (value: string | undefined, name: string) => void;
 };
 
-function RegionSelectInput({ name, value, onChange }: Props) {
+function RegionSelectInput(props: Props) {
+    const { name, value, onChange } = props;
     return (
         <SelectInput
             name={name}
             options={ethiopiaRegions}
-            keySelector={(o) => o.key}
-            labelSelector={(o) => o.label}
+            keySelector={keySelector}
+            labelSelector={labelSelector}
             value={value}
             onChange={onChange}
             placeholder="Select region"

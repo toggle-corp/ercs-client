@@ -1,0 +1,16 @@
+.cover-image,
+.default-cover-image {
+    width: 8.75rem;
+    height: 8.75rem;
+}
+
+.default-cover-image {
+    background-color: var(--go-ui-color-red-10);
+    color: var(--go-ui-color-primary-red);
+
+    .dashboard-icon {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+}
+

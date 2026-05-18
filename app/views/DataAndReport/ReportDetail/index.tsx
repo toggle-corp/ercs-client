@@ -49,8 +49,10 @@ function ReportDetail() {
 
     const reportData = data?.report;
 
-    // To do: add condition or ai summary
+    // TODO: add condition or ai summary
     const aiSummaryAvailable = !reportData?.iframeUrl;
+    const publishedDate = new Date(reportData?.publishedAt);
+    const encodedPublishedDate = encodeDate(publishedDate);
 
     return (
         <PageContainer
@@ -61,7 +63,9 @@ function ReportDetail() {
             >
                 <ListView
                     // eslint-disable-next-line react/jsx-props-no-spreading
-                    {...(aiSummaryAvailable ? { layout: 'grid', withSidebar: true } : { layout: 'block' })}
+                    {...(aiSummaryAvailable
+                        ? { layout: 'grid', withSidebar: true }
+                        : { layout: 'block' })}
                 >
                     <ListView
                         layout="block"
@@ -82,7 +86,7 @@ function ReportDetail() {
                                             Published Date:
                                         </Description>
                                         <Description>
-                                            {encodeDate(new Date(reportData?.publishedAt))}
+                                            {encodedPublishedDate}
                                         </Description>
                                     </ListView>
                                 )}
@@ -116,8 +120,10 @@ function ReportDetail() {
                         {reportData?.file?.url
                             ? <PdfViewer file={reportData?.file?.url ?? ''} />
                             : (
-                                <PowerBIEmbed embedUrl={reportData?.iframeUrl ?? ''} />
-                            )}
+                                <PowerBIEmbed
+                                    embedUrl={reportData?.iframeUrl ?? ''}
+                                />
+                            ) }
                     </ListView>
                     {aiSummaryAvailable && (
                         <div className={styles.details}>

@@ -39,20 +39,24 @@ const IMAGES_QUERY = gql`
         }
     }
 `;
-
+// For Local Development
 const toSafeSrc = (src: string) => (src.startsWith('http')
     ? src.replace(/^http:\/\/web:8000/, 'http://localhost:8000')
     : src);
 
 interface ImageComponentProps {
-  src: string;
-  name: string;
-  onView: (src: string) => void;
+    src: string;
+    name: string;
+    onView: (src: string) => void;
 }
 
 function ImageComponent(props: ImageComponentProps) {
-    const { src, name, onView } = props;
+    const {
+        src, name,
+        onView,
+    } = props;
     const safeSrc = toSafeSrc(src);
+
     return (
         <div className={styles.imgContainer}>
             <Image src={safeSrc} size="md" />
