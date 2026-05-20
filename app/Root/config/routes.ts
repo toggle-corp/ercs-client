@@ -130,6 +130,41 @@ const login: RouteConfig = {
     visibility: 'is-not-authenticated',
 };
 
+const additionalLinks: RouteConfig = {
+    index: true,
+    path: '/additional-links',
+    load: () => import('#views/AdditionalLinks'),
+    visibility: 'is-anything',
+};
+
+const manuals: RouteConfig = {
+    index: true,
+    path: '/manuals',
+    load: () => import('#views/Manuals'),
+    visibility: 'is-anything',
+};
+
+const policies: RouteConfig = {
+    index: true,
+    path: '/policies',
+    load: () => import('#views/Polices'),
+    visibility: 'is-anything',
+};
+
+const guidelines: RouteConfig = {
+    index: true,
+    path: '/guidelines',
+    load: () => import('#views/Guidelines'),
+    visibility: 'is-anything',
+};
+
+const onlineInteractive: RouteConfig = {
+    index: true,
+    path: '/online-interactive',
+    load: () => import('#views/OnlineInteractive'),
+    visibility: 'is-anything',
+};
+
 function child(route: RouteConfig, path: string): RouteConfig {
     const found = route.children?.find((c) => c.path === path);
     if (!found) throw new Error(`Child route "${path}" not found in "${route.path}"`);
@@ -153,6 +188,11 @@ const routes = {
     login,
     reportDetail,
     capacityAndResourcesDetails,
+    additionalLinks,
+    manuals,
+    guidelines,
+    onlineInteractive,
+    policies,
     // child routes
     emergencyAlert: child(preparedness, 'emergency-alert'),
     disasterResponse: child(preparedness, 'disaster-response'),
