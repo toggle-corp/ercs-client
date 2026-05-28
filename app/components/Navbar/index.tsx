@@ -8,20 +8,40 @@ import {
     NavigationTabList,
     PageContainer,
 } from '@ifrc-go/ui';
+import { gql } from 'urql';
 
 import Link from '#components/Link';
 import NavLink from '#components/NavLink';
 import UserContext from '#contexts/UserContext';
+import { useLogoutMutation } from '#generated/types/graphql';
+import useAlert from '#hooks/useAlert';
+import useAuth from '#hooks/useAuth';
 import Logo from '#resources/image/logo.png';
 
 import styles from './styles.module.css';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const LOGOUT_MUTATION = gql`
+    mutation Logout {
+        logout
+    }
+`;
+
 function Navbar() {
-    const { authenticated } = use(UserContext);
+    const [{ fetching: logoutPending }, triggerLogout] = useLogoutMutation();
+    const { removeUserAuth } = use(UserContext);
+    const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const alert = useAlert();
 
     const handleLogin = () => {
         navigate('/login');
+    };
+
+    const handleLogout = async () => {
+        await triggerLogout({});
+        removeUserAuth();
+        alert.show('Logout successful!', { variant: 'success' });
     };
     return (
         <nav className={styles.navbar}>
@@ -48,21 +68,21 @@ function Navbar() {
                             </Heading>
                         </ListView>
                     </Link>
-                    {!authenticated
+                    {!isAuthenticated
                         ? (
                             <Button
                                 name="login"
                                 styleVariant="filled"
                                 onClick={handleLogin}
                             >
-
                                 Login
                             </Button>
                         )
                         : (
                             <Button
-                                name="login"
-
+                                name="logout"
+                                onClick={handleLogout}
+                                disabled={logoutPending}
                             >
                                 Logout
                             </Button>
@@ -103,7 +123,7 @@ function Navbar() {
                     >
                         Capacity & Resources
                     </NavLink>
-                    {authenticated && (
+                    {isAuthenticated && (
                         <>
                             <NavLink
                                 to="teamList"

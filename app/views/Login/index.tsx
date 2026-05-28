@@ -1,4 +1,9 @@
 import {
+    use,
+    useCallback,
+    useMemo,
+} from 'react';
+import {
     Button,
     Container,
     Description,
@@ -17,7 +22,11 @@ import {
     requiredStringCondition,
     useForm,
 } from '@togglecorp/toggle-form';
+import { gql } from 'urql';
 
+import UserContext from '#contexts/UserContext';
+import { useLoginMutation } from '#generated/types/graphql';
+import useAlert from '#hooks/useAlert';
 import BackGroundImage from '#resources/image/loginbackground.jpg';
 import Logo from '#resources/image/logo.png';
 
@@ -30,8 +39,7 @@ interface FormFields {
 type FormSchema = ObjectSchema<FormFields>;
 type FormSchemaFields = ReturnType<FormSchema['fields']>;
 
-const defaultFormValue: FormFields = {
-};
+const defaultFormValue: FormFields = {};
 
 const formSchema: FormSchema = {
     fields: (): FormSchemaFields => ({
@@ -46,6 +54,22 @@ const formSchema: FormSchema = {
     }),
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const LOGIN_MUTATION = gql`
+    mutation Login($password: String!, $username: String!) {
+        login(password: $password, username: $username) {
+            mfaEnabled
+            isActive
+            fullName
+            id
+            email
+            regionId
+            role
+            createdAt
+        }
+    }
+`;
+
 function Login() {
     const {
         value: formValue,
@@ -54,16 +78,63 @@ function Login() {
         setError,
         validate,
     } = useForm(formSchema, { value: defaultFormValue });
+    const { setUser } = use(UserContext);
+
+    const alert = useAlert();
+
+    const [{ fetching: loginPending }, triggerLogin] = useLoginMutation();
 
     const fieldError = getErrorObject(formError);
 
-    // TODO: Implement actual login logic
-    const login = () => {};
+    const login = useCallback(async (val: FormFields) => {
+        try {
+            const { data, error: apiError } = await triggerLogin({
+                username: val.username ?? '',
+                password: val.password ?? '',
+            });
 
-    const handleFormSubmit = () => createSubmitHandler(
-        validate,
-        setError,
-        login,
+            if (apiError) {
+                alert.show('Incorrect username/password', {
+                    variant: 'danger',
+                });
+                return;
+            }
+
+            const loginResponse = data?.login;
+
+            if (!loginResponse) {
+                alert.show('Something went wrong. Please try again.', {
+                    variant: 'danger',
+                });
+                return;
+            }
+
+            setUser({
+                id: loginResponse.id,
+                fullName: loginResponse.fullName,
+                email: loginResponse.email,
+                regionId: loginResponse.regionId,
+                role: loginResponse.role,
+                mfaEnabled: loginResponse.mfaEnabled,
+                isActive: loginResponse.isActive,
+                createdAt: loginResponse.createdAt,
+            });
+
+            alert.show('Login successful!', { variant: 'success' });
+        } catch {
+            alert.show('Something went wrong. Please try again.', {
+                variant: 'danger',
+            });
+        }
+    }, [triggerLogin, alert, setUser]);
+
+    const handleFormSubmit = useMemo(
+        () => createSubmitHandler(
+            validate,
+            setError,
+            login,
+        ),
+        [validate, setError, login],
     );
 
     return (
@@ -78,10 +149,12 @@ function Login() {
                 />
                 <form onSubmit={handleFormSubmit}>
                     <Container
+                        pending={loginPending}
                         spacing="lg"
                         withCenteredContent
                         withPadding
                         className={styles.container}
+                        pendingMessage="Logging in..."
                     >
                         <InlineLayout
                             contentAlignment="center"

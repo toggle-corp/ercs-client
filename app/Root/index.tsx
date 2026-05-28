@@ -53,12 +53,20 @@ const gqlClient = new Client({
 
 function Root() {
     const [user, setUser] = useState<MeQuery['me'] | undefined>();
-    const authenticated = !!user;
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
+
+    const removeUserAuth = (() => {
+        setUser(undefined);
+        setIsAuthLoading(false);
+    });
+
     const userContext: UserContextInterface = useMemo(() => ({
-        authenticated,
         user,
         setUser,
-    }), [authenticated, user]);
+        removeUserAuth,
+        isAuthLoading,
+        setIsAuthLoading,
+    }), [user, isAuthLoading]);
 
     const requestContextValue = useMemo(() => ({
         transformUrl: processGoUrls,
@@ -88,7 +96,6 @@ function Root() {
                     </AlertContext.Provider>
                 </UserContext.Provider>
             </RequestContext.Provider>
-
         </UrqlProvider>
     );
 }

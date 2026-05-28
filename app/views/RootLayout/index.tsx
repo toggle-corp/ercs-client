@@ -42,7 +42,7 @@ const countryId = 65; // ethiopia
 
 function RootLayout() {
     use(fetchHealth);
-    const { setUser } = use(UserContext);
+    const { setUser, setIsAuthLoading } = use(UserContext);
     const [{ fetching, data }] = useMeQuery();
 
     const {
@@ -92,13 +92,13 @@ function RootLayout() {
     ]);
 
     useEffect(() => {
-        if (fetching) {
-            return;
+        if (!fetching) {
+            if (isDefined(data?.me)) {
+                setUser(data.me);
+            }
+            setIsAuthLoading(false);
         }
-        if (isDefined(data?.me)) {
-            setUser(data.me);
-        }
-    }, [fetching, data, setUser]);
+    }, [fetching, data, setUser, setIsAuthLoading]);
 
     return (
         <GoContext.Provider value={GoContextValue}>
