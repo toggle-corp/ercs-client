@@ -23,6 +23,7 @@ import Link from '#components/Link';
 import Page from '#components/Page';
 import {
     type TeamMembersQuery,
+    useGenderEnumsQuery,
     useTeamMembersQuery,
 } from '#generated/types/graphql';
 import useFilterState from '#hooks/useFilterState';
@@ -33,9 +34,9 @@ const TEAM_MEMBERS_QUERY = gql`
         $offset: Int
         $limit: Int
         $search: String
-        $woredaId: ID
+        $woredas: [ID!]
         $teamId: ID!
-        $regionId: ID
+        $regions: [ID!]
     ) {
         team(id: $teamId) {
             id
@@ -46,9 +47,9 @@ const TEAM_MEMBERS_QUERY = gql`
             pagination: { limit: $limit, offset: $offset }
             filters: {
                 search: $search
-                woredaId: $woredaId
+                woredas: $woredas
                 teamId: $teamId
-                regionId: $regionId
+                regions: $regions
             }
         ) {
             totalCount
@@ -71,6 +72,20 @@ const TEAM_MEMBERS_QUERY = gql`
         }
     }
 `;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const GENDER_ENUMS_QUERY = gql`
+    query GenderEnums {
+        enums {
+            TeamMemberSex {
+                label
+                key
+                value
+            }
+        }
+    }
+`;
+
 function idSelector<T>(item: { id: T }) {
     return item.id;
 }
@@ -96,6 +111,8 @@ function NameEmailCell({
 
 function Members() {
     const { id } = useParams<{ id: string }>();
+    const [{ data: genderTypeEnum }] = useGenderEnumsQuery();
+
     const {
         sortState,
         limit,
@@ -124,6 +141,7 @@ function Members() {
     });
 
     const members = data?.teamMembers.results ?? [];
+    const genderOptions = genderTypeEnum?.enums.TeamMemberSex;
 
     const columns = [
         createStringColumn<MemberList, string | number>(
@@ -170,25 +188,6 @@ function Members() {
             'Field of study',
             (dept) => dept?.fieldOfStudy,
         ),
-    ];
-
-    // NOTE: the value represents gender enum in query
-    const genderOptions = [
-        {
-            key: 'MALE',
-            label: 'Male',
-            value: 10,
-        },
-        {
-            key: 'FEMALE',
-            label: 'Female',
-            value: 20,
-        },
-        {
-            key: 'OTHER',
-            label: 'Other',
-            value: 30,
-        },
     ];
 
     return (

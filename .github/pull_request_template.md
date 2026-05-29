@@ -21,5 +21,5 @@
 
 ## This PR includes
 
-- [ ] Translation
-- [ ] Permission
+- [ ] Permission Checks
+- [ ] Translations

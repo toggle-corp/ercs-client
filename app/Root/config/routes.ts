@@ -140,28 +140,28 @@ const additionalLinks: RouteConfig = {
 const manuals: RouteConfig = {
     index: true,
     path: '/manuals',
-    load: () => import('#views/Manuals'),
+    load: () => import('#views/Documents/Manuals'),
     visibility: 'is-anything',
 };
 
 const policies: RouteConfig = {
     index: true,
     path: '/policies',
-    load: () => import('#views/Polices'),
+    load: () => import('#views/Documents/Policies'),
     visibility: 'is-anything',
 };
 
 const guidelines: RouteConfig = {
     index: true,
     path: '/guidelines',
-    load: () => import('#views/Guidelines'),
+    load: () => import('#views/Documents/Guidelines'),
     visibility: 'is-anything',
 };
 
 const onlineInteractive: RouteConfig = {
     index: true,
     path: '/online-interactive',
-    load: () => import('#views/OnlineInteractive'),
+    load: () => import('#views/Documents/OnlineInteractive'),
     visibility: 'is-anything',
 };
 

@@ -33,7 +33,7 @@ import Logo from '#resources/image/logo.png';
 import styles from './styles.module.css';
 
 interface FormFields {
-    username?: string;
+    email?: string;
     password?: string;
 }
 type FormSchema = ObjectSchema<FormFields>;
@@ -43,7 +43,7 @@ const defaultFormValue: FormFields = {};
 
 const formSchema: FormSchema = {
     fields: (): FormSchemaFields => ({
-        username: {
+        email: {
             required: true,
             requiredValidation: requiredStringCondition,
         },
@@ -56,8 +56,8 @@ const formSchema: FormSchema = {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LOGIN_MUTATION = gql`
-    mutation Login($password: String!, $username: String!) {
-        login(password: $password, username: $username) {
+    mutation Login($password: String!, $email: String!) {
+        login(password: $password, email: $email) {
             mfaEnabled
             isActive
             fullName
@@ -89,12 +89,12 @@ function Login() {
     const login = useCallback(async (val: FormFields) => {
         try {
             const { data, error: apiError } = await triggerLogin({
-                username: val.username ?? '',
+                email: val.email ?? '',
                 password: val.password ?? '',
             });
 
             if (apiError) {
-                alert.show('Incorrect username/password', {
+                alert.show('Incorrect email/password', {
                     variant: 'danger',
                 });
                 return;
@@ -190,11 +190,11 @@ function Login() {
                                     spacing="lg"
                                 >
                                     <TextInput
-                                        name="username"
+                                        name="email"
                                         label="Email/Username"
-                                        value={formValue.username}
+                                        value={formValue.email}
                                         onChange={setFieldValue}
-                                        error={fieldError?.username}
+                                        error={fieldError?.email}
                                         withAsterisk
                                         autoFocus
                                     />

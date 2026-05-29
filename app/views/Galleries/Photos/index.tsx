@@ -10,7 +10,6 @@ import {
     ListView,
     Pager,
 } from '@ifrc-go/ui';
-import { isDefined } from '@togglecorp/fujs';
 import { gql } from 'urql';
 
 import { useGalleryQuery } from '#generated/types/graphql';
