@@ -1,70 +1,88 @@
 import {
     createBrowserRouter,
-    RouterProvider
-} from "react-router"
+    type RouteObject,
+    RouterProvider,
+} from 'react-router';
+import mapboxgl from 'mapbox-gl';
 
-import type { RouteConfig } from "#root/config/routes.ts";
-import routes from "#root/config/routes.ts";
-import PageError from "#views/PageError/index.tsx";
+import { mapboxToken } from '#config';
+import type { RouteConfig } from '#root/config/routes.ts';
+import routes from '#root/config/routes.ts';
+import PageError from '#views/PageError/index.tsx';
 
 const privateRoutes = Object.values(routes).filter(
-    ({ visibility }) => visibility === "is-authenticated",
+    ({ visibility }) => visibility === 'is-authenticated',
 );
 
 const publicRoutes = Object.values(routes).filter(
-    ({ visibility }) => visibility === "is-anything",
+    ({ visibility }) => visibility === 'is-anything',
 );
 
 const guestRoutes = Object.values(routes).filter(
-    ({ visibility }) => visibility === "is-not-authenticated",
+    ({ visibility }) => visibility === 'is-not-authenticated',
 );
 
-function mapRoute(routeConfig: RouteConfig) {
+function mapRoute(routeConfig: RouteConfig): RouteObject {
+    // Only truly index routes: no path, index: true
+    if (routeConfig.index && !routeConfig.path) {
+        return {
+            index: true,
+            lazy: async () => {
+                const { default: Component } = await routeConfig.load();
+                return { Component };
+            },
+        };
+    }
+
     return {
-        index: routeConfig.index,
         path: routeConfig.path,
         lazy: async () => {
             const { default: Component } = await routeConfig.load();
             return { Component };
         },
+        children: routeConfig.children?.map(mapRoute),
     };
 }
+
+mapboxgl.accessToken = mapboxToken ?? '';
+mapboxgl.setRTLTextPlugin(
+    'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js',
+    // eslint-disable-next-line no-console
+    (err) => { console.error(err); },
+    true,
+);
 
 const router = createBrowserRouter([
     {
         errorElement: <PageError />,
         lazy: async () => {
-            const { default: Component } = await import("./Root/index.tsx");
+            const { default: Component } = await import('./Root/index.tsx');
             return { Component };
         },
         children: [
             {
                 lazy: async () => {
-                    const { default: Component } =
-            await import("./views/RootLayout/index.tsx");
+                    const { default: Component } = await import('./views/RootLayout/index.tsx');
                     return { Component };
                 },
                 children: [
                     {
                         lazy: async () => {
-                            const { default: Component } =
-                await import("./views/GuestLayout/index.tsx");
+                            const { default: Component } = await import('./views/GuestLayout/index.tsx');
                             return { Component };
                         },
                         children: guestRoutes.map(mapRoute),
                     },
                     {
                         lazy: async () => {
-                            const { default: Component } =
-                await import("./views/PrivateLayout/index.tsx");
+                            const { default: Component } = await import('./views/PrivateLayout/index.tsx');
                             return { Component };
                         },
                         children: privateRoutes.map(mapRoute),
                     },
                     {
                         lazy: async () => {
-                            const { default: Component } =
-                await import("./views/PublicLayout/index.tsx");
+                            const { default: Component } = await import('./views/PublicLayout/index.tsx');
                             return { Component };
                         },
                         children: publicRoutes.map(mapRoute),

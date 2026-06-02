@@ -1,0 +1,23 @@
+.image {
+  filter: grayscale(100%);
+
+}
+
+.separator {
+    border-bottom:var(--go-ui-width-separator-sm)  solid  var(--go-ui-color-gray-20);
+}
+
+.container {
+    justify-content: center;
+    height: 100%;
+
+    .login {
+          height: 100%;
+
+    }
+}
+
+.logo {
+    width: 70px;
+    height: 70px;
+}

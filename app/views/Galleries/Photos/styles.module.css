@@ -1,0 +1,23 @@
+.img-container {
+    position: relative;
+    transition: all 0.3s ease-in;
+
+    .action-button {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        opacity: 0;
+        z-index: 1;
+    }
+
+    &:hover {
+        transition: all 0.2s ease-out;
+        opacity: 0.85;
+        cursor: pointer;
+
+        .action-button {
+            opacity: 1;
+        }
+    }
+
+}

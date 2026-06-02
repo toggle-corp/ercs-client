@@ -1,8 +1,13 @@
-import { useState } from "react"
+import {
+    Suspense,
+    useMemo,
+    useState,
+} from 'react';
 import { Cookies } from 'react-cookie';
 import { Outlet } from 'react-router';
 import { AlertContainer } from '@ifrc-go/ui';
 import { AlertContext } from '@ifrc-go/ui/contexts';
+import { RequestContext } from '@togglecorp/toggle-request';
 import { cacheExchange } from '@urql/exchange-graphcache';
 import {
     Client,
@@ -10,13 +15,24 @@ import {
     Provider as UrqlProvider,
 } from 'urql';
 
+import PreloadMessage from '#components/PreloadMessage';
+import {
+    api,
+    appTitle,
+    environment,
+} from '#config';
 import UserContext, { type UserContextInterface } from '#contexts/UserContext';
-import useAlertContextProviderValue from "#hooks/useAlertContextProviderValue";
+import type { MeQuery } from '#generated/types/graphql';
+import useAlertContextProviderValue from '#hooks/useAlertContextProviderValue';
+import {
+    processGoError,
+    processGoOptions,
+    processGoResponse,
+    processGoUrls,
+} from '#utils/restRequest/go';
 
-import type { User } from './types/user';
-
-const COOKIE_NAME = `ERCS-${import.meta.env.APP_ENVIRONMENT}-CSRFTOKEN`;
-const GRAPHQL_ENDPOINT = `${import.meta.env.APP_GRAPHQL_ENDPOINT}/graphql/`;
+const COOKIE_NAME = `ERCS-${environment}-CSRFTOKEN`;
+const GRAPHQL_ENDPOINT = `${api}/graphql/`;
 
 const cookies = new Cookies();
 const gqlClient = new Client({
@@ -27,7 +43,7 @@ const gqlClient = new Client({
     ],
     fetchOptions: () => ({
         headers: {
-            'X-CSRFToken': cookies.get(COOKIE_NAME) || "taWf0Spres9M7HxChROyrQjTewfNgBds" ,
+            'X-CSRFToken': cookies.get(COOKIE_NAME),
         },
         credentials: 'include',
     }),
@@ -36,24 +52,43 @@ const gqlClient = new Client({
 });
 
 function Root() {
-    const [user, setUser] = useState<User | undefined>();
+    const [user, setUser] = useState<MeQuery['me'] | undefined>();
     const authenticated = !!user;
-    const userContext: UserContextInterface = {
+    const userContext: UserContextInterface = useMemo(() => ({
         authenticated,
         user,
         setUser,
+    }), [authenticated, user]);
 
-    }
+    const requestContextValue = useMemo(() => ({
+        transformUrl: processGoUrls,
+        transformOptions: processGoOptions,
+        transformResponse: processGoResponse,
+        transformError: processGoError,
+    }), []);
     const alertContextValue = useAlertContextProviderValue();
 
     return (
         <UrqlProvider value={gqlClient}>
-            <UserContext.Provider value={userContext}>
-                <AlertContext.Provider value={alertContextValue}>
-                    <AlertContainer />
-                    <Outlet />
-                </AlertContext.Provider>
-            </UserContext.Provider>
+            <RequestContext.Provider value={requestContextValue}>
+                <UserContext.Provider value={userContext}>
+                    <AlertContext.Provider value={alertContextValue}>
+                        <AlertContainer />
+                        <Suspense
+                            fallback={(
+                                <PreloadMessage>
+                                    {appTitle}
+                                    {' '}
+                                    loading...
+                                </PreloadMessage>
+                            )}
+                        >
+                            <Outlet />
+                        </Suspense>
+                    </AlertContext.Provider>
+                </UserContext.Provider>
+            </RequestContext.Provider>
+
         </UrqlProvider>
     );
 }

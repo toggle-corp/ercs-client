@@ -1,0 +1,5 @@
+.legend-icon {
+    > div {
+        padding: var(--go-ui-spacing-4xs) !important;
+    }
+}

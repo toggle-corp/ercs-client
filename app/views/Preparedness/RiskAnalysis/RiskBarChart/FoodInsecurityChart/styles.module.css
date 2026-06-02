@@ -1,0 +1,29 @@
+.food-insecurity-chart {
+    height: 20rem;
+
+    .point {
+        color: currentcolor;
+    }
+
+    .path {
+        fill: none;
+        stroke-width: 2;
+        stroke: currentcolor;
+    }
+
+    .historical-data {
+        opacity: 0.6;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    .prediction {
+        color: var(--go-ui-color-primary-red);
+    }
+
+    .average {
+        color: var(--go-ui-color-hazard-fi);
+    }
+}

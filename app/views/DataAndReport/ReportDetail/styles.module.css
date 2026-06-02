@@ -1,0 +1,17 @@
+.page-container {
+    padding-top: 0 !important;
+
+    .content {
+        padding-top: var(--go-ui-spacing-md)
+    }
+}
+
+.details {
+    position: relative;
+}
+
+.sticky-details {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}

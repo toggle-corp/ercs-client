@@ -1,10 +1,10 @@
-import type { User } from '#root/types/user';
 import { createContext } from 'react';
 
+import type { MeQuery } from '#generated/types/graphql';
 
 export interface UserContextInterface {
-    user: User | undefined;
-    setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
+    user: MeQuery['me'] | undefined;
+    setUser: React.Dispatch<React.SetStateAction<MeQuery['me'] | undefined>>;
     authenticated: boolean,
 }
 
