@@ -16,14 +16,20 @@ import NavigationTab from '#components/NavigationTab';
 import Page from '#components/Page';
 import RegionSelectInput from '#components/RegionSelectInput';
 
+// NOTE: There is limit of 20 dashboards for now, as we don't have more than that.
+// We can add pagination if needed in the future
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ExternalDashboards_QUERY = gql`
+const EXTERNAL_DASHBOARDS_QUERY = gql`
     query ExternalDashboards(
-        $page: String = ""
+        $page: DashboardPage
         $isActive: Boolean = true
+        $limit: Int = 20
+        $offset: Int = 0
     ) {
         externalDashboards(
             filters: { page: $page, isActive: $isActive }
+            pagination: { limit: $limit, offset: $offset }
         ) {
             results {
                 title

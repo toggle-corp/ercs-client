@@ -8,14 +8,14 @@ import DocumentCard from '#components/DocumentCard';
 import Link from '#components/Link';
 import Page from '#components/Page';
 import {
+    ReportTypeEnum,
     useDocumentListQuery,
-    useReportEnumsQuery,
 } from '#generated/types/graphql';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DOCUMENT_LIST_QUERY = gql`
     query DocumentList(
-        $reportType: String
+        $reportType: ReportTypeEnum
         $limit: Int = 10
         $offset: Int = 0
     ) {
@@ -40,40 +40,22 @@ const DOCUMENT_LIST_QUERY = gql`
     }
 `;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const REPORT_ENUMS_QUERY = gql`
-    query ReportEnums {
-        enums {
-            ReportType {
-                label
-                key
-                value
-            }
-        }
-    }
-`;
-
 interface Props {
-    reportType: 'REPORT' | 'MANUAL' | 'POLICY' | 'GUIDELINE' | 'ONLINE_INTERACTIVE';
+    reportType: ReportTypeEnum
     heading: string;
     description: string;
 }
 
 function DocumentList(props: Props) {
-    const [{ data: reportTypeEnum }] = useReportEnumsQuery();
     const {
         reportType,
         heading,
         description,
     } = props;
 
-    const reportTypeValue = reportTypeEnum?.enums.ReportType?.find(
-        (item) => item.key === reportType,
-    )?.value ?? 0;
-
     const [{ data, fetching }] = useDocumentListQuery({
         variables: {
-            reportType: String(reportTypeValue),
+            reportType,
         },
     });
 
