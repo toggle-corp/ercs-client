@@ -92,7 +92,7 @@ function GlobalFooter(props: Props) {
                     </ListView>
                 </Container>
                 <Container
-                    heading="Policies"
+                    heading="Documents"
                     spacing="lg"
                 >
                     <ListView
@@ -100,16 +100,19 @@ function GlobalFooter(props: Props) {
                         withSpacingOpticalCorrection
                     >
                         <Link
-                            colorVariant="text-on-dark"
-                            to="cookie"
+                            to="manuals"
                         >
-                            Cookie Policy
+                            Manuals
                         </Link>
                         <Link
-                            colorVariant="text-on-dark"
-                            to="termsAndConditions"
+                            to="policies"
                         >
-                            Terms and Conditions
+                            Policy
+                        </Link>
+                        <Link
+                            to="guidelines"
+                        >
+                            Guidelines
                         </Link>
                     </ListView>
                 </Container>
@@ -122,9 +125,8 @@ function GlobalFooter(props: Props) {
                         withSpacingOpticalCorrection
                     >
                         <Link
-                            href="https://github.com/ifrcgo/go-web-app"
-                            external
-                            colorVariant="text-on-dark"
+                            to="dataAndReport"
+
                         >
                             Dataset
                         </Link>
@@ -134,11 +136,14 @@ function GlobalFooter(props: Props) {
                             Project Mapping
                         </Link>
                         <Link
-                            href="https://github.com/ifrcgo/go-web-app"
-                            colorVariant="text-on-dark"
-                            external
+                            to="onlineInteractive"
                         >
                             Online Interactive
+                        </Link>
+                        <Link
+                            to="additionalLinks"
+                        >
+                            Additional Links
                         </Link>
                     </ListView>
                 </Container>

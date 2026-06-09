@@ -3,49 +3,19 @@ import {
     Container,
     ListView,
 } from '@ifrc-go/ui';
-import { gql } from 'urql';
 
 import InfoCard from '#components/InfoCard';
 import PowerBIEmbed from '#components/PowerBiEmbed';
-import { useExternalDashboardsQuery } from '#generated/types/graphql';
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ExternalDashboards_QUERY = gql`
-    query ExternalDashboards(
-        $page: String = ""
-        $isActive: Boolean = true
-    ) {
-        externalDashboards(
-            filters: { page: $page, isActive: $isActive }
-        ) {
-            results {
-                title
-                updatedAt
-                order
-                id
-                isActive
-                createdAt
-                description
-                page
-                regionId
-                showOnHome
-                url
-            }
-            pageInfo {
-                limit
-                offset
-            }
-            totalCount
-        }
-    }
-`;
+import {
+    DashboardPage,
+    useExternalDashboardsQuery,
+} from '#generated/types/graphql';
 
 function EmergencyResponse() {
     //  Todo: Region filter
     const [{ data: emergencyResponse, fetching }] = useExternalDashboardsQuery({
         variables: {
-            // NOTE: Page variable value based on page enum where 70 is emergency response
-            page: '70',
+            page: DashboardPage.EmergencyResponse,
             isActive: true,
         },
 

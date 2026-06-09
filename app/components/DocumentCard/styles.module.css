@@ -1,0 +1,6 @@
+.document-cover {
+    border: var(--go-ui-width-separator-sm) solid var(--go-ui-color-gray-30);
+    width: 12.5rem;
+    height: 12.5rem;
+    overflow: hidden;
+}

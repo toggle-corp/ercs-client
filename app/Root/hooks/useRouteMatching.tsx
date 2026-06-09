@@ -1,7 +1,6 @@
-import { use } from 'react';
 import { generatePath } from 'react-router';
 
-import UserContext from '#contexts/UserContext';
+import useAuth from '#hooks/useAuth';
 import type { RouteKeys } from '#root/config/routes';
 import routes from '#root/config/routes';
 
@@ -10,8 +9,7 @@ export interface Attrs {
 }
 
 function useRouteMatching(routeKey: RouteKeys, attrs?: Attrs) {
-    const { authenticated } = use(UserContext);
-
+    const { isAuthenticated } = useAuth();
     const to = routes[routeKey];
 
     if (!to) {
@@ -23,11 +21,11 @@ function useRouteMatching(routeKey: RouteKeys, attrs?: Attrs) {
         path,
     } = to;
 
-    if (visibility === 'is-not-authenticated' && authenticated) {
+    if (visibility === 'is-not-authenticated' && isAuthenticated) {
         return undefined;
     }
 
-    if (visibility === 'is-authenticated' && !authenticated) {
+    if (visibility === 'is-authenticated' && !isAuthenticated) {
         return undefined;
     }
 

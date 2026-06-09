@@ -1,14 +1,9 @@
 import { useParams } from 'react-router';
+import { SearchLineIcon } from '@ifrc-go/icons';
 import {
-    DownloadTwoFillIcon,
-    SearchLineIcon,
-} from '@ifrc-go/icons';
-import {
-    Button,
     Container,
     ListView,
     Pager,
-    SelectInput,
     Table,
     TextInput,
 } from '@ifrc-go/ui';
@@ -19,13 +14,16 @@ import {
 } from '@ifrc-go/ui/utils';
 import { gql } from 'urql';
 
+import ExportButton from '#components/ExportButton';
 import Link from '#components/Link';
 import Page from '#components/Page';
 import {
+    type TeamMembersExportQuery,
     type TeamMembersQuery,
     useTeamMembersQuery,
 } from '#generated/types/graphql';
 import useFilterState from '#hooks/useFilterState';
+import useGraphQLToCSV from '#hooks/useGraphqlToCsv';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TEAM_MEMBERS_QUERY = gql`
@@ -33,9 +31,9 @@ const TEAM_MEMBERS_QUERY = gql`
         $offset: Int
         $limit: Int
         $search: String
-        $woredaId: ID
+        $woredas: [ID!]
         $teamId: ID!
-        $regionId: ID
+        $regions: [ID!]
     ) {
         team(id: $teamId) {
             id
@@ -46,9 +44,9 @@ const TEAM_MEMBERS_QUERY = gql`
             pagination: { limit: $limit, offset: $offset }
             filters: {
                 search: $search
-                woredaId: $woredaId
+                woredas: $woredas
                 teamId: $teamId
-                regionId: $regionId
+                regions: $regions
             }
         ) {
             totalCount
@@ -71,6 +69,38 @@ const TEAM_MEMBERS_QUERY = gql`
         }
     }
 `;
+
+const TEAM_MEMBERS_EXPORT_QUERY = gql`
+    query TeamMembersExport(
+        $search: String
+        $woredas: [ID!]
+        $teamId: ID!
+        $regions: [ID!]
+    ) {
+        teamMembers(
+            filters: {
+                search: $search
+                woredas: $woredas
+                teamId: $teamId
+                regions: $regions
+            }
+        ) {
+            results {
+                id
+                name
+                email
+                sex
+                phoneNumber
+                position
+                training
+                fieldOfStudy
+                createdAt
+                updatedAt
+            }
+        }
+    }
+`;
+
 function idSelector<T>(item: { id: T }) {
     return item.id;
 }
@@ -125,6 +155,36 @@ function Members() {
 
     const members = data?.teamMembers.results ?? [];
 
+    const {
+        pending: exportPending,
+        trigger: triggerExport,
+    } = useGraphQLToCSV<TeamMembersExportQuery>({
+        query: TEAM_MEMBERS_EXPORT_QUERY,
+        filename: `team-${data?.team.id ? data?.team.name.toLowerCase() : id}-members.csv`,
+        transform: (responseData) => (
+            responseData.teamMembers.results ?? []
+        ).map((member) => ({
+            ID: member.id,
+            Name: member.name,
+            Email: member.email,
+            Gender: member.sex,
+            'Phone Number': member.phoneNumber,
+            Position: member.position,
+            Training: member.training,
+            'Field of Study': member.fieldOfStudy,
+            'Created At': member.createdAt,
+            'Updated At': member.updatedAt,
+        })),
+    });
+
+    const handleExport = () => {
+        if (!id) return;
+        triggerExport({
+            teamId: id,
+            search: filter.searchText,
+        });
+    };
+
     const columns = [
         createStringColumn<MemberList, string | number>(
             'sn',
@@ -172,25 +232,6 @@ function Members() {
         ),
     ];
 
-    // NOTE: the value represents gender enum in query
-    const genderOptions = [
-        {
-            key: 'MALE',
-            label: 'Male',
-            value: 10,
-        },
-        {
-            key: 'FEMALE',
-            label: 'Female',
-            value: 20,
-        },
-        {
-            key: 'OTHER',
-            label: 'Other',
-            value: 30,
-        },
-    ];
-
     return (
         <Page
             heading={data?.team.name}
@@ -202,56 +243,48 @@ function Members() {
                 </i>
             )}
         >
-            <Container
-                pending={fetching}
-                withPadding
-                headerActions={(
-                    <Button
-                        name="export"
-                        before={<DownloadTwoFillIcon />}
-                    >
-                        Export
-                    </Button>
-                )}
-                filters={(
-                    <>
-                        <SelectInput
-                            placeholder="Gender"
-                            name="sex"
-                            options={genderOptions}
-                            keySelector={(option) => option.key}
-                            labelSelector={(option) => option.label}
-                            value={filter.sex}
-                            onChange={setFilterField}
-                        />
-                        <TextInput
-                            name="searchText"
-                            placeholder="Search"
-                            value={rawFilter.searchText}
-                            onChange={setFilterField}
-                            icons={<SearchLineIcon />}
-                        />
-                    </>
-                )}
-                footerActions={(
-                    <Pager
-                        activePage={page}
-                        itemsCount={data?.teamMembers.totalCount ?? 0}
-                        maxItemsPerPage={limit}
-                        onActivePageChange={setPage}
-                    />
-                )}
+            <ListView
+                layout="block"
             >
-                <SortContext.Provider value={sortState}>
-                    <Table
-                        keySelector={idSelector}
-                        columns={columns}
-                        data={members}
-                        filtered={false}
-                        pending={fetching}
+                <ListView
+                    withSpaceBetweenContents
+                >
+                    <TextInput
+                        name="searchText"
+                        placeholder="Search"
+                        value={rawFilter.searchText}
+                        onChange={setFilterField}
+                        icons={<SearchLineIcon />}
                     />
-                </SortContext.Provider>
-            </Container>
+                    <ExportButton
+                        pendingExport={exportPending}
+                        onClick={handleExport}
+                        totalCount={members.length}
+                    />
+                </ListView>
+                <Container
+                    pending={fetching}
+                    footerActions={(
+                        <Pager
+                            activePage={page}
+                            itemsCount={data?.teamMembers.totalCount ?? 0}
+                            maxItemsPerPage={limit}
+                            onActivePageChange={setPage}
+                        />
+                    )}
+                >
+
+                    <SortContext.Provider value={sortState}>
+                        <Table
+                            keySelector={idSelector}
+                            columns={columns}
+                            data={members}
+                            filtered={false}
+                            pending={fetching}
+                        />
+                    </SortContext.Provider>
+                </Container>
+            </ListView>
         </Page>
     );
 }

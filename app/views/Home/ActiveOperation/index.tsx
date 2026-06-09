@@ -1,7 +1,4 @@
-import {
-    use,
-    useState,
-} from 'react';
+import { useState } from 'react';
 import {
     Button,
     Container,
@@ -44,8 +41,9 @@ import GoMapContainer from '#components/GoMapContainer';
 import Link from '#components/Link';
 import MapPopup from '#components/MapPopup';
 import { goUrl } from '#config';
-import GoContext from '#contexts/GoContext';
+import type { GlobalEnums } from '#contexts/GoContext';
 import useFilterState from '#hooks/useFilterState';
+import useGoContext from '#hooks/useGoContext';
 import useInputState from '#hooks/useInputState';
 import {
     DEFAULT_MAP_PADDING,
@@ -83,8 +81,7 @@ import {
     type ScaleOption,
 } from '#utils/utils';
 
-type GlobalEnumsResponse = GoApiResponse<'/api/v2/global-enums/'>;
-type AppealTypeOption = NonNullable<GlobalEnumsResponse['api_appeal_type']>[number];
+type AppealTypeOption = NonNullable<GlobalEnums['api_appeal_type']>[number];
 
 type AppealQueryParams = GoApiUrlQuery<'/api/v2/appeal/'>;
 type AppealResponse = GoApiResponse<'/api/v2/appeal/'>;
@@ -103,7 +100,7 @@ function ActiveOperation() {
         countryResponse: countryData,
         countryId,
         globalEnums,
-    } = use(GoContext);
+    } = useGoContext();
     const [scaleBy, setScaleBy] = useInputState<ScaleOption['value']>('peopleTargeted');
     const [presentationMode, setPresentationMode] = useState(false);
     const {

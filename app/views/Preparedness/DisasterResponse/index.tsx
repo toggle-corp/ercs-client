@@ -6,15 +6,16 @@ import {
 
 import InfoCard from '#components/InfoCard';
 import PowerBIEmbed from '#components/PowerBiEmbed';
-import { useExternalDashboardsQuery } from '#generated/types/graphql';
+import {
+    DashboardPage,
+    useExternalDashboardsQuery,
+} from '#generated/types/graphql';
 
 function DisasterResponse() {
     //  Todo: Region filter
     const [{ data: disasterResponse, fetching }] = useExternalDashboardsQuery({
-
         variables: {
-            // NOTE: Page variable value based on page enum where 60 is disaster response
-            page: '60',
+            page: DashboardPage.DisasterResponse,
             isActive: true,
         },
 

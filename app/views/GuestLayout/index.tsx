@@ -1,14 +1,14 @@
-import { use } from 'react';
 import {
     Navigate,
     Outlet,
 } from 'react-router';
 
-import UserContext from '#contexts/UserContext';
+import useAuth from '#hooks/useAuth';
 
 function GuestLayout() {
-    const { authenticated } = use(UserContext);
-    if (authenticated) {
+    const { isAuthenticated } = useAuth();
+
+    if (isAuthenticated) {
         return <Navigate to="/" />;
     }
     return (

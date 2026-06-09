@@ -14,6 +14,7 @@ import Page from '#components/Page';
 import RegionSelectInput from '#components/RegionSelectInput';
 import ReportCard from '#components/ReportCard';
 import {
+    ReportTypeEnum,
     useReportsQuery,
     useThematicAreasQuery,
 } from '#generated/types/graphql';
@@ -38,9 +39,10 @@ const Reports_QUERY = gql`
         $thematicAreaId: ID
         $limit: Int = 10
         $offset: Int = 0
+        $reportType: ReportTypeEnum
     ) {
         reports(
-            filters: { thematicAreaId: $thematicAreaId }
+            filters: { thematicAreaId: $thematicAreaId, reportType: $reportType }
             pagination: { limit: $limit, offset: $offset }
         ) {
             totalCount
@@ -103,6 +105,9 @@ function DataAndReport() {
             thematicAreaId: rawFilter.thematicAreaId,
             // TODO: add search filter in backend and uncomment below line
             // search: rawFilter.search,
+
+            // NOTE: Report Type variable value based on Report Type enum where 10 is Report
+            reportType: ReportTypeEnum.Report,
             limit,
             offset,
         },

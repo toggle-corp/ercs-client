@@ -1,7 +1,4 @@
-import {
-    use,
-    useMemo,
-} from 'react';
+import { useMemo } from 'react';
 import {
     Container,
     Description,
@@ -15,7 +12,7 @@ import {
 
 import Link from '#components/Link';
 import WikiLink from '#components/WikiLink';
-import CountryContext from '#contexts/GoContext';
+import useGoContext from '#hooks/useGoContext';
 import useInputState from '#hooks/useInputState';
 import { multiMonthSelectDefaultValue } from '#utils/constants';
 import { getGeoJsonBounds } from '#utils/geo';
@@ -36,7 +33,7 @@ function getCurrentMonth() {
 }
 
 function RiskAnalysis() {
-    const { countryResponse, countryId } = use(CountryContext);
+    const { countryResponse, countryId } = useGoContext();
     const [
         selectedMonths,
         setSelectedMonths,

@@ -1,10 +1,10 @@
-import { use } from 'react';
 import {
     SelectInput,
     type SelectInputProps,
 } from '@ifrc-go/ui';
 
-import GoContext, { type DisasterTypes } from '#contexts/GoContext';
+import { type DisasterTypes } from '#contexts/GoContext';
+import useGoContext from '#hooks/useGoContext';
 
 export type DisasterTypeItem = NonNullable<DisasterTypes['results']>[number];
 
@@ -45,7 +45,7 @@ function DisasterTypeSelectInput<const NAME>(props: Props<NAME>) {
         ...otherProps
     } = props;
 
-    const { disasterTypes } = use(GoContext);
+    const { disasterTypes } = useGoContext();
 
     const options = optionsFilter
         ? disasterTypes?.results.filter(optionsFilter)

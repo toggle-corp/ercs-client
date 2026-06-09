@@ -10,7 +10,6 @@ import {
     ListView,
     Pager,
 } from '@ifrc-go/ui';
-import { isDefined } from '@togglecorp/fujs';
 import { gql } from 'urql';
 
 import { useGalleryQuery } from '#generated/types/graphql';
@@ -109,9 +108,7 @@ function Photos(props: {albumId: string, handleView: (src:string) => void}) {
             limit,
             offset,
         },
-        pause: !albumId,
     });
-
     return (
         <Container
             pending={imageLoading}
@@ -123,7 +120,7 @@ function Photos(props: {albumId: string, handleView: (src:string) => void}) {
                     onActivePageChange={setPage}
                 />
             )}
-            empty={isDefined(imageData) && imageData.galleryImages.results.length === 0}
+            empty={!imageData?.galleryImages.results.length}
             emptyMessage="No Image Available"
         >
             <ListView

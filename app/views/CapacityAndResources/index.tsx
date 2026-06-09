@@ -26,12 +26,12 @@ const CAPACITY_AND_RESOURCES_QUERY = gql`
         $limit: Int = 10
         $offset: Int = 0
         $search: String = ""
-        $regionId: ID
+        $regions: [ID!]
         $isActive: Boolean 
     ) {
         capacityAndResources(
             pagination: { limit: $limit, offset: $offset }
-            filters: { search: $search, regionId: $regionId, isActive: $isActive }
+            filters: { search: $search, regions: $regions, isActive: $isActive }
         ) {
             totalCount
             results {
