@@ -10,6 +10,7 @@ import {
     ListView,
     Pager,
 } from '@ifrc-go/ui';
+import { saveAs } from 'file-saver';
 import { gql } from 'urql';
 
 import { useGalleryQuery } from '#generated/types/graphql';
@@ -19,10 +20,13 @@ import styles from './styles.module.css';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const IMAGES_QUERY = gql`
-    query Gallery($offset: Int, $limit: Int, $albumId: ID) {
+    query Gallery(
+        $pagination: OffsetPaginationInput,
+        $filters: GalleryImageFilter
+    ) {
         galleryImages(
-            pagination: { limit: $limit, offset: $offset }
-            filters: { albumId: $albumId }
+            filters: $filters
+            pagination: $pagination
         ) {
             totalCount
             results {
@@ -56,6 +60,10 @@ function ImageComponent(props: ImageComponentProps) {
     } = props;
     const safeSrc = toSafeSrc(src);
 
+    const handleDownloadClick = () => {
+        saveAs(safeSrc, name);
+    };
+
     return (
         <div className={styles.imgContainer}>
             <Image src={safeSrc} size="md" />
@@ -64,17 +72,16 @@ function ImageComponent(props: ImageComponentProps) {
                 className={styles.actionButton}
                 withPadding
             >
-                <a href={safeSrc} download={name}>
-                    <IconButton
-                        name="download"
-                        ariaLabel="download"
-                        title="download"
-                        round={false}
-                        variant="secondary"
-                    >
-                        <DownloadTwoFillIcon />
-                    </IconButton>
-                </a>
+                <IconButton
+                    name="download"
+                    ariaLabel="download"
+                    title="download"
+                    round={false}
+                    variant="secondary"
+                    onClick={handleDownloadClick}
+                >
+                    <DownloadTwoFillIcon />
+                </IconButton>
                 <IconButton
                     name={safeSrc}
                     ariaLabel="open"
@@ -104,10 +111,15 @@ function Photos(props: {albumId: string, handleView: (src:string) => void}) {
 
     const [{ fetching: imageLoading, data: imageData }] = useGalleryQuery({
         variables: {
-            albumId,
-            limit,
-            offset,
+            filters: {
+                albumId,
+            },
+            pagination: {
+                limit,
+                offset,
+            },
         },
+        pause: !albumId,
     });
     return (
         <Container

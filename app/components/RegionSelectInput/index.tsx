@@ -1,45 +1,90 @@
-import { SelectInput } from '@ifrc-go/ui';
+import {
+    SelectInput,
+    type SelectInputProps,
+} from '@ifrc-go/ui';
+import { gql } from 'urql';
 
 import {
-    keySelector,
-    labelSelector,
-    type Selector,
+    AdminAreaLevel,
+    type AdminAreasQuery,
+    useAdminAreasQuery,
+} from '#generated/types/graphql';
+import {
+    idSelector,
+    nameSelector,
 } from '#utils/utils';
 
-// Note: This will dynamically fetch from server
-const ethiopiaRegions: Selector[] = [
-    { key: 'AA', label: 'Addis Ababa' },
-    { key: 'AF', label: 'Afar' },
-    { key: 'AM', label: 'Amhara' },
-    { key: 'BE', label: 'Benishangul-Gumuz' },
-    { key: 'CERS', label: 'Central Ethiopia Regional State' },
-    { key: 'DR', label: 'Dire Dawa' },
-    { key: 'GA', label: 'Gambela' },
-    { key: 'HA', label: 'Harari' },
-    { key: 'OR', label: 'Oromia' },
-    { key: 'SI', label: 'Sidama' },
-    { key: 'SO', label: 'Somali' },
-    { key: 'SW', label: 'South West Ethiopia' },
-    { key: 'SNNP', label: 'SNNPR' },
-    { key: 'TI', label: 'Tigray' },
-];
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const REGION_QUERY = gql`
+    query AdminAreas($filters: AdminAreaFilter) {
+        adminAreas(filters: $filters) {
+            results {
+                centroidLat
+                centroidLon
+                id
+                level
+                levelDisplay
+                name
+                parentId
+                pcode
+            }
+            totalCount
+        }
+    }
+`;
 
-type Props = {
-  name: string;
-  value: string | undefined;
-  onChange: (value: string | undefined, name: string) => void;
+export type RegionItem = NonNullable<AdminAreasQuery['adminAreas']['results']>[number];
+
+type Props<NAME> = SelectInputProps<
+    string,
+    NAME,
+    RegionItem,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any,
+    'value' | 'name' | 'options' | 'keySelector' | 'labelSelector'
+> & {
+    className?: string;
+    name: NAME;
+    value: string | undefined | null;
+    onChange: (
+        newValue: string | undefined,
+        name: NAME,
+        option: RegionItem | undefined,
+    ) => void;
 };
 
-function RegionSelectInput(props: Props) {
-    const { name, value, onChange } = props;
+function RegionSelectInput<const NAME>(props: Props<NAME>) {
+    const {
+        className,
+        name,
+        value,
+        onChange,
+        disabled,
+        ...otherProps
+    } = props;
+
+    const [{ data, fetching }] = useAdminAreasQuery({
+        variables: {
+            filters: {
+                level: AdminAreaLevel.Region,
+            },
+        },
+    });
+
+    const regions = data?.adminAreas.results;
+
     return (
         <SelectInput
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...otherProps}
+            className={className}
             name={name}
-            options={ethiopiaRegions}
-            keySelector={keySelector}
-            labelSelector={labelSelector}
+            options={regions}
+            keySelector={idSelector}
+            labelSelector={nameSelector}
             value={value}
             onChange={onChange}
+            disabled={disabled || fetching}
             placeholder="Select region"
         />
     );

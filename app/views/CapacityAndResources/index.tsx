@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { SearchLineIcon } from '@ifrc-go/icons';
 import {
     Container,
@@ -23,15 +24,12 @@ import useFilterState from '#hooks/useFilterState';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CAPACITY_AND_RESOURCES_QUERY = gql`
     query CapacityAndResources(
-        $limit: Int = 10
-        $offset: Int = 0
-        $search: String = ""
-        $regions: [ID!]
-        $isActive: Boolean 
+        $pagination: OffsetPaginationInput,
+        $filters: CapacityAndResourceFilter
     ) {
         capacityAndResources(
-            pagination: { limit: $limit, offset: $offset }
-            filters: { search: $search, regions: $regions, isActive: $isActive }
+            filters: $filters
+            pagination: $pagination
         ) {
             totalCount
             results {
@@ -58,6 +56,8 @@ function ResourcesActions({ id }: {id: string}) {
 }
 
 function CapacityAndResourcesList() {
+    const [regionId, setRegionId] = useState<string | undefined>(undefined);
+
     const {
         limit,
         page,
@@ -75,11 +75,15 @@ function CapacityAndResourcesList() {
     });
     const [{ data, fetching }] = useCapacityAndResourcesQuery({
         variables: {
-            // regionId: '',
-            isActive: true,
-            search: filter.searchText,
-            limit,
-            offset,
+            filters: {
+                regions: [regionId ?? ''],
+                isActive: true,
+                search: filter.searchText,
+            },
+            pagination: {
+                limit,
+                offset,
+            },
         },
     });
     const capacityAndResourcesData = data?.capacityAndResources.results ?? [];
@@ -107,11 +111,10 @@ function CapacityAndResourcesList() {
     return (
         <Page
             actions={(
-                // TODO: add region filter
                 <RegionSelectInput
                     name="region"
-                    value={undefined}
-                    onChange={() => {}}
+                    value={regionId}
+                    onChange={setRegionId}
                 />
             )}
             heading="Capacity and Resources"

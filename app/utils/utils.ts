@@ -123,19 +123,22 @@ export interface ClickedPoint {
     lngLat: mapboxgl.LngLatLike;
 }
 
-export type Selector = {
-    key?: string;
-    id?: string;
-    label: string | null | undefined;
+export function labelSelector<T>(item: { label: T }) {
+    return item.label;
 }
 
-export function keySelector(type: Selector) {
-    return type.key ?? '';
-}
-export function labelSelector(type: Selector) {
-    return type.label ?? '?';
+export function keySelector<T>(item: { key: T }) {
+    return item.key;
 }
 
-export function idSelector(type: Selector) {
-    return type.id ?? '';
+export function idSelector<T>(item: { id: T }) {
+    return item.id;
+}
+
+export function nameSelector<T>(item: { name: T }) {
+    return item.name;
+}
+
+export function valueSelector<T>(item: { value: T }) {
+    return item.value;
 }

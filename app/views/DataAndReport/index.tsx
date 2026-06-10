@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { SearchLineIcon } from '@ifrc-go/icons';
 import {
     Container,
@@ -36,14 +37,12 @@ const ThematicAreas_QUERY = gql`
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Reports_QUERY = gql`
     query Reports(
-        $thematicAreaId: ID
-        $limit: Int = 10
-        $offset: Int = 0
-        $reportType: ReportTypeEnum
+        $pagination: OffsetPaginationInput,
+        $filters: ReportFilter
     ) {
         reports(
-            filters: { thematicAreaId: $thematicAreaId, reportType: $reportType }
-            pagination: { limit: $limit, offset: $offset }
+            filters: $filters
+            pagination: $pagination
         ) {
             totalCount
             results {
@@ -84,6 +83,7 @@ const labelSelector = (item: ThematicArea) => item.name;
 
 function DataAndReport() {
     const [{ data }] = useThematicAreasQuery();
+    const [regionId, setRegionId] = useState<string | undefined>(undefined);
 
     const {
         limit,
@@ -102,14 +102,17 @@ function DataAndReport() {
 
     const [{ data: reportsData, fetching }] = useReportsQuery({
         variables: {
-            thematicAreaId: rawFilter.thematicAreaId,
-            // TODO: add search filter in backend and uncomment below line
-            // search: rawFilter.search,
-
-            // NOTE: Report Type variable value based on Report Type enum where 10 is Report
-            reportType: ReportTypeEnum.Report,
-            limit,
-            offset,
+            filters: {
+                thematicAreaId: rawFilter.thematicAreaId,
+                reportType: ReportTypeEnum.Report,
+                // TODO: add search filter in backend and uncomment below line
+                // search: rawFilter.search,
+                regions: [regionId ?? ''],
+            },
+            pagination: {
+                limit,
+                offset,
+            },
         },
     });
     const thematicAreaOptions = data?.thematicAreas?.results ?? [];
@@ -118,11 +121,10 @@ function DataAndReport() {
     return (
         <Page
             actions={(
-                // TODO: add region filter
                 <RegionSelectInput
                     name="region"
-                    value={undefined}
-                    onChange={() => {}}
+                    value={regionId}
+                    onChange={setRegionId}
                 />
             )}
             heading="Dataset Overview"
@@ -173,18 +175,22 @@ function DataAndReport() {
                     )}
                     empty={reportDetails.length === 0}
                 >
-                    {reportDetails.map((report) => (
-                        <Link
-                            to="reportDetail"
-                            withFullWidth
-                            attrs={{ id: report.id }}
-                        >
-                            <ReportCard
-                                key={report.id}
-                                report={report}
-                            />
-                        </Link>
-                    ))}
+                    <ListView
+                        layout="block"
+                    >
+                        {reportDetails.map((report) => (
+                            <Link
+                                to="reportDetail"
+                                withFullWidth
+                                attrs={{ id: report.id }}
+                            >
+                                <ReportCard
+                                    key={report.id}
+                                    report={report}
+                                />
+                            </Link>
+                        ))}
+                    </ListView>
                 </Container>
             </ListView>
         </Page>

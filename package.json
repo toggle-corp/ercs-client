@@ -32,6 +32,7 @@
     "@urql/exchange-graphcache": "^9.0.0",
     "file-saver": "^2.0.5",
     "graphql": "^16.13.2",
+    "html-to-image": "^1.11.13",
     "knip": "^6.3.0",
     "lint": "^0.8.19",
     "mapbox-gl": "^1.13.3",

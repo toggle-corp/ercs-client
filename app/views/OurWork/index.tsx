@@ -2,6 +2,8 @@ import { Outlet } from 'react-router';
 import {
     AlertLineIcon,
     HeartAddLineIcon,
+    InspectIcon,
+    MapIcon,
     ShieldUserLineIcon,
 } from '@ifrc-go/icons';
 import {
@@ -14,7 +16,6 @@ import { gql } from 'urql';
 import KeyCard from '#components/KeyCard';
 import NavigationTab from '#components/NavigationTab';
 import Page from '#components/Page';
-import RegionSelectInput from '#components/RegionSelectInput';
 
 // NOTE: There is limit of 20 dashboards for now, as we don't have more than that.
 // We can add pagination if needed in the future
@@ -22,14 +23,12 @@ import RegionSelectInput from '#components/RegionSelectInput';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const EXTERNAL_DASHBOARDS_QUERY = gql`
     query ExternalDashboards(
-        $page: DashboardPage
-        $isActive: Boolean = true
-        $limit: Int = 20
-        $offset: Int = 0
+        $pagination: OffsetPaginationInput,
+        $filters: ExternalDashboardFilter
     ) {
         externalDashboards(
-            filters: { page: $page, isActive: $isActive }
-            pagination: { limit: $limit, offset: $offset }
+            filters: $filters
+            pagination: $pagination
         ) {
             results {
                 title
@@ -98,14 +97,6 @@ function OurWork() {
                     {keyFigures}
                 </Container>
             )}
-            actions={(
-                // TODO: add region filter
-                <RegionSelectInput
-                    name="region"
-                    value={undefined}
-                    onChange={() => {}}
-                />
-            )}
         >
             <ListView
                 layout="block"
@@ -115,12 +106,28 @@ function OurWork() {
                     <NavigationTab
                         to="emergencyResponse"
                     >
-                        Emergency Response
+                        <ListView
+                            spacing="2xs"
+                            withCenteredContents
+                        >
+                            <InspectIcon fontSize={18} />
+                            <span>
+                                Emergency Response
+                            </span>
+                        </ListView>
                     </NavigationTab>
                     <NavigationTab
                         to="projectMapping"
                     >
-                        Project Mapping
+                        <ListView
+                            spacing="2xs"
+                            withCenteredContents
+                        >
+                            <MapIcon fontSize={18} />
+                            <span>
+                                Project Mapping
+                            </span>
+                        </ListView>
                     </NavigationTab>
 
                 </NavigationTabList>

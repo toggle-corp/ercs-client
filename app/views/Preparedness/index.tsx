@@ -1,5 +1,11 @@
 import { Outlet } from 'react-router';
 import {
+    AlertLineIcon,
+    AnalyzingIcon,
+    EmergencyResponseUnitIcon,
+    InspectIcon,
+} from '@ifrc-go/icons';
+import {
     ListView,
     NavigationTabList,
 } from '@ifrc-go/ui';
@@ -24,23 +30,50 @@ function Preparedness() {
                     <NavigationTab
                         to="emergencyAlert"
                     >
-                        Emergency Alert
+                        <ListView
+                            spacing="2xs"
+                        >
+                            <AlertLineIcon fontSize={18} />
+                            <span>
+                                Emergency Alert
+                            </span>
+                        </ListView>
                     </NavigationTab>
                     <NavigationTab
                         to="disasterResponse"
                     >
-                        Disaster Response
-                        {' '}
+                        <ListView
+                            spacing="2xs"
+                        >
+                            <EmergencyResponseUnitIcon fontSize={18} />
+                            <span>
+                                Disaster Response
+                            </span>
+                        </ListView>
                     </NavigationTab>
                     <NavigationTab
                         to="pmer"
                     >
-                        PMER
+                        <ListView
+                            spacing="2xs"
+                        >
+                            <InspectIcon fontSize={18} />
+                            <span>
+                                PMER
+                            </span>
+                        </ListView>
                     </NavigationTab>
                     <NavigationTab
                         to="riskAnalysis"
                     >
-                        Risk Analysis
+                        <ListView
+                            spacing="2xs"
+                        >
+                            <AnalyzingIcon fontSize={18} />
+                            <span>
+                                Risk Analysis
+                            </span>
+                        </ListView>
                     </NavigationTab>
                 </NavigationTabList>
                 <Outlet />

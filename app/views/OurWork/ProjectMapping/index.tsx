@@ -12,11 +12,12 @@ import {
 } from '#generated/types/graphql';
 
 function ProjectMapping() {
-    //  Todo: Region filter
     const [{ data: projectMappingData, fetching }] = useExternalDashboardsQuery({
         variables: {
-            page: DashboardPage.ProjectMapping,
-            isActive: true,
+            filters: {
+                page: DashboardPage.ProjectMapping,
+                isActive: true,
+            },
         },
 
     });
