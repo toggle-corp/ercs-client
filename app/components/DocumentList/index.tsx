@@ -15,13 +15,12 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DOCUMENT_LIST_QUERY = gql`
     query DocumentList(
-        $reportType: ReportTypeEnum
-        $limit: Int = 10
-        $offset: Int = 0
+        $pagination: OffsetPaginationInput,
+        $filters: ReportFilter
     ) {
         reports(
-            filters: { reportType: $reportType }
-            pagination: { limit: $limit, offset: $offset }
+            filters: $filters
+            pagination: $pagination
         ) {
             totalCount
             results {
@@ -55,7 +54,9 @@ function DocumentList(props: Props) {
 
     const [{ data, fetching }] = useDocumentListQuery({
         variables: {
-            reportType,
+            filters: {
+                reportType,
+            },
         },
     });
 

@@ -16,13 +16,12 @@ import useFilterState from '#hooks/useFilterState';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PUBLIC_LINKS_QUERY = gql`
     query PublicLinks(
-        $limit: Int = 10
-        $offset: Int = 0
-        $linkType: LinkTypeEnum
+        $pagination: OffsetPaginationInput,
+        $filters: LinkFilter
     ) {
         publicLinks(
-            pagination: { limit: $limit, offset: $offset }
-            filters: { linkType: $linkType }
+            filters: $filters
+            pagination: $pagination
         ) {
             totalCount
             results {
@@ -54,9 +53,13 @@ function AdditionalLinkList({ linkType }: LinkListProps) {
 
     const [{ data, fetching }] = usePublicLinksQuery({
         variables: {
-            linkType,
-            limit,
-            offset,
+            filters: {
+                linkType,
+            },
+            pagination: {
+                limit,
+                offset,
+            },
         },
     });
 

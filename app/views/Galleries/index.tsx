@@ -31,10 +31,13 @@ import styles from './styles.module.css';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ALBUM_QUERY = gql`
-    query Albums($offset: Int, $limit: Int, $search: String) {
+    query Albums(
+        $pagination: OffsetPaginationInput,
+        $filters: GalleryAlbumFilter
+    ) {
         galleryAlbums(
-            pagination: { limit: $limit, offset: $offset }
-            filters: { search: $search }
+            filters: $filters
+            pagination: $pagination
         ) {
             results {
                 title
@@ -97,9 +100,13 @@ function Galleries() {
 
     const [{ data, fetching }] = useAlbumsQuery(({
         variables: {
-            search: filter.searchText,
-            limit,
-            offset,
+            filters: {
+                search: filter.searchText,
+            },
+            pagination: {
+                limit,
+                offset,
+            },
         },
     }));
     const handleView = (src: string) => {
@@ -203,6 +210,7 @@ function Galleries() {
                         )}
                     </ListView>
                     <Photos
+                        key={albumId}
                         albumId={albumId}
                         handleView={handleView}
                     />

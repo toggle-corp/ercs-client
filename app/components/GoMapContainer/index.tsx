@@ -26,12 +26,13 @@ import {
     isDefined,
 } from '@togglecorp/fujs';
 import { MapContainer } from '@togglecorp/re-map';
+import FileSaver from 'file-saver';
+import { toPng } from 'html-to-image';
 
 import Link from '#components/Link';
+import useAlert from '#hooks/useAlert';
 import goLogo from '#resources/image/logo.png';
 
-// import FileSaver from 'file-saver';
-// import { toPng } from 'html-to-image';
 import styles from './styles.module.css';
 
 interface Props {
@@ -128,20 +129,20 @@ function GoMapContainer(props: Props) {
         }
     }, [presentationMode, onPresentationModeChange]);
 
-    // const alert = useAlert();
-    // const handleDownloadClick = useCallback(() => {
-    //     if (!containerRef?.current) {
-    //         alert.show(
-    //             "Failed to download map. Try again.",
-    //             { variant: 'danger' },
-    //         );
-    //         exitPrintMode();
-    //         return;
-    //     }
-    //     toPng(containerRef.current, { skipAutoScale: false })
-    //         .then((data) => FileSaver.saveAs(data, title))
-    //         .finally(exitPrintMode);
-    // }, [exitPrintMode, title, alert]);
+    const alert = useAlert();
+    const handleDownloadClick = useCallback(() => {
+        if (!containerRef?.current) {
+            alert.show(
+                'Failed to download map. Try again.',
+                { variant: 'danger' },
+            );
+            exitPrintMode();
+            return;
+        }
+        toPng(containerRef.current, { skipAutoScale: false })
+            .then((data) => FileSaver.saveAs(data, title))
+            .finally(exitPrintMode);
+    }, [exitPrintMode, title, alert]);
 
     return (
         <Container
@@ -181,7 +182,7 @@ function GoMapContainer(props: Props) {
                             <ListView>
                                 <Button
                                     name={undefined}
-                                    onClick={() => {}}
+                                    onClick={handleDownloadClick}
                                     before={(
                                         <DownloadTwoLineIcon />
                                     )}

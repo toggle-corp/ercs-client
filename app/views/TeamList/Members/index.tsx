@@ -12,6 +12,10 @@ import {
     createElementColumn,
     createStringColumn,
 } from '@ifrc-go/ui/utils';
+import {
+    decodeDate,
+    formatDateToString,
+} from '@togglecorp/fujs';
 import { gql } from 'urql';
 
 import ExportButton from '#components/ExportButton';
@@ -28,12 +32,9 @@ import useGraphQLToCSV from '#hooks/useGraphqlToCsv';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TEAM_MEMBERS_QUERY = gql`
     query TeamMembers(
-        $offset: Int
-        $limit: Int
-        $search: String
-        $woredas: [ID!]
+        $pagination: OffsetPaginationInput,
+        $filters: TeamMemberFilter
         $teamId: ID!
-        $regions: [ID!]
     ) {
         team(id: $teamId) {
             id
@@ -41,13 +42,8 @@ const TEAM_MEMBERS_QUERY = gql`
             description
         }
         teamMembers(
-            pagination: { limit: $limit, offset: $offset }
-            filters: {
-                search: $search
-                woredas: $woredas
-                teamId: $teamId
-                regions: $regions
-            }
+            filters: $filters
+            pagination: $pagination
         ) {
             totalCount
             results {
@@ -72,18 +68,10 @@ const TEAM_MEMBERS_QUERY = gql`
 
 const TEAM_MEMBERS_EXPORT_QUERY = gql`
     query TeamMembersExport(
-        $search: String
-        $woredas: [ID!]
-        $teamId: ID!
-        $regions: [ID!]
+        $filters: TeamMemberFilter
     ) {
         teamMembers(
-            filters: {
-                search: $search
-                woredas: $woredas
-                teamId: $teamId
-                regions: $regions
-            }
+            filters: $filters
         ) {
             results {
                 id
@@ -146,9 +134,13 @@ function Members() {
     const [{ fetching, data }] = useTeamMembersQuery({
         variables: {
             teamId: id!,
-            offset,
-            limit,
-            search: filter.searchText,
+            filters: {
+                search: filter.searchText,
+            },
+            pagination: {
+                offset,
+                limit,
+            },
         },
         pause: !id,
     });
@@ -163,18 +155,22 @@ function Members() {
         filename: `team-${data?.team.id ? data?.team.name.toLowerCase() : id}-members.csv`,
         transform: (responseData) => (
             responseData.teamMembers.results ?? []
-        ).map((member) => ({
-            ID: member.id,
-            Name: member.name,
-            Email: member.email,
-            Gender: member.sex,
-            'Phone Number': member.phoneNumber,
-            Position: member.position,
-            Training: member.training,
-            'Field of Study': member.fieldOfStudy,
-            'Created At': member.createdAt,
-            'Updated At': member.updatedAt,
-        })),
+        ).map((member) => {
+            const createdAt = member.createdAt ? formatDateToString(decodeDate(member.createdAt as string), 'yyyy-dd-MM') : '';
+            const updatedAt = member.updatedAt ? formatDateToString(decodeDate(member.createdAt as string), 'yyyy-dd-MM') : '';
+            return {
+                ID: member.id,
+                Name: member.name,
+                Email: member.email,
+                Gender: member.sex,
+                'Phone Number': member.phoneNumber,
+                Position: member.position,
+                Training: member.training,
+                'Field of Study': member.fieldOfStudy,
+                'Created At': createdAt,
+                'Updated At': updatedAt,
+            };
+        }),
     });
 
     const handleExport = () => {
@@ -248,6 +244,7 @@ function Members() {
             >
                 <ListView
                     withSpaceBetweenContents
+                    withWrap
                 >
                     <TextInput
                         name="searchText"

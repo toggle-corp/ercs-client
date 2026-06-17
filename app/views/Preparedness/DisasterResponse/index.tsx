@@ -1,47 +1,60 @@
+import { useState } from 'react';
 import { AlertLineIcon } from '@ifrc-go/icons';
 import {
     Container,
+    InlineLayout,
     ListView,
 } from '@ifrc-go/ui';
 
 import InfoCard from '#components/InfoCard';
 import PowerBIEmbed from '#components/PowerBiEmbed';
+import RegionSelectInput from '#components/RegionSelectInput';
 import {
     DashboardPage,
     useExternalDashboardsQuery,
 } from '#generated/types/graphql';
 
 function DisasterResponse() {
-    //  Todo: Region filter
+    const [regionId, setRegionId] = useState<string | undefined>(undefined);
     const [{ data: disasterResponse, fetching }] = useExternalDashboardsQuery({
         variables: {
-            page: DashboardPage.DisasterResponse,
-            isActive: true,
+            filters: {
+                page: DashboardPage.DisasterResponse,
+                isActive: true,
+                regions: [regionId ?? ''],
+            },
         },
-
     });
     return (
-        <Container
-            pending={fetching}
-            empty={disasterResponse?.externalDashboards.results.length === 0}
+        <ListView
+            layout="block"
         >
-            <ListView
-                layout="block"
-                spacing="2xl"
+            <InlineLayout
+                after={(
+                    <RegionSelectInput
+                        name="region"
+                        value={regionId}
+                        onChange={setRegionId}
+                    />
+                )}
+            />
+            <InfoCard
+                icon={<AlertLineIcon />}
+                title="Alerts Dashboard"
+                description="Real-time emergency alerts and early warning system monitoring across regions"
+            />
+            <Container
+                pending={fetching}
+                empty={disasterResponse?.externalDashboards.results.length === 0}
             >
-                <InfoCard
-                    icon={<AlertLineIcon />}
-                    title="Alerts Dashboard"
-                    description="Real-time emergency alerts and early warning system monitoring across regions"
-                />
                 {disasterResponse?.externalDashboards.results.map((report) => (
                     <PowerBIEmbed
                         key={report.id}
                         embedUrl={report.url}
                     />
                 ))}
-            </ListView>
-        </Container>
+            </Container>
+        </ListView>
     );
 }
 export default DisasterResponse;

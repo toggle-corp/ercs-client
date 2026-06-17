@@ -303,7 +303,7 @@ function ActiveOperation() {
         ),
         createEventColumn<AppealListItem, string>(
             'operation',
-            'operation',
+            'Operation',
             (item) => item.name,
             (item) => ({
                 href: `${goUrl}/emergencies/${item.event}/details`,
@@ -407,7 +407,7 @@ function ActiveOperation() {
                 onAdminZeroFillClick={handleCountryClick}
             >
                 <GoMapContainer
-                    title="Global Emergency Map"
+                    title="Ethiopia Active Operation"
                     withPresentationMode
                     onPresentationModeChange={setPresentationMode}
                     footer={(

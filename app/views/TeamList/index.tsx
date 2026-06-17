@@ -22,13 +22,12 @@ import useFilterState from '#hooks/useFilterState';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TEAMS_QUERY = gql`
     query Teams(
-        $limit: Int = 10
-        $offset: Int = 0
-        $search: String = ""
+        $pagination: OffsetPaginationInput,
+        $filters: TeamFilter
     ) {
         teams(
-            pagination: { limit: $limit, offset: $offset }
-            filters: { search: $search }
+            filters: $filters
+            pagination: $pagination
         ) {
             totalCount
             results {
@@ -71,9 +70,13 @@ function TeamList() {
     });
     const [{ data, fetching }] = useTeamsQuery(({
         variables: {
-            search: filter.searchText,
-            limit,
-            offset,
+            filters: {
+                search: filter.searchText,
+            },
+            pagination: {
+                limit,
+                offset,
+            },
         },
     }));
     const teams = data?.teams.results ?? [];
