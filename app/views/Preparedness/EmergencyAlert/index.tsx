@@ -22,7 +22,7 @@ function EmergencyAlert() {
             filters: {
                 page: DashboardPage.EmergencyAlerts,
                 isActive: true,
-                regions: [regionId ?? ''],
+                regions: regionId ? [regionId] : null,
             },
         },
     });

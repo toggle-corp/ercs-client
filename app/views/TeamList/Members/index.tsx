@@ -47,12 +47,12 @@ const TEAM_MEMBERS_QUERY = gql`
         ) {
             totalCount
             results {
-                woredaId
+                woreda
                 updatedAt
                 training
                 teamId
                 sex
-                regionId
+                region
                 position
                 phoneNumber
                 order

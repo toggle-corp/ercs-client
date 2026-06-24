@@ -1,5 +1,6 @@
 import { StarLineIcon } from '@ifrc-go/icons';
 import {
+    BlockLoading,
     Description,
     Heading,
     InlineView,
@@ -8,8 +9,13 @@ import {
 
 import styles from './styles.module.css';
 
-function AIsummary() {
-    // TODO: fetch ai summary data from backend and display here
+interface AISummaryProps {
+    loading? : boolean,
+    summary: string
+}
+
+function AIsummary(props: AISummaryProps) {
+    const { loading, summary } = props;
     return (
         <ListView
             layout="block"
@@ -24,37 +30,16 @@ function AIsummary() {
             >
                 <Heading level={2}>AI Summary</Heading>
             </InlineView>
-            <Description textSize="lg">
-                A cholera outbreak was declared in Arsi Zone,
-                Ethiopia on 17 May 2025 and is spreading to nearby areas.
-                By mid-June, 201 cases (92% severe) and 2 deaths were reported.
-                The outbreak is rapidly increasing, with over 62,000 people in need of assistance.
-            </Description>
-            <Description textSize="lg">
-                A cholera outbreak was declared in Arsi Zone,
-                Ethiopia on 17 May 2025 and is spreading to nearby areas.
-                By mid-June, 201 cases (92% severe) and 2 deaths were reported.
-                The outbreak is rapidly increasing, with over 62,000 people in need of assistance.
-            </Description>
-            <Description textSize="lg">
-                A cholera outbreak was declared in Arsi Zone,
-                Ethiopia on 17 May 2025 and is spreading to nearby areas.
-                By mid-June, 201 cases (92% severe) and 2 deaths were reported.
-                The outbreak is rapidly increasing, with over 62,000 people in need of assistance.
-            </Description>
-            <Description textSize="lg">
-                A cholera outbreak was declared in Arsi Zone,
-                Ethiopia on 17 May 2025 and is spreading to nearby areas.
-                By mid-June, 201 cases (92% severe) and 2 deaths were reported.
-                The outbreak is rapidly increasing, with over 62,000 people in need of assistance.
-            </Description>
-            <Description textSize="lg">
-                A cholera outbreak was declared in Arsi Zone,
-                Ethiopia on 17 May 2025 and is spreading to nearby areas.
-                By mid-June, 201 cases (92% severe) and 2 deaths were reported.
-                The outbreak is rapidly increasing, with over 62,000 people in need of assistance.
-            </Description>
-
+            {loading ? (
+                <BlockLoading
+                    withoutBorder
+                    message="Generating...."
+                />
+            ) : (
+                <Description textSize="lg">
+                    {summary}
+                </Description>
+            ) }
         </ListView>
     );
 }

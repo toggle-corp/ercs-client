@@ -105,9 +105,8 @@ function DataAndReport() {
             filters: {
                 thematicAreaId: rawFilter.thematicAreaId,
                 reportType: ReportTypeEnum.Report,
-                // TODO: add search filter in backend and uncomment below line
-                // search: rawFilter.search,
-                regions: [regionId ?? ''],
+                search: rawFilter.searchText ?? '',
+                regions: regionId ? [regionId] : null,
             },
             pagination: {
                 limit,

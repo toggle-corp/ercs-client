@@ -12,7 +12,12 @@ import { gql } from 'urql';
 
 import PdfViewer from '#components/PdfViewer';
 import PowerBIEmbed from '#components/PowerBiEmbed';
-import { useReportQuery } from '#generated/types/graphql';
+import {
+    DocumentExtractionStatus,
+    ExtractionType,
+    useReportQuery,
+    useReportSummaryQuery,
+} from '#generated/types/graphql';
 import AIsummary from '#views/DataAndReport/AIsummary';
 
 import styles from './styles.module.css';
@@ -39,6 +44,33 @@ const REPORT_QUERY = gql`
     }
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const REPORT_SUMMARY_QUERY = gql`
+    query ReportSummary(
+        $pagination: OffsetPaginationInput,
+        $filters: ReportSummaryFilter
+    ) {
+        reportSummaries(
+            filters: $filters
+            pagination: $pagination
+        ) {
+            totalCount
+            results {
+                id
+                chunkType
+                text
+                pageNumber
+                status
+            }
+            totalCount
+            pageInfo {
+                offset
+                limit
+            }
+        }
+    }
+`;
+
 function ReportDetail() {
     const { id } = useParams<{ id: string }>();
 
@@ -47,10 +79,21 @@ function ReportDetail() {
         pause: !id,
     });
 
-    const reportData = data?.report;
+    const [{ fetching: summaryLoading, data: summaryData }] = useReportSummaryQuery({
+        variables: {
+            filters: {
+                report: id,
+                status: DocumentExtractionStatus.Success,
+                chunkType: ExtractionType.DocumentSummary,
+            },
+        },
+        pause: !id,
+    });
 
-    // TODO: add condition or ai summary
-    const aiSummaryAvailable = !reportData?.iframeUrl;
+    const reportData = data?.report;
+    const aiSummary = summaryData?.reportSummaries.results
+        .map((summary) => summary.text)
+        .join('\n \n');
     const publishedDate = new Date(reportData?.publishedAt);
     const encodedPublishedDate = encodeDate(publishedDate);
 
@@ -63,13 +106,13 @@ function ReportDetail() {
             >
                 <ListView
                     // eslint-disable-next-line react/jsx-props-no-spreading
-                    {...(aiSummaryAvailable
+                    {...(aiSummary
                         ? { layout: 'grid', withSidebar: true }
                         : { layout: 'block' })}
                 >
                     <ListView
                         layout="block"
-                        spacing={aiSummaryAvailable ? 'md' : 'xs'}
+                        spacing={aiSummary ? 'md' : 'xs'}
                         className={styles.content}
                     >
                         <ListView
@@ -125,10 +168,13 @@ function ReportDetail() {
                                 />
                             ) }
                     </ListView>
-                    {aiSummaryAvailable && (
+                    {aiSummary && (
                         <div className={styles.details}>
                             <div className={styles.stickyDetails}>
-                                <AIsummary />
+                                <AIsummary
+                                    summary={aiSummary}
+                                    loading={summaryLoading}
+                                />
                             </div>
                         </div>
                     )}
