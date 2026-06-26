@@ -7,8 +7,12 @@ import {
     InlineLayout,
     ListView,
 } from '@ifrc-go/ui';
+import { isDefined } from '@togglecorp/fujs';
 
-import type { ReportsQuery } from '#generated/types/graphql';
+import {
+    ReportContentType,
+    type ReportsQuery,
+} from '#generated/types/graphql';
 
 import styles from './styles.module.css';
 
@@ -21,12 +25,13 @@ function ReportCard({ report }: ReportCardProps) {
         coverImage,
         title,
         description,
+        contentType,
     } = report;
 
     return (
         <InlineLayout
             before={
-                coverImage?.url ? (
+                isDefined(coverImage?.url) ? (
                     <Image
                         src={coverImage.url}
                         alt="Report"
@@ -52,6 +57,19 @@ function ReportCard({ report }: ReportCardProps) {
                 layout="block"
                 spacing="3xs"
             >
+                {contentType === ReportContentType.Iframe && (
+                    <Description
+                        withLightText
+                    >
+                        <InlineLayout
+                            spacing="3xs"
+                            before={<DashboardLineIcon />}
+                        >
+                            External Dashboard
+                        </InlineLayout>
+                    </Description>
+                )}
+
                 <Heading
                     level={4}
                 >

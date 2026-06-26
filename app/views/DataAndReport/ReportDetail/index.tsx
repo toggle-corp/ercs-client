@@ -7,7 +7,10 @@ import {
     ListView,
     PageContainer,
 } from '@ifrc-go/ui';
-import { encodeDate } from '@togglecorp/fujs';
+import {
+    encodeDate,
+    isDefined,
+} from '@togglecorp/fujs';
 import { gql } from 'urql';
 
 import PdfViewer from '#components/PdfViewer';
@@ -15,6 +18,7 @@ import PowerBIEmbed from '#components/PowerBiEmbed';
 import {
     DocumentExtractionStatus,
     ExtractionType,
+    ReportContentType,
     useReportQuery,
     useReportSummaryQuery,
 } from '#generated/types/graphql';
@@ -78,6 +82,7 @@ function ReportDetail() {
         variables: { id: id! },
         pause: !id,
     });
+    const reportData = data?.report;
 
     const [{ fetching: summaryLoading, data: summaryData }] = useReportSummaryQuery({
         variables: {
@@ -87,10 +92,9 @@ function ReportDetail() {
                 chunkType: ExtractionType.DocumentSummary,
             },
         },
-        pause: !id,
+        pause: !id || !reportData || reportData.contentType === ReportContentType.Iframe,
     });
 
-    const reportData = data?.report;
     const aiSummary = summaryData?.reportSummaries.results
         .map((summary) => summary.text)
         .join('\n \n');
@@ -106,7 +110,7 @@ function ReportDetail() {
             >
                 <ListView
                     // eslint-disable-next-line react/jsx-props-no-spreading
-                    {...(aiSummary
+                    {...(isDefined(aiSummary)
                         ? { layout: 'grid', withSidebar: true }
                         : { layout: 'block' })}
                 >
@@ -160,7 +164,7 @@ function ReportDetail() {
                                 </Description>
                             </ListView>
                         </ListView>
-                        {reportData?.file?.url
+                        {isDefined(reportData?.file?.url)
                             ? <PdfViewer file={reportData?.file?.url ?? ''} />
                             : (
                                 <PowerBIEmbed
@@ -168,7 +172,7 @@ function ReportDetail() {
                                 />
                             ) }
                     </ListView>
-                    {aiSummary && (
+                    {isDefined(aiSummary) && (
                         <div className={styles.details}>
                             <div className={styles.stickyDetails}>
                                 <AIsummary
