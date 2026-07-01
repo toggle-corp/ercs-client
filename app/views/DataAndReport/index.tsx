@@ -52,6 +52,7 @@ const Reports_QUERY = gql`
                 contentType
                 visibility
                 publishedAt
+                contentType
                 createdAt
                 owner
                 iframeUrl
@@ -91,6 +92,7 @@ function DataAndReport() {
         rawFilter,
         setFilterField,
         setPage,
+        filter,
         offset,
     } = useFilterState<{
         thematicAreaId?: string,
@@ -105,9 +107,8 @@ function DataAndReport() {
             filters: {
                 thematicAreaId: rawFilter.thematicAreaId,
                 reportType: ReportTypeEnum.Report,
-                // TODO: add search filter in backend and uncomment below line
-                // search: rawFilter.search,
-                regions: [regionId ?? ''],
+                search: filter.searchText ?? '',
+                regions: regionId ? [regionId] : null,
             },
             pagination: {
                 limit,

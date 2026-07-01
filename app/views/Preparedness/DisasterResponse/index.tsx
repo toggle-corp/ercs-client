@@ -21,7 +21,7 @@ function DisasterResponse() {
             filters: {
                 page: DashboardPage.DisasterResponse,
                 isActive: true,
-                regions: [regionId ?? ''],
+                regions: regionId ? [regionId] : null,
             },
         },
     });

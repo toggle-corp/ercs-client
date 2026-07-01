@@ -76,7 +76,7 @@ function CapacityAndResourcesList() {
     const [{ data, fetching }] = useCapacityAndResourcesQuery({
         variables: {
             filters: {
-                regions: [regionId ?? ''],
+                regions: regionId ? [regionId] : null,
                 isActive: true,
                 search: filter.searchText,
             },
