@@ -5,4 +5,8 @@
     white-space: pre-line;
     color: var(--go-ui-color-white);
 
+    .summary-container {
+        flex-grow: 1;
+        min-height: 0;
+    }
 }

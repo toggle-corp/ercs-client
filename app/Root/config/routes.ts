@@ -33,7 +33,7 @@ const preparedness: RouteConfig = {
         },
         {
             path: 'pmer',
-            load: () => import('#views/Preparedness/DisasterResponse'),
+            load: () => import('#views/Preparedness/Pmer'),
             visibility: 'is-anything',
         },
         {

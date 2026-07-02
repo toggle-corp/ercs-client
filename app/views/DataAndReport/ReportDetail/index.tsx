@@ -98,8 +98,9 @@ function ReportDetail() {
     const aiSummary = summaryData?.reportSummaries.results
         .map((summary) => summary.text)
         .join('\n \n');
+
     const publishedDate = new Date(reportData?.publishedAt);
-    const encodedPublishedDate = encodeDate(publishedDate);
+    const encodedPublishedDate = reportData?.publishedAt ? encodeDate(publishedDate) : '-';
 
     return (
         <PageContainer
@@ -109,8 +110,9 @@ function ReportDetail() {
                 pending={fetching}
             >
                 <ListView
+                    // FIXME: isDefined is not working as expected, need to check why
                     // eslint-disable-next-line react/jsx-props-no-spreading
-                    {...(isDefined(aiSummary)
+                    {...(aiSummary
                         ? { layout: 'grid', withSidebar: true }
                         : { layout: 'block' })}
                 >
@@ -172,7 +174,7 @@ function ReportDetail() {
                                 />
                             ) }
                     </ListView>
-                    {isDefined(aiSummary) && (
+                    {aiSummary && (
                         <div className={styles.details}>
                             <div className={styles.stickyDetails}>
                                 <AIsummary
