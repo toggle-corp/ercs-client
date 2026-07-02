@@ -13,10 +13,46 @@ import {
 import InfoCard from '#components/InfoCard';
 import KeyCard from '#components/KeyCard';
 import Page from '#components/Page';
+import {
+    DashboardPage,
+    useExternalDashboardsQuery,
+} from '#generated/types/graphql';
+import type { RouteKeys } from '#root/config/routes';
+import useRouting from '#root/hooks/useRouting';
 import ActiveOperation from '#views/Home/ActiveOperation';
 
+const DASHBOARD_PAGE_TO_ROUTE_KEY: Record<DashboardPage, RouteKeys> = {
+    [DashboardPage.CapacityResources]: 'capacityAndResources',
+    [DashboardPage.DisasterResponse]: 'disasterResponse',
+    [DashboardPage.EmergencyAlerts]: 'emergencyAlert',
+    [DashboardPage.EmergencyResponse]: 'emergencyResponse',
+    [DashboardPage.Home]: 'home',
+    [DashboardPage.Operations]: 'home',
+    [DashboardPage.ProjectMapping]: 'projectMapping',
+};
+
 function Home() {
-    // TODO: Fetch real data for key figures and operations
+    const routeTo = useRouting();
+
+    const [{ data, fetching }] = useExternalDashboardsQuery({
+        variables: {
+            filters: {
+                isActive: true,
+                showOnHome: true,
+            },
+            pagination: {
+                limit: 6,
+            },
+        },
+    });
+
+    const operationDashboards = data?.externalDashboards.results ?? [];
+
+    const handleViewClick = (page: DashboardPage) => {
+        const routeKey = DASHBOARD_PAGE_TO_ROUTE_KEY[page];
+        routeTo(routeKey);
+    };
+
     const keyFigures = (
         <ListView
             layout="grid"
@@ -74,76 +110,38 @@ function Home() {
                 layout="block"
             >
                 <ActiveOperation />
-                <InfoCard
-                    icon={<DashboardFillIcon />}
-                    title="Operational Dashboards"
-                    description="Real-time emergency alerts and early warning system monitoring across regions"
-                />
-                <ListView
-                    layout="grid"
-                    numPreferredGridColumns={3}
+                <Container
+                    pending={fetching}
                 >
-                    <KeyCard
-                        value="Emergency Response Dashboard"
-                        valueType="text"
-                        info=" Real-time overview of all active emergency operations"
-                        size="sm"
-                        pillText="Operation"
-                        withIconBackground
-                        withShadow
-                        viewButton
-                    />
-                    <KeyCard
-                        value="Emergency Response Dashboard"
-                        valueType="text"
-                        info=" Real-time overview of all active emergency operations"
-                        size="sm"
-                        pillText="Operation"
-                        withIconBackground
-                        withShadow
-                        viewButton
-                    />
-                    <KeyCard
-                        value="Emergency Response Dashboard"
-                        valueType="text"
-                        info=" Real-time overview of all active emergency operations"
-                        size="sm"
-                        pillText="Operation"
-                        withIconBackground
-                        withShadow
-                        viewButton
-                    />
-                    <KeyCard
-                        value="Emergency Response Dashboard"
-                        valueType="text"
-                        info=" Real-time overview of all active emergency operations"
-                        size="sm"
-                        pillText="Operation"
-                        withIconBackground
-                        withShadow
-                        viewButton
-                    />
-                    <KeyCard
-                        value="Emergency Response Dashboard"
-                        valueType="text"
-                        info=" Real-time overview of all active emergency operations"
-                        size="sm"
-                        pillText="Operation"
-                        withIconBackground
-                        withShadow
-                        viewButton
-                    />
-                    <KeyCard
-                        value="Emergency Response Dashboard"
-                        valueType="text"
-                        info=" Real-time overview of all active emergency operations"
-                        size="sm"
-                        pillText="Operation"
-                        withIconBackground
-                        withShadow
-                        viewButton
-                    />
-                </ListView>
+                    <ListView
+                        layout="block"
+                    >
+
+                        <InfoCard
+                            icon={<DashboardFillIcon />}
+                            title="Operational Dashboards"
+                            description="Real-time emergency alerts and early warning system monitoring across regions"
+                        />
+                        <ListView
+                            layout="grid"
+                            numPreferredGridColumns={3}
+                        >
+                            {operationDashboards.map((res) => (
+                                <KeyCard
+                                    key={res.id}
+                                    value={res.title}
+                                    valueType="text"
+                                    size="sm"
+                                    pillText={res.pageDisplay}
+                                    withIconBackground
+                                    withShadow
+                                    viewButton
+                                    onViewClick={() => handleViewClick(res.page)}
+                                />
+                            ))}
+                        </ListView>
+                    </ListView>
+                </Container>
             </ListView>
         </Page>
     );
