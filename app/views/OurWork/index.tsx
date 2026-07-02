@@ -41,6 +41,7 @@ const EXTERNAL_DASHBOARDS_QUERY = gql`
                 page
                 regionId
                 showOnHome
+                pageDisplay
                 url
             }
             pageInfo {

@@ -78,7 +78,9 @@ function CapacityAndResourcesList() {
             filters: {
                 regions: regionId ? [regionId] : null,
                 isActive: true,
-                search: filter.searchText,
+                title: {
+                    iContains: filter.searchText,
+                },
             },
             pagination: {
                 limit,

@@ -1,6 +1,6 @@
 import { StarLineIcon } from '@ifrc-go/icons';
 import {
-    BlockLoading,
+    Container,
     Description,
     Heading,
     InlineView,
@@ -30,16 +30,16 @@ function AIsummary(props: AISummaryProps) {
             >
                 <Heading level={2}>AI Summary</Heading>
             </InlineView>
-            {loading ? (
-                <BlockLoading
-                    withoutBorder
-                    message="Generating...."
-                />
-            ) : (
+            <Container
+                className={styles.summaryContainer}
+                pending={loading}
+                pendingMessage="Generating...."
+                withContentOverflow
+            >
                 <Description textSize="lg">
                     {summary}
                 </Description>
-            ) }
+            </Container>
         </ListView>
     );
 }

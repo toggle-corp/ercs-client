@@ -1,0 +1,14 @@
+.pmer {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--go-ui-spacing-sm);
+    min-height: 60vh;
+    text-align: center;
+
+    .icon {
+        color: var(--go-ui-color-text-light);
+        font-size: 2.5rem;
+    }
+}

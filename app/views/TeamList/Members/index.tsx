@@ -133,9 +133,10 @@ function Members() {
 
     const [{ fetching, data }] = useTeamMembersQuery({
         variables: {
-            teamId: id!,
+            teamId: id ?? '',
             filters: {
                 search: filter.searchText,
+                teamId: id,
             },
             pagination: {
                 offset,
