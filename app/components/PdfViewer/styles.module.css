@@ -1,0 +1,20 @@
+
+
+/* The pdf renderer's own floating bottom toolbar, pagination bar, and per-page page-number overlay */
+:global(#pdf-controls),
+:global(#pdf-pagination),
+:global(#pdf-page-info) {
+    display: none;
+}
+
+/*
+ * docx/doc/xls/ppt files render through an iframe to the MS Office Online
+ * viewer. Its parent has no defined height, so its own `height: 100%` falls
+ * back to the ~150px iframe default, forcing the office viewer to scroll
+ * internally. Give it a tall, explicit height so the full document renders
+ * and the outer page scrolls instead.
+ */
+:global(#msdoc-renderer),
+:global(#msdoc-iframe) {
+    height: 112vh;
+}

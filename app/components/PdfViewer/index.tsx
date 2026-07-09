@@ -1,73 +1,57 @@
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
+import '@cyntler/react-doc-viewer/dist/index.css';
 
-import {
-    useCallback,
-    useState,
-} from 'react';
-import {
-    Document,
-    Page as PdfPage,
-    pdfjs,
-} from 'react-pdf';
+import { useMemo } from 'react';
+import DocViewer, {
+    DocViewerRenderers,
+    type IConfig,
+} from '@cyntler/react-doc-viewer';
+import { ErrorWarningFillIcon } from '@ifrc-go/icons';
+import { Message } from '@ifrc-go/ui';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+import styles from './styles.module.css';
+
+function NoRendererMessage() {
+    return (
+        <Message
+            variant="error"
+            icon={<ErrorWarningFillIcon />}
+            title="Preview not available"
+            description="This file type cannot be previewed. Please download the file to view it."
+        />
+    );
+}
+
+const viewerConfig: IConfig = {
+    header: {
+        disableHeader: true,
+        disableFileName: true,
+    },
+    pdfVerticalScrollByDefault: true,
+    noRenderer: {
+        overrideComponent: NoRendererMessage,
+    },
+};
 
 interface PdfViewerProps {
     file: string;
-    loadingMessage?: React.ReactNode;
-    errorMessage?: React.ReactNode;
+    fileName?: string;
 }
 
 function PdfViewer({
     file,
-    loadingMessage = <p>Loading PDF…</p>,
-    errorMessage = <p>Failed to load PDF.</p>,
+    fileName,
 }: PdfViewerProps) {
-    const [numPages, setNumPages] = useState<number>(0);
-    const [loadedPages, setLoadedPages] = useState<number>(0);
-    const [containerWidth, setContainerWidth] = useState<number>();
-
-    const allPagesLoaded = numPages > 0 && loadedPages === numPages;
-    const onContainerRef = useCallback((node: HTMLDivElement | null): void => {
-        if (node) {
-            setContainerWidth(node.getBoundingClientRect().width);
-        }
-    }, []);
-
-    const onDocumentLoadSuccess = useCallback(
-        ({ numPages: nextNumPages }: { numPages: number }): void => {
-            setNumPages(nextNumPages);
-        },
-        [],
+    const documents = useMemo(
+        () => [{ uri: file, fileName }],
+        [file, fileName],
     );
-
-    const onPageLoadSuccess = useCallback((): void => {
-        setLoadedPages((prev) => prev + 1);
-    }, []);
     return (
-        <div
-            ref={onContainerRef}
-        >
-            {!allPagesLoaded && loadingMessage}
-            <div
-                style={{ display: allPagesLoaded ? 'block' : 'none' }}
-            >
-                <Document
-                    file={file}
-                    onLoadSuccess={onDocumentLoadSuccess}
-                    error={errorMessage}
-                >
-                    {Array.from({ length: numPages }, (_, index) => (
-                        <PdfPage
-                            key={index + 1}
-                            pageNumber={index + 1}
-                            width={containerWidth}
-                            onLoadSuccess={onPageLoadSuccess}
-                        />
-                    ))}
-                </Document>
-            </div>
+        <div className={styles.pdfViewer}>
+            <DocViewer
+                documents={documents}
+                pluginRenderers={DocViewerRenderers}
+                config={viewerConfig}
+            />
         </div>
     );
 }

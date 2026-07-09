@@ -1,10 +1,13 @@
 import {
+    useCallback,
     useEffect,
     useRef,
     useState,
 } from 'react';
 import { useParams } from 'react-router';
+import { DownloadTwoFillIcon } from '@ifrc-go/icons';
 import {
+    Button,
     Container,
     Description,
     Heading,
@@ -16,6 +19,7 @@ import {
     encodeDate,
     isDefined,
 } from '@togglecorp/fujs';
+import { saveAs } from 'file-saver';
 import { gql } from 'urql';
 
 import PdfViewer from '#components/PdfViewer';
@@ -27,6 +31,7 @@ import {
     useReportQuery,
     useReportSummaryQuery,
 } from '#generated/types/graphql';
+import useAuth from '#hooks/useAuth';
 import AIsummary from '#views/DataAndReport/AIsummary';
 
 import styles from './styles.module.css';
@@ -83,7 +88,7 @@ interface Props {
 
 function ReportDetailContent(props: Props) {
     const { id } = props;
-
+    const { isAuthenticated } = useAuth();
     const [{ fetching, data }] = useReportQuery({
         variables: { id: id! },
         pause: !id,
@@ -146,7 +151,12 @@ function ReportDetailContent(props: Props) {
         ? encodeDate(new Date(publishedAt))
         : '-';
 
-    const fileUrl = reportData?.file?.url;
+    const fileUrl = reportData?.file?.url ?? '';
+    const fileName = reportData?.file?.name;
+
+    const handleDownloadClick = useCallback(() => {
+        saveAs(fileUrl, fileName ?? fileUrl.split('/').pop());
+    }, [fileUrl, fileName]);
 
     return (
         <PageContainer
@@ -204,18 +214,35 @@ function ReportDetailContent(props: Props) {
                                 layout="block"
                                 spacing="xs"
                             >
-                                <Heading
-                                    level={3}
-                                >
-                                    {reportData?.title}
-                                </Heading>
+                                <ListView withSpaceBetweenContents>
+                                    <Heading
+                                        level={3}
+                                    >
+                                        {reportData?.title}
+                                    </Heading>
+                                    {isAuthenticated && (
+                                        <Button
+                                            name="download"
+                                            title="download"
+                                            onClick={handleDownloadClick}
+                                            styleVariant="action"
+                                        >
+                                            <DownloadTwoFillIcon />
+                                        </Button>
+                                    )}
+                                </ListView>
                                 <Description>
                                     {reportData?.description}
                                 </Description>
                             </ListView>
                         </ListView>
                         {isDefined(fileUrl)
-                            ? <PdfViewer file={fileUrl} />
+                            ? (
+                                <PdfViewer
+                                    file={fileUrl}
+                                    fileName={fileName ?? undefined}
+                                />
+                            )
                             : (
                                 <PowerBIEmbed
                                     embedUrl={reportData?.iframeUrl ?? ''}
