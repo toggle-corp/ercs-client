@@ -1,6 +1,7 @@
 import {
     useCallback,
     useEffect,
+    useMemo,
     useRef,
     useState,
 } from 'react';
@@ -22,7 +23,7 @@ import {
 import { saveAs } from 'file-saver';
 import { gql } from 'urql';
 
-import PdfViewer from '#components/PdfViewer';
+import DocumentViewer from '#components/DocumentViewer';
 import PowerBIEmbed from '#components/PowerBiEmbed';
 import {
     DocumentExtractionStatus,
@@ -87,11 +88,14 @@ interface Props {
 }
 
 function ReportDetailContent(props: Props) {
-    const { id } = props;
+    const { id: reportId } = props;
     const { isAuthenticated } = useAuth();
+    const summaryPollCountRef = useRef(0);
+    const [summaryPollTimedOut, setSummaryPollTimedOut] = useState(false);
+
     const [{ fetching, data }] = useReportQuery({
-        variables: { id: id! },
-        pause: !id,
+        variables: { id: reportId! },
+        pause: !reportId,
     });
     const reportData = data?.report;
 
@@ -101,21 +105,42 @@ function ReportDetailContent(props: Props) {
     ] = useReportSummaryQuery({
         variables: {
             filters: {
-                report: id,
+                report: reportId,
                 chunkType: ExtractionType.DocumentSummary,
             },
         },
-        pause: !id || !reportData || reportData.contentType === ReportContentType.Iframe,
+        pause: !reportId || !reportData || reportData.contentType === ReportContentType.Iframe,
     });
 
-    const summaryStatus = summaryData?.reportSummaries.results[0]?.status;
+    const summaryResults = useMemo(
+        () => summaryData?.reportSummaries.results ?? [],
+        [summaryData?.reportSummaries.results],
+    );
+    const summaryStatus = summaryResults[0]?.status;
 
-    const summaryPollCountRef = useRef(0);
-    const [summaryPollTimedOut, setSummaryPollTimedOut] = useState(false);
+    const aiSummary = summaryResults
+        ?.map((summary) => summary.text)
+        .join('\n \n') ?? '';
+
+    const showAiSummary = reportData?.contentType === ReportContentType.File
+        && (summaryResults?.length ?? 0) > 0
+        && summaryStatus !== DocumentExtractionStatus.Failure
+        && !summaryPollTimedOut;
+
+    const publishedDate = isDefined(reportData?.publishedAt)
+        ? encodeDate(new Date(reportData?.publishedAt))
+        : '-';
+
+    const fileUrl = reportData?.file?.url ?? '';
+    const fileName = reportData?.file?.name;
+
+    const handleDownloadClick = useCallback(() => {
+        saveAs(fileUrl, fileName ?? fileUrl.split('/').pop());
+    }, [fileUrl, fileName]);
 
     useEffect(() => {
         if (
-            !summaryData?.reportSummaries.results.length
+            summaryResults.length === 0
             || summaryStatus === DocumentExtractionStatus.Success
             || summaryStatus === DocumentExtractionStatus.Failure
             || summaryPollTimedOut
@@ -133,30 +158,7 @@ function ReportDetailContent(props: Props) {
         }, SUMMARY_POLL_INTERVAL);
 
         return () => window.clearTimeout(timeout);
-    }, [summaryData, summaryStatus, summaryPollTimedOut, refetchSummary]);
-
-    const summaryResults = summaryData?.reportSummaries.results;
-
-    const aiSummary = summaryResults
-        ?.map((summary) => summary.text)
-        .join('\n \n') ?? '';
-
-    const showAiSummary = reportData?.contentType === ReportContentType.File
-        && (summaryResults?.length ?? 0) > 0
-        && summaryStatus !== DocumentExtractionStatus.Failure
-        && !summaryPollTimedOut;
-
-    const publishedAt = reportData?.publishedAt;
-    const publishedDate = isDefined(publishedAt)
-        ? encodeDate(new Date(publishedAt))
-        : '-';
-
-    const fileUrl = reportData?.file?.url ?? '';
-    const fileName = reportData?.file?.name;
-
-    const handleDownloadClick = useCallback(() => {
-        saveAs(fileUrl, fileName ?? fileUrl.split('/').pop());
-    }, [fileUrl, fileName]);
+    }, [summaryResults, summaryStatus, summaryPollTimedOut, refetchSummary]);
 
     return (
         <PageContainer
@@ -166,9 +168,6 @@ function ReportDetailContent(props: Props) {
                 pending={fetching}
             >
                 <ListView
-                    // ListView's props are a discriminated union: `withSidebar`
-                    // is only allowed alongside layout="grid", so the variants
-                    // have to be spread as complete objects.
                     // eslint-disable-next-line react/jsx-props-no-spreading
                     {...(showAiSummary
                         ? { layout: 'grid', withSidebar: true }
@@ -238,8 +237,8 @@ function ReportDetailContent(props: Props) {
                         </ListView>
                         {isDefined(fileUrl)
                             ? (
-                                <PdfViewer
-                                    file={fileUrl}
+                                <DocumentViewer
+                                    fileUrl={fileUrl}
                                     fileName={fileName ?? undefined}
                                 />
                             )

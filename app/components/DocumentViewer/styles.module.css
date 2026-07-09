@@ -18,3 +18,8 @@
 :global(#msdoc-iframe) {
     height: 112vh;
 }
+
+.no-renderer-message {
+    aspect-ratio: 5 / 3;
+    color: var(--go-ui-color-text-light);
+}

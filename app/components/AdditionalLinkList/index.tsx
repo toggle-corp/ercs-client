@@ -63,7 +63,7 @@ function AdditionalLinkList({ linkType }: LinkListProps) {
         },
     });
 
-    const items = data?.publicLinks?.results ?? [];
+    const links = data?.publicLinks?.results ?? [];
 
     return (
         <Container
@@ -76,26 +76,29 @@ function AdditionalLinkList({ linkType }: LinkListProps) {
                     onActivePageChange={setPage}
                 />
             )}
+            empty={links.length === 0}
+            emptyMessage={`No ${linkType.toLowerCase()} links found.`}
         >
             <ListView
                 layout="block"
                 spacing="2xl"
             >
-                {items.map((item) => (
+                {links.map((link) => (
                     <Container
-                        key={item.id}
+                        key={link.id}
                         spacingOffset={-2}
                         headingLevel={4}
-                        heading={item.title}
-                        headerDescription={item.description}
+                        heading={link.title}
+                        headerDescription={link.description}
+
                     >
                         <Link
-                            href={item.url}
+                            href={link.url}
                             external
                             styleVariant="action"
                             colorVariant="primary"
                         >
-                            {item.url}
+                            {link.url}
                         </Link>
                     </Container>
                 ))}

@@ -8,15 +8,19 @@ import DocViewer, {
 import { ErrorWarningFillIcon } from '@ifrc-go/icons';
 import { Message } from '@ifrc-go/ui';
 
+import useAuth from '#hooks/useAuth';
+
 import styles from './styles.module.css';
 
 function NoRendererMessage() {
+    const { isAuthenticated } = useAuth();
     return (
         <Message
+            className={styles.noRendererMessage}
             variant="error"
             icon={<ErrorWarningFillIcon />}
             title="Preview not available"
-            description="This file type cannot be previewed. Please download the file to view it."
+            description={`This file type cannot be previewed. ${isAuthenticated ? 'Please download the file to view it.' : ''}`}
         />
     );
 }
@@ -32,21 +36,21 @@ const viewerConfig: IConfig = {
     },
 };
 
-interface PdfViewerProps {
-    file: string;
+interface DocumentViewerProps {
+    fileUrl: string;
     fileName?: string;
 }
 
-function PdfViewer({
-    file,
+function DocumentViewer({
+    fileUrl,
     fileName,
-}: PdfViewerProps) {
+}: DocumentViewerProps) {
     const documents = useMemo(
-        () => [{ uri: file, fileName }],
-        [file, fileName],
+        () => [{ uri: fileUrl, fileName }],
+        [fileUrl, fileName],
     );
     return (
-        <div className={styles.pdfViewer}>
+        <div className={styles.DocumentViewer}>
             <DocViewer
                 documents={documents}
                 pluginRenderers={DocViewerRenderers}
@@ -56,4 +60,4 @@ function PdfViewer({
     );
 }
 
-export default PdfViewer;
+export default DocumentViewer;

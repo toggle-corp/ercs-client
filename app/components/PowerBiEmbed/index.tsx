@@ -39,12 +39,15 @@ interface Props {
 function PowerBIEmbed(props: Props) {
     const { embedUrl } = props;
 
-    // Track which url errored so a new url gets a fresh attempt
+    // Stores the last embedUrl that failed to load, so that passing in a
+    // different (or corrected) url is treated as a fresh attempt.
     const [erroredUrl, setErroredUrl] = useState<string>();
 
     const embedConfig: IReportEmbedConfiguration = useMemo(() => ({
         type: 'report',
         embedUrl,
+        // id/accessToken are unused for this public, token-less embed flow,
+        // but the type requires the keys to be present.
         id: undefined,
         accessToken: undefined,
         tokenType: models.TokenType.Embed,
@@ -61,6 +64,8 @@ function PowerBIEmbed(props: Props) {
     }), [embedUrl]);
 
     const eventHandlers = useMemo(() => new Map([
+        // powerbi-client-react expects a Map of PowerBI event names to
+        // handlers; 'error' is the only one we currently need.
         ['error', (event?: ICustomEvent<models.IError>) => {
             // eslint-disable-next-line no-console
             console.error('PowerBI embed error:', event?.detail);
@@ -68,7 +73,12 @@ function PowerBIEmbed(props: Props) {
         }],
     ]), [embedUrl]);
 
-    if (!isValidEmbedUrl(embedUrl) || erroredUrl === embedUrl) {
+    // Comparing against embedUrl (rather than a plain boolean) lets a new/corrected
+    // url reset the error state automatically, without a useEffect.
+    const hasPreviouslyErrored = erroredUrl === embedUrl;
+    const canEmbed = isValidEmbedUrl(embedUrl) && !hasPreviouslyErrored;
+
+    if (!canEmbed) {
         return (
             <div className={styles.embedError}>
                 Unable to load this dashboard. The embed link is missing or invalid.

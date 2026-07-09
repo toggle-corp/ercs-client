@@ -77,6 +77,7 @@ function ReportCard({ report }: ReportCardProps) {
                 </Heading>
                 <Description
                     withLightText
+                    className={styles.description}
                 >
                     {description}
                 </Description>

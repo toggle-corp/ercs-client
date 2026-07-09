@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { SearchLineIcon } from '@ifrc-go/icons';
 import {
     Container,
@@ -14,7 +13,6 @@ import { gql } from 'urql';
 
 import Link from '#components/Link';
 import Page from '#components/Page';
-import RegionSelectInput from '#components/RegionSelectInput';
 import {
     type CapacityAndResourcesQuery,
     useCapacityAndResourcesQuery,

@@ -10,11 +10,11 @@ import { gql } from 'urql';
 import Page from '#components/Page';
 import PowerBIEmbed from '#components/PowerBiEmbed';
 import RegionSelectInput from '#components/RegionSelectInput';
-import { useCapacityAndResourcesAndReportsQuery } from '#generated/types/graphql';
+import { useCapacityAndResourcesAndDashboardsQuery } from '#generated/types/graphql';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CAPACITY_AND_RESOURCES_AND_REPORTS_QUERY = gql`
-    query CapacityAndResourcesAndReports(
+const CAPACITY_AND_RESOURCES_AND_DASHBOARDS_QUERY = gql`
+    query CapacityAndResourcesAndDashboards(
         $id: ID!
         $pagination: OffsetPaginationInput
         $filters: ExternalDashboardFilter
@@ -49,19 +49,20 @@ const CAPACITY_AND_RESOURCES_AND_REPORTS_QUERY = gql`
 `;
 
 export default function CapacityAndResourcesDetails() {
-    const { id } = useParams<{ id: string }>();
+    const { id: capacityAndResourceId } = useParams<{ id: string }>();
     const [regionId, setRegionId] = useState<string | undefined>(undefined);
 
-    const [{ data, fetching: pending }] = useCapacityAndResourcesAndReportsQuery({
+    const [{ data, fetching: pending }] = useCapacityAndResourcesAndDashboardsQuery({
         variables: {
-            id: id!,
+            id: capacityAndResourceId ?? '',
             filters: {
                 regions: isDefined(regionId) ? [regionId] : null,
-                capacityAndResources: isDefined(id) ? [id] : null,
+                capacityAndResources: isDefined(capacityAndResourceId)
+                    ? [capacityAndResourceId] : null,
                 isActive: true,
             },
         },
-        pause: !id,
+        pause: !capacityAndResourceId,
     });
 
     const resourceData = data?.capacityAndResource;
@@ -81,6 +82,8 @@ export default function CapacityAndResourcesDetails() {
         >
             <Container
                 pending={pending}
+                empty={dashboards?.length === 0}
+                emptyMessage="No dashboards found for the selected capacity and resource."
             >
                 <ListView
                     layout="block"
