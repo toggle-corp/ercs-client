@@ -37,7 +37,7 @@ import AIsummary from '#views/DataAndReport/AIsummary';
 
 import styles from './styles.module.css';
 
-const SUMMARY_POLL_INTERVAL = 10000;
+const SUMMARY_POLL_INTERVAL = 1000 * 60;
 const MAX_SUMMARY_POLL_COUNT = 30;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -253,8 +253,8 @@ function ReportDetailContent(props: Props) {
                             <div className={styles.stickyDetails}>
                                 <AIsummary
                                     summary={aiSummary}
-                                    loading={summaryLoading
-                                         || summaryStatus !== DocumentExtractionStatus.Success}
+                                    summaryStatus={summaryStatus}
+                                    loading={summaryLoading}
                                 />
                             </div>
                         </div>

@@ -21,17 +21,25 @@ import { isTruthyString } from '@togglecorp/fujs';
 
 import styles from './styles.module.css';
 
-const pendingMessages = [
-    'Reading the document...',
-    'Analyzing the content...',
-    'Identifying the key points...',
-    'Drafting the summary...',
-    'Taking a little longer than usual. Hang tight...',
-];
+const pendingMessage = (
+    <span className={styles.pendingMessage}>
+        The AI summary is being generated and may take some time, especially for larger
+        reports. Feel free to come back and check again later
+        <span className={styles.dots} aria-hidden>
+            {Array.from({ length: 5 }, (_, index) => (
+                <span
+                    key={index}
+                    className={styles.dot}
+                    style={{ animationDelay: `${index * 0.2}s` }}
+                >
+                    .
+                </span>
+            ))}
+        </span>
+    </span>
+);
 
-const PENDING_MESSAGE_INTERVAL = 5000;
 const COPIED_FEEDBACK_DURATION = 2000;
-const skeletonLineKeys = Array.from({ length: 5 }, (_, i) => i);
 
 interface Props {
     loading?: boolean;
@@ -43,16 +51,8 @@ function AIsummary(props: Props) {
     const { loading, summary } = props;
 
     const hasSummary = isTruthyString(summary);
-    const [pendingMessageIndex, setPendingMessageIndex] = useState(0);
-    const [copied, setCopied] = useState(false);
-    const [wasLoading, setWasLoading] = useState(loading);
 
-    if (wasLoading !== loading) {
-        setWasLoading(loading);
-        if (loading) {
-            setPendingMessageIndex(0);
-        }
-    }
+    const [copied, setCopied] = useState(false);
 
     const handleCopyClick = () => {
         navigator.clipboard.writeText(summary).then(() => {
@@ -67,21 +67,6 @@ function AIsummary(props: Props) {
     useEffect(() => () => {
         window.clearTimeout(copiedTimeoutRef.current);
     }, []);
-
-    useEffect(() => {
-        if (!loading) {
-            return undefined;
-        }
-        const interval = window.setInterval(() => {
-            setPendingMessageIndex(
-                (prevIndex) => Math.min(prevIndex + 1, pendingMessages.length - 1),
-            );
-        }, PENDING_MESSAGE_INTERVAL);
-
-        return () => {
-            window.clearInterval(interval);
-        };
-    }, [loading]);
 
     return (
         <ListView
@@ -111,6 +96,10 @@ function AIsummary(props: Props) {
                 withContentOverflow
                 withBackground
                 spacing="lg"
+                pending={loading}
+                pendingMessage="Generating your AI summary... This may take a few moments."
+                empty={!hasSummary}
+                emptyMessage={pendingMessage}
                 withFooterBorder={hasSummary}
                 footer={hasSummary && (
                     <InlineLayout
@@ -127,29 +116,12 @@ function AIsummary(props: Props) {
                     />
                 )}
             >
-                {loading ? (
-                    <div
-                        className={styles.skeleton}
-                        aria-busy="true"
-                    >
-                        <Description withLightText>
-                            {pendingMessages[pendingMessageIndex]}
-                        </Description>
-                        {skeletonLineKeys.map((key) => (
-                            <div
-                                key={key}
-                                className={styles.skeletonLine}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <Description
-                        textSize="md"
-                        className={styles.summaryText}
-                    >
-                        {summary}
-                    </Description>
-                )}
+                <Description
+                    textSize="md"
+                    className={styles.summaryText}
+                >
+                    {summary}
+                </Description>
             </Container>
         </ListView>
     );
