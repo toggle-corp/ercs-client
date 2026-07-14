@@ -253,7 +253,6 @@ function ReportDetailContent(props: Props) {
                             <div className={styles.stickyDetails}>
                                 <AIsummary
                                     summary={aiSummary}
-                                    summaryStatus={summaryStatus}
                                     loading={summaryLoading}
                                 />
                             </div>

@@ -8,6 +8,17 @@
 }
 
 /*
+ * react-pdf renders its own plain-text "Loading PDF…" / "Loading page…"
+ * message while it parses and renders pages. That appears right after our
+ * custom loadingRenderer (which only covers the file fetch), giving a jarring
+ * second loading state. Hide it so the BlockLoading is the only loader shown.
+ */
+/* stylelint-disable-next-line selector-class-pattern */
+:global(.react-pdf__message--loading) {
+    display: none;
+}
+
+/*
  * docx/doc/xls/ppt files render through an iframe to the MS Office Online
  * viewer. Its parent has no defined height, so its own `height: 100%` falls
  * back to the ~150px iframe default, forcing the office viewer to scroll
@@ -22,4 +33,8 @@
 .no-renderer-message {
     aspect-ratio: 5 / 3;
     color: var(--go-ui-color-text-light);
+}
+
+.loading-renderer {
+    aspect-ratio: 5 / 3;
 }

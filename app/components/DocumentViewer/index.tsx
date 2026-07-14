@@ -6,7 +6,10 @@ import DocViewer, {
     type IConfig,
 } from '@cyntler/react-doc-viewer';
 import { ErrorWarningFillIcon } from '@ifrc-go/icons';
-import { Message } from '@ifrc-go/ui';
+import {
+    BlockLoading,
+    Message,
+} from '@ifrc-go/ui';
 
 import useAuth from '#hooks/useAuth';
 
@@ -25,6 +28,16 @@ function NoRendererMessage() {
     );
 }
 
+function LoadingRenderer() {
+    return (
+        <BlockLoading
+            className={styles.loadingRenderer}
+            message="Loading preview..."
+            withoutBorder
+        />
+    );
+}
+
 const viewerConfig: IConfig = {
     header: {
         disableHeader: true,
@@ -33,6 +46,9 @@ const viewerConfig: IConfig = {
     pdfVerticalScrollByDefault: true,
     noRenderer: {
         overrideComponent: NoRendererMessage,
+    },
+    loadingRenderer: {
+        overrideComponent: LoadingRenderer,
     },
 };
 
