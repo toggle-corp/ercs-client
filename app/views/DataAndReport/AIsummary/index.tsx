@@ -21,7 +21,7 @@ import { isTruthyString } from '@togglecorp/fujs';
 
 import styles from './styles.module.css';
 
-const pendingMessage = (
+const emptyMessage = (
     <span className={styles.pendingMessage}>
         The AI summary is being generated and may take some time, especially for larger
         reports. Feel free to come back and check again later
@@ -99,7 +99,7 @@ function AIsummary(props: Props) {
                 pending={loading}
                 pendingMessage="Generating your AI summary... This may take a few moments."
                 empty={!hasSummary}
-                emptyMessage={pendingMessage}
+                emptyMessage={emptyMessage}
                 withFooterBorder={hasSummary}
                 footer={hasSummary && (
                     <InlineLayout

@@ -135,7 +135,8 @@ function ReportDetailContent(props: Props) {
     const fileName = reportData?.file?.name;
 
     const handleDownloadClick = useCallback(() => {
-        saveAs(fileUrl, fileName ?? fileUrl.split('/').pop());
+        const urlName = fileUrl.split('/').pop()?.split('?')[0]?.replace(/\.[^/.]+$/, '');
+        saveAs(fileUrl, fileName ?? urlName);
     }, [fileUrl, fileName]);
 
     useEffect(() => {
@@ -265,7 +266,7 @@ function ReportDetailContent(props: Props) {
 }
 
 function ReportDetail() {
-    const { id } = useParams<{ id: string }>();
+    const { id } = useParams<{ id: string | undefined }>();
 
     return (
         <ReportDetailContent
