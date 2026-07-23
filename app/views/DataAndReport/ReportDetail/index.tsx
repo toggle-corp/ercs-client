@@ -1,5 +1,14 @@
-import { useParams } from 'react-router';
 import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
+import { useParams } from 'react-router';
+import { DownloadTwoFillIcon } from '@ifrc-go/icons';
+import {
+    Button,
     Container,
     Description,
     Heading,
@@ -10,11 +19,14 @@ import {
 import {
     encodeDate,
     isDefined,
+    isNotDefined,
 } from '@togglecorp/fujs';
+import { saveAs } from 'file-saver';
 import { gql } from 'urql';
 
-import PdfViewer from '#components/PdfViewer';
+import DocumentViewer from '#components/DocumentViewer';
 import PowerBIEmbed from '#components/PowerBiEmbed';
+import PreloadMessage from '#components/PreloadMessage';
 import {
     DocumentExtractionStatus,
     ExtractionType,
@@ -22,9 +34,13 @@ import {
     useReportQuery,
     useReportSummaryQuery,
 } from '#generated/types/graphql';
+import useAuth from '#hooks/useAuth';
 import AIsummary from '#views/DataAndReport/AIsummary';
 
 import styles from './styles.module.css';
+
+const SUMMARY_POLL_INTERVAL = 1000 * 60;
+const MAX_SUMMARY_POLL_COUNT = 30;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const REPORT_QUERY = gql`
@@ -51,12 +67,10 @@ const REPORT_QUERY = gql`
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const REPORT_SUMMARY_QUERY = gql`
     query ReportSummary(
-        $pagination: OffsetPaginationInput,
         $filters: ReportSummaryFilter
     ) {
         reportSummaries(
             filters: $filters
-            pagination: $pagination
         ) {
             totalCount
             results {
@@ -67,58 +81,105 @@ const REPORT_SUMMARY_QUERY = gql`
                 status
             }
             totalCount
-            pageInfo {
-                offset
-                limit
-            }
         }
     }
 `;
 
-function ReportDetail() {
-    const { id } = useParams<{ id: string }>();
+interface Props {
+    id: string | undefined;
+}
 
-    const [{ fetching, data }] = useReportQuery({
-        variables: { id: id! },
-        pause: !id,
+function ReportDetailContent(props: Props) {
+    const { id: reportId } = props;
+    const { isAuthenticated } = useAuth();
+    const summaryPollCountRef = useRef(0);
+    const [summaryPollTimedOut, setSummaryPollTimedOut] = useState(false);
+
+    const [{ fetching, data, error }] = useReportQuery({
+        variables: { id: reportId! },
+        pause: !reportId,
     });
     const reportData = data?.report;
 
-    const [{ fetching: summaryLoading, data: summaryData }] = useReportSummaryQuery({
+    const [
+        { fetching: summaryLoading, data: summaryData },
+        refetchSummary,
+    ] = useReportSummaryQuery({
         variables: {
             filters: {
-                report: id,
-                status: DocumentExtractionStatus.Success,
+                report: reportId,
                 chunkType: ExtractionType.DocumentSummary,
             },
         },
-        pause: !id || !reportData || reportData.contentType === ReportContentType.Iframe,
+        pause: !reportId || !reportData || reportData.contentType === ReportContentType.Iframe,
     });
 
-    const aiSummary = summaryData?.reportSummaries.results
-        .map((summary) => summary.text)
-        .join('\n \n');
+    const summaryResults = useMemo(
+        () => summaryData?.reportSummaries.results ?? [],
+        [summaryData?.reportSummaries.results],
+    );
+    const summaryStatus = summaryResults[0]?.status;
 
-    const publishedDate = new Date(reportData?.publishedAt);
-    const encodedPublishedDate = reportData?.publishedAt ? encodeDate(publishedDate) : '-';
+    const aiSummary = summaryResults
+        ?.map((summary) => summary.text)
+        .join('\n \n') ?? '';
+
+    const showAiSummary = reportData?.contentType === ReportContentType.File
+        && (summaryResults?.length ?? 0) > 0
+        && summaryStatus !== DocumentExtractionStatus.Failure
+        && !summaryPollTimedOut;
+
+    const publishedDate = isDefined(reportData?.publishedAt)
+        ? encodeDate(new Date(reportData?.publishedAt))
+        : '-';
+
+    const fileUrl = reportData?.file?.url ?? '';
+    const fileName = reportData?.file?.name;
+
+    const handleDownloadClick = useCallback(() => {
+        const urlName = fileUrl.split('/').pop()?.split('?')[0]?.replace(/\.[^/.]+$/, '');
+        saveAs(fileUrl, fileName ?? urlName);
+    }, [fileUrl, fileName]);
+
+    useEffect(() => {
+        if (
+            summaryResults.length === 0
+            || summaryStatus === DocumentExtractionStatus.Success
+            || summaryStatus === DocumentExtractionStatus.Failure
+            || summaryPollTimedOut
+        ) {
+            return undefined;
+        }
+
+        const timeout = window.setTimeout(() => {
+            if (summaryPollCountRef.current >= MAX_SUMMARY_POLL_COUNT) {
+                setSummaryPollTimedOut(true);
+                return;
+            }
+            summaryPollCountRef.current += 1;
+            refetchSummary({ requestPolicy: 'network-only' });
+        }, SUMMARY_POLL_INTERVAL);
+
+        return () => window.clearTimeout(timeout);
+    }, [summaryResults, summaryStatus, summaryPollTimedOut, refetchSummary]);
 
     return (
-        <PageContainer
-            contentClassName={styles.pageContainer}
-        >
+        <PageContainer>
             <Container
                 pending={fetching}
+                withPadding
+                errored={isDefined(error)}
+                errorMessage="Failed to load the report. Please try again later."
             >
                 <ListView
-                    // FIXME: isDefined is not working as expected, need to check why
                     // eslint-disable-next-line react/jsx-props-no-spreading
-                    {...(aiSummary
+                    {...(showAiSummary
                         ? { layout: 'grid', withSidebar: true }
                         : { layout: 'block' })}
                 >
                     <ListView
                         layout="block"
-                        spacing={aiSummary ? 'md' : 'xs'}
+                        spacing={showAiSummary ? 'md' : 'xs'}
                         className={styles.content}
                     >
                         <ListView
@@ -135,7 +196,7 @@ function ReportDetail() {
                                             Published Date:
                                         </Description>
                                         <Description>
-                                            {encodedPublishedDate}
+                                            {publishedDate}
                                         </Description>
                                     </ListView>
                                 )}
@@ -156,25 +217,42 @@ function ReportDetail() {
                                 layout="block"
                                 spacing="xs"
                             >
-                                <Heading
-                                    level={3}
-                                >
-                                    {reportData?.title}
-                                </Heading>
+                                <ListView withSpaceBetweenContents>
+                                    <Heading
+                                        level={3}
+                                    >
+                                        {reportData?.title}
+                                    </Heading>
+                                    {isAuthenticated && (
+                                        <Button
+                                            name="download"
+                                            title="download"
+                                            onClick={handleDownloadClick}
+                                            styleVariant="action"
+                                        >
+                                            <DownloadTwoFillIcon />
+                                        </Button>
+                                    )}
+                                </ListView>
                                 <Description>
                                     {reportData?.description}
                                 </Description>
                             </ListView>
                         </ListView>
-                        {isDefined(reportData?.file?.url)
-                            ? <PdfViewer file={reportData?.file?.url ?? ''} />
+                        {isDefined(fileUrl)
+                            ? (
+                                <DocumentViewer
+                                    fileUrl={fileUrl}
+                                    fileName={fileName ?? undefined}
+                                />
+                            )
                             : (
                                 <PowerBIEmbed
                                     embedUrl={reportData?.iframeUrl ?? ''}
                                 />
-                            ) }
+                            )}
                     </ListView>
-                    {aiSummary && (
+                    {showAiSummary && (
                         <div className={styles.details}>
                             <div className={styles.stickyDetails}>
                                 <AIsummary
@@ -187,6 +265,25 @@ function ReportDetail() {
                 </ListView>
             </Container>
         </PageContainer>
+    );
+}
+
+function ReportDetail() {
+    const { id } = useParams<{ id: string | undefined }>();
+
+    if (isNotDefined(id)) {
+        return (
+            <PreloadMessage>
+                Report not found.
+            </PreloadMessage>
+        );
+    }
+
+    return (
+        <ReportDetailContent
+            key={id}
+            id={id}
+        />
     );
 }
 

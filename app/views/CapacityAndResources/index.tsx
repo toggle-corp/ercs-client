@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { SearchLineIcon } from '@ifrc-go/icons';
 import {
     Container,
@@ -14,7 +13,6 @@ import { gql } from 'urql';
 
 import Link from '#components/Link';
 import Page from '#components/Page';
-import RegionSelectInput from '#components/RegionSelectInput';
 import {
     type CapacityAndResourcesQuery,
     useCapacityAndResourcesQuery,
@@ -56,8 +54,6 @@ function ResourcesActions({ id }: {id: string}) {
 }
 
 function CapacityAndResourcesList() {
-    const [regionId, setRegionId] = useState<string | undefined>(undefined);
-
     const {
         limit,
         page,
@@ -76,7 +72,6 @@ function CapacityAndResourcesList() {
     const [{ data, fetching }] = useCapacityAndResourcesQuery({
         variables: {
             filters: {
-                regions: regionId ? [regionId] : null,
                 isActive: true,
                 title: {
                     iContains: filter.searchText,
@@ -112,13 +107,6 @@ function CapacityAndResourcesList() {
     ];
     return (
         <Page
-            actions={(
-                <RegionSelectInput
-                    name="region"
-                    value={regionId}
-                    onChange={setRegionId}
-                />
-            )}
             heading="Capacity and Resources"
             description="Monitor and allocate capacity and resources effectively to support humanitarian operations and response efforts."
         >

@@ -68,6 +68,7 @@ function DocumentList(props: Props) {
             <Container
                 pending={fetching}
                 empty={data?.reports.totalCount === 0}
+                emptyMessage={`No documents found for the ${reportType.toLowerCase()}.`}
             >
                 <ListView
                     layout="grid"
@@ -83,7 +84,7 @@ function DocumentList(props: Props) {
                             <DocumentCard
                                 manual={{
                                     title: document.title,
-                                    src: document.coverImage?.url ?? '',
+                                    src: document.coverImage?.url,
                                 }}
                             />
                         </Link>

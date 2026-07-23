@@ -158,7 +158,7 @@ function Members() {
             responseData.teamMembers.results ?? []
         ).map((member) => {
             const createdAt = member.createdAt ? formatDateToString(decodeDate(member.createdAt as string), 'yyyy-dd-MM') : '';
-            const updatedAt = member.updatedAt ? formatDateToString(decodeDate(member.createdAt as string), 'yyyy-dd-MM') : '';
+            const updatedAt = member.updatedAt ? formatDateToString(decodeDate(member.updatedAt as string), 'yyyy-dd-MM') : '';
             return {
                 ID: member.id,
                 Name: member.name,
@@ -177,8 +177,9 @@ function Members() {
     const handleExport = () => {
         if (!id) return;
         triggerExport({
-            teamId: id,
-            search: filter.searchText,
+            filters: {
+                teamId: id,
+            },
         });
     };
 

@@ -13,5 +13,7 @@
 .sticky-details {
     position: sticky;
     top: 0;
+    padding-top: var(--go-ui-spacing-md);    
+    padding-bottom: var(--go-ui-spacing-md);
     height: 100vh;
 }

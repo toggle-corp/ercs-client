@@ -14,3 +14,12 @@
     }
 }
 
+.description {
+    display: -webkit-box;
+    overflow: hidden;
+    line-height: var(--go-ui-line-height-md);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+}
+

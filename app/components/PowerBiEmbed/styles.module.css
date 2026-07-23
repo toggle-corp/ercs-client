@@ -5,3 +5,14 @@
         border: none;
     }
 }
+
+.embed-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 5 / 3;
+    background-color: var(--go-ui-color-background);
+    padding: 1rem;
+    text-align: center;
+    color: var(--go-ui-color-text-light);
+}

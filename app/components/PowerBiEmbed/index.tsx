@@ -1,4 +1,8 @@
-/* eslint-disable no-console */
+import {
+    useMemo,
+    useState,
+} from 'react';
+import { isFalsyString } from '@togglecorp/fujs';
 import type { IReportEmbedConfiguration } from 'powerbi-client';
 import { models } from 'powerbi-client';
 import { PowerBIEmbed as PowerBI } from 'powerbi-client-react';
@@ -6,10 +10,44 @@ import type { ICustomEvent } from 'service';
 
 import styles from './styles.module.css';
 
-function PowerBIEmbed({ embedUrl }: { embedUrl: string }) {
-    const embedConfig: IReportEmbedConfiguration = {
+const VALID_EMBED_HOSTNAME_SUFFIXES = [
+    'powerbi.com',
+    'powerbigov.us',
+    'powerbi.cn',
+];
+
+function isValidEmbedUrl(embedUrl: string) {
+    if (isFalsyString(embedUrl)) {
+        return false;
+    }
+
+    try {
+        const parsed = new URL(embedUrl);
+        return parsed.protocol === 'https:'
+            && VALID_EMBED_HOSTNAME_SUFFIXES.some(
+                (suffix) => parsed.hostname === suffix || parsed.hostname.endsWith(`.${suffix}`),
+            );
+    } catch {
+        return false;
+    }
+}
+
+interface Props {
+    embedUrl: string;
+}
+
+function PowerBIEmbed(props: Props) {
+    const { embedUrl } = props;
+
+    // Stores the last embedUrl that failed to load, so that passing in a
+    // different (or corrected) url is treated as a fresh attempt.
+    const [erroredUrl, setErroredUrl] = useState<string>();
+
+    const embedConfig: IReportEmbedConfiguration = useMemo(() => ({
         type: 'report',
         embedUrl,
+        // id/accessToken are unused for this public, token-less embed flow,
+        // but the type requires the keys to be present.
         id: undefined,
         accessToken: undefined,
         tokenType: models.TokenType.Embed,
@@ -23,19 +61,36 @@ function PowerBIEmbed({ embedUrl }: { embedUrl: string }) {
             },
             navContentPaneEnabled: true,
         },
-    };
+    }), [embedUrl]);
+
+    const eventHandlers = useMemo(() => new Map([
+        // powerbi-client-react expects a Map of PowerBI event names to
+        // handlers; 'error' is the only one we currently need.
+        ['error', (event?: ICustomEvent<models.IError>) => {
+            // eslint-disable-next-line no-console
+            console.error('PowerBI embed error:', event?.detail);
+            setErroredUrl(embedUrl);
+        }],
+    ]), [embedUrl]);
+
+    // Comparing against embedUrl (rather than a plain boolean) lets a new/corrected
+    // url reset the error state automatically, without a useEffect.
+    const hasPreviouslyErrored = erroredUrl === embedUrl;
+    const canEmbed = isValidEmbedUrl(embedUrl) && !hasPreviouslyErrored;
+
+    if (!canEmbed) {
+        return (
+            <div className={styles.embedError}>
+                Unable to load this dashboard. The embed link is missing or invalid.
+            </div>
+        );
+    }
 
     return (
         <PowerBI
             embedConfig={embedConfig}
             cssClassName={styles.embed}
-            eventHandlers={
-                new Map([
-                    ['loaded', () => console.log('Report loaded')],
-                    ['rendered', () => console.log('Report rendered')],
-                    ['error', (event?: ICustomEvent<models.IError>) => console.error('Error:', event?.detail)],
-                ])
-            }
+            eventHandlers={eventHandlers}
         />
     );
 }
