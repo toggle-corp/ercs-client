@@ -19,12 +19,14 @@ import {
 import {
     encodeDate,
     isDefined,
+    isNotDefined,
 } from '@togglecorp/fujs';
 import { saveAs } from 'file-saver';
 import { gql } from 'urql';
 
 import DocumentViewer from '#components/DocumentViewer';
 import PowerBIEmbed from '#components/PowerBiEmbed';
+import PreloadMessage from '#components/PreloadMessage';
 import {
     DocumentExtractionStatus,
     ExtractionType,
@@ -93,7 +95,7 @@ function ReportDetailContent(props: Props) {
     const summaryPollCountRef = useRef(0);
     const [summaryPollTimedOut, setSummaryPollTimedOut] = useState(false);
 
-    const [{ fetching, data }] = useReportQuery({
+    const [{ fetching, data, error }] = useReportQuery({
         variables: { id: reportId! },
         pause: !reportId,
     });
@@ -162,11 +164,12 @@ function ReportDetailContent(props: Props) {
     }, [summaryResults, summaryStatus, summaryPollTimedOut, refetchSummary]);
 
     return (
-        <PageContainer
-            contentClassName={styles.pageContainer}
-        >
+        <PageContainer>
             <Container
                 pending={fetching}
+                withPadding
+                errored={isDefined(error)}
+                errorMessage="Failed to load the report. Please try again later."
             >
                 <ListView
                     // eslint-disable-next-line react/jsx-props-no-spreading
@@ -267,6 +270,14 @@ function ReportDetailContent(props: Props) {
 
 function ReportDetail() {
     const { id } = useParams<{ id: string | undefined }>();
+
+    if (isNotDefined(id)) {
+        return (
+            <PreloadMessage>
+                Report not found.
+            </PreloadMessage>
+        );
+    }
 
     return (
         <ReportDetailContent
