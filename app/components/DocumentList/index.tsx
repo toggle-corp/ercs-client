@@ -84,7 +84,7 @@ function DocumentList(props: Props) {
                             <DocumentCard
                                 manual={{
                                     title: document.title,
-                                    src: document.coverImage?.url ?? '',
+                                    src: document.coverImage?.url,
                                 }}
                             />
                         </Link>

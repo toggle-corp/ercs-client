@@ -6,12 +6,14 @@ import {
 } from '@ifrc-go/ui';
 import { isDefined } from '@togglecorp/fujs';
 
+import defaultDocumentCover from '#resources/image/logo.png';
+
 import styles from './styles.module.css';
 
 interface DocumentCardProps {
     manual: {
         title: string;
-        src: string;
+        src?: string;
         date?: string;
     };
 }
@@ -25,7 +27,7 @@ function DocumentCard({ manual }: DocumentCardProps) {
         >
             <Image
                 withContainedFit
-                src={manual.src}
+                src={manual.src || defaultDocumentCover}
                 size="lg"
                 className={styles.documentCover}
             />
