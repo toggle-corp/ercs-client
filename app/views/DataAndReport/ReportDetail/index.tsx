@@ -133,10 +133,13 @@ function ReportDetailContent(props: Props) {
         ? encodeDate(new Date(reportData?.publishedAt))
         : '-';
 
-    const fileUrl = reportData?.file?.url ?? '';
+    const fileUrl = reportData?.file?.url;
     const fileName = reportData?.file?.name;
 
     const handleDownloadClick = useCallback(() => {
+        if (isNotDefined(fileUrl)) {
+            return;
+        }
         const urlName = fileUrl.split('/').pop()?.split('?')[0]?.replace(/\.[^/.]+$/, '');
         saveAs(fileUrl, fileName ?? urlName);
     }, [fileUrl, fileName]);
@@ -239,18 +242,19 @@ function ReportDetailContent(props: Props) {
                                 </Description>
                             </ListView>
                         </ListView>
-                        {isDefined(fileUrl)
-                            ? (
-                                <DocumentViewer
-                                    fileUrl={fileUrl}
-                                    fileName={fileName ?? undefined}
-                                />
-                            )
-                            : (
-                                <PowerBIEmbed
-                                    embedUrl={reportData?.iframeUrl ?? ''}
-                                />
-                            )}
+                        {reportData?.contentType === ReportContentType.File
+                            && isDefined(fileUrl) && (
+                            <DocumentViewer
+                                fileUrl={fileUrl}
+                                fileName={fileName ?? undefined}
+                            />
+                        )}
+                        {reportData?.contentType === ReportContentType.Iframe
+                            && isDefined(reportData?.iframeUrl) && (
+                            <PowerBIEmbed
+                                embedUrl={reportData.iframeUrl}
+                            />
+                        )}
                     </ListView>
                     {showAiSummary && (
                         <div className={styles.details}>
