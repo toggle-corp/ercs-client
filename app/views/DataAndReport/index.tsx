@@ -16,9 +16,11 @@ import RegionSelectInput from '#components/RegionSelectInput';
 import ReportCard from '#components/ReportCard';
 import {
     ReportTypeEnum,
+    ReportVisibility,
     useReportsQuery,
     useThematicAreasQuery,
 } from '#generated/types/graphql';
+import useAuth from '#hooks/useAuth';
 import useFilterState from '#hooks/useFilterState';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -85,6 +87,7 @@ const labelSelector = (item: ThematicArea) => item.name;
 function DataAndReport() {
     const [{ data }] = useThematicAreasQuery();
     const [regionId, setRegionId] = useState<string | undefined>(undefined);
+    const { isAuthenticated, isAuthLoading } = useAuth();
 
     const {
         limit,
@@ -109,12 +112,14 @@ function DataAndReport() {
                 reportType: ReportTypeEnum.Report,
                 search: filter.searchText ?? '',
                 regions: regionId ? [regionId] : null,
+                visibility: isAuthenticated ? undefined : ReportVisibility.Public,
             },
             pagination: {
                 limit,
                 offset,
             },
         },
+        pause: isAuthLoading,
     });
     const thematicAreaOptions = data?.thematicAreas?.results ?? [];
     const reportDetails = reportsData?.reports?.results ?? [];
@@ -165,7 +170,7 @@ function DataAndReport() {
                 </Description>
                 <Container
                     withLargeBreakpointInHeader
-                    pending={fetching}
+                    pending={fetching || isAuthLoading}
                     footerActions={(
                         <Pager
                             activePage={page}
