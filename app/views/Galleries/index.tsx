@@ -8,10 +8,8 @@ import {
     Container,
     Description,
     Heading,
-    Image,
     InlineView,
     ListView,
-    Modal,
     NavigationTabList,
     TabLayout,
     TextInput,
@@ -26,8 +24,6 @@ import {
 } from '#generated/types/graphql';
 import useFilterState from '#hooks/useFilterState';
 import Photos from '#views/Galleries/Photos';
-
-import styles from './styles.module.css';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ALBUM_QUERY = gql`
@@ -49,38 +45,10 @@ const ALBUM_QUERY = gql`
         }
     }
 `;
-interface ImageViewerProps {
-  src: string;
-  onClose: () => void;
-}
-
-function ImageViewer(props: ImageViewerProps) {
-    const { src, onClose } = props;
-    return (
-        <Modal
-            closeOnClickOutside
-            closeOnEscape
-            onClose={onClose}
-            size="lg"
-        >
-            <Image
-                src={src}
-                alt={src}
-                className={styles.image}
-                imgElementClassName={styles.img}
-                withContainedFit
-                withoutCaption
-            />
-        </Modal>
-    );
-}
-
 type AlbumList = NonNullable<AlbumsQuery['galleryAlbums']['results']>[number];
 
 function Galleries() {
     const [activeId, setActiveId] = useState('');
-    const [selectedImage, setSelectedImage] = useState('');
-    const [viewerOpen, setViewerOpen] = useState(false);
     const [albumData, setAlbumData] = useState<AlbumList[]>([]);
     const albumId = activeId || albumData[0]?.id || '';
     const {
@@ -109,17 +77,13 @@ function Galleries() {
             },
         },
     }));
-    const handleView = (src: string) => {
-        setSelectedImage(src);
-        setViewerOpen(true);
-    };
 
     useEffect(() => {
+        if (!data?.galleryAlbums?.results?.length) return;
         if (filter.searchText) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setAlbumData(data?.galleryAlbums.results ?? []);
         }
-        if (!data?.galleryAlbums?.results?.length) return;
         setAlbumData((prev) => {
             const existingIds = new Set(prev.map((a) => a.id));
             const incoming = data.galleryAlbums.results.filter((a) => !existingIds.has(a.id));
@@ -145,12 +109,6 @@ function Galleries() {
                 layout="block"
                 spacing="xs"
             >
-                {viewerOpen && (
-                    <ImageViewer
-                        src={selectedImage}
-                        onClose={() => setViewerOpen(false)}
-                    />
-                )}
                 <Heading
                     level={4}
                 >
@@ -212,7 +170,6 @@ function Galleries() {
                     <Photos
                         key={albumId}
                         albumId={albumId}
-                        handleView={handleView}
                     />
                 </ListView>
             </ListView>
