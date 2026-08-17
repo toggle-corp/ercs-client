@@ -1,4 +1,4 @@
-import { AlertLineIcon } from '@ifrc-go/icons';
+import { MapIcon } from '@ifrc-go/icons';
 import {
     Container,
     ListView,
@@ -31,15 +31,22 @@ function ProjectMapping() {
                 spacing="2xl"
             >
                 <InfoCard
-                    icon={<AlertLineIcon />}
-                    title="Emergency Response Overview Dashboard"
+                    icon={<MapIcon />}
+                    title="Project Mapping Dashboard"
                     description="Real-time emergency alerts and early warning system monitoring across regions"
                 />
-                {projectMappingData?.externalDashboards.results.map((report) => (
-                    <PowerBIEmbed
-                        key={report.id}
-                        embedUrl={report.url}
-                    />
+                {projectMappingData?.externalDashboards.results.map((dashboard) => (
+                    <Container
+                        key={dashboard.id}
+                        heading={dashboard.title}
+                        headingLevel={4}
+                        headerDescription={dashboard.description}
+                        withHeaderBorder
+                    >
+                        <PowerBIEmbed
+                            embedUrl={dashboard.url}
+                        />
+                    </Container>
                 ))}
             </ListView>
         </Container>

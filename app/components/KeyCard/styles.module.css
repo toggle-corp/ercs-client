@@ -18,4 +18,11 @@
         padding: var(--go-ui-spacing-3xs) var(--go-ui-spacing-sm) ;
         font-weight: 500;
     }
+
+    .info {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
 }

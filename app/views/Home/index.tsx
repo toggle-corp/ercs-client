@@ -132,6 +132,7 @@ function Home() {
                                     value={res.title}
                                     valueType="text"
                                     size="sm"
+                                    info={res.description}
                                     pillText={res.pageDisplay}
                                     withIconBackground
                                     withShadow
