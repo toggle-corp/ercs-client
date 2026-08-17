@@ -42,19 +42,31 @@ function EmergencyAlert() {
             />
             <InfoCard
                 icon={<AlertLineIcon />}
-                title="Alerts Dashboard"
+                title="Emergency Alerts Dashboard"
                 description="Real-time emergency alerts and early warning system monitoring across regions"
             />
             <Container
                 pending={fetching}
                 empty={emergencyAlert?.externalDashboards.results.length === 0}
             >
-                {emergencyAlert?.externalDashboards.results.map((report) => (
-                    <PowerBIEmbed
-                        key={report.id}
-                        embedUrl={report.url}
-                    />
-                ))}
+                <ListView
+                    layout="block"
+                    spacing="2xl"
+                >
+                    {emergencyAlert?.externalDashboards.results.map((dashboard) => (
+                        <Container
+                            key={dashboard.id}
+                            heading={dashboard.title}
+                            headingLevel={4}
+                            headerDescription={dashboard.description}
+                            withHeaderBorder
+                        >
+                            <PowerBIEmbed
+                                embedUrl={dashboard.url}
+                            />
+                        </Container>
+                    ))}
+                </ListView>
             </Container>
         </ListView>
     );

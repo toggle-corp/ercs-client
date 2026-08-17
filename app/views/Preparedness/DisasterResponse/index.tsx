@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertLineIcon } from '@ifrc-go/icons';
+import { EmergencyResponseUnitIcon } from '@ifrc-go/icons';
 import {
     Container,
     InlineLayout,
@@ -39,20 +39,32 @@ function DisasterResponse() {
                 )}
             />
             <InfoCard
-                icon={<AlertLineIcon />}
-                title="Alerts Dashboard"
+                icon={<EmergencyResponseUnitIcon />}
+                title="Disaster Response Dashboard"
                 description="Real-time emergency alerts and early warning system monitoring across regions"
             />
             <Container
                 pending={fetching}
                 empty={disasterResponse?.externalDashboards.results.length === 0}
             >
-                {disasterResponse?.externalDashboards.results.map((report) => (
-                    <PowerBIEmbed
-                        key={report.id}
-                        embedUrl={report.url}
-                    />
-                ))}
+                <ListView
+                    layout="block"
+                    spacing="2xl"
+                >
+                    {disasterResponse?.externalDashboards.results.map((dashboard) => (
+                        <Container
+                            key={dashboard.id}
+                            heading={dashboard.title}
+                            headingLevel={4}
+                            headerDescription={dashboard.description}
+                            withHeaderBorder
+                        >
+                            <PowerBIEmbed
+                                embedUrl={dashboard.url}
+                            />
+                        </Container>
+                    ))}
+                </ListView>
             </Container>
         </ListView>
     );

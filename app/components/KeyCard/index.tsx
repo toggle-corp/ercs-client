@@ -11,6 +11,7 @@ import {
 import {
     _cs,
     isDefined,
+    isTruthyString,
 } from '@togglecorp/fujs';
 
 import styles from './styles.module.css';
@@ -19,7 +20,7 @@ type KeyCardProps = KeyFigureProps & {
     withShadow?: boolean
     icon?: React.ReactNode;
     pillText?: React.ReactNode;
-    info?: string;
+    info?: string | null;
     withIconBackground?: boolean;
     viewButton? :boolean;
     onViewClick?: () => void
@@ -89,10 +90,11 @@ function KeyCard(props : KeyCardProps) {
                             // eslint-disable-next-line react/jsx-props-no-spreading
                             {...keyFigureProps}
                         />
-                        {isDefined(icon) && (
+                        {isTruthyString(info) && (
                             <Description
                                 textSize="sm"
                                 withLightText
+                                className={styles.info}
                             >
                                 {info}
                             </Description>
