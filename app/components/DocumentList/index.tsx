@@ -7,6 +7,7 @@ import { gql } from 'urql';
 import DocumentCard from '#components/DocumentCard';
 import Link from '#components/Link';
 import Page from '#components/Page';
+import SocialShare from '#components/SocialShare';
 import {
     ReportTypeEnum,
     useDocumentListQuery,
@@ -31,6 +32,7 @@ const DOCUMENT_LIST_QUERY = gql`
                 file {
                     url
                 }
+                createdAt
                 coverImage {
                     url
                 }
@@ -52,6 +54,8 @@ function DocumentList(props: Props) {
         description,
     } = props;
 
+    const isOnlineInteractive = reportType === ReportTypeEnum.OnlineInteractive;
+
     const [{ data, fetching }] = useDocumentListQuery({
         variables: {
             filters: {
@@ -64,6 +68,7 @@ function DocumentList(props: Props) {
         <Page
             heading={heading}
             description={description}
+            info={isOnlineInteractive ? <SocialShare title={heading} /> : undefined}
         >
             <Container
                 pending={fetching}
@@ -85,6 +90,9 @@ function DocumentList(props: Props) {
                                 manual={{
                                     title: document.title,
                                     src: document.coverImage?.url,
+                                    date: isOnlineInteractive
+                                        ? document.createdAt
+                                        : undefined,
                                 }}
                             />
                         </Link>

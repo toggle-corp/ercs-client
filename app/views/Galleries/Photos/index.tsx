@@ -1,6 +1,7 @@
 import {
     useCallback,
     useEffect,
+    useMemo,
     useState,
 } from 'react';
 import {
@@ -18,7 +19,10 @@ import {
     Pager,
     RawButton,
 } from '@ifrc-go/ui';
-import { isDefined } from '@togglecorp/fujs';
+import {
+    isDefined,
+    isNotDefined,
+} from '@togglecorp/fujs';
 import { saveAs } from 'file-saver';
 import { gql } from 'urql';
 
@@ -39,12 +43,9 @@ const IMAGES_QUERY = gql`
         ) {
             totalCount
             results {
-                albumId
-                caption
                 id
                 image {
                     name
-                    size
                     url
                 }
             }
@@ -57,10 +58,10 @@ const toSafeSrc = (src: string) => (src.startsWith('http')
     : src);
 
 interface ImageViewerProps {
-    images: string[];
+    images: string[] | undefined;
     index: number;
-    page: number;
-    totalPages: number;
+    totalCount: number;
+    pending: boolean;
     onIndexChange: (index: number) => void;
     onClose: () => void;
 }
@@ -69,16 +70,19 @@ function ImageViewer(props: ImageViewerProps) {
     const {
         images,
         index,
-        page,
-        totalPages,
+        totalCount,
+        pending,
         onIndexChange,
         onClose,
     } = props;
 
-    const hasPrev = index > 0;
-    const hasNext = index < images.length - 1;
+    const hasPrev = isDefined(images) && index > 0;
+    const hasNext = isDefined(images) && index < images.length - 1;
 
     useEffect(() => {
+        if (isNotDefined(images)) {
+            return undefined;
+        }
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'ArrowLeft' && index > 0) {
                 onIndexChange(index - 1);
@@ -90,9 +94,9 @@ function ImageViewer(props: ImageViewerProps) {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [index, images.length, onIndexChange]);
+    }, [index, images, onIndexChange]);
 
-    const src = images[index];
+    const src = images?.[index];
 
     return (
         <Modal
@@ -113,7 +117,9 @@ function ImageViewer(props: ImageViewerProps) {
                     <ChevronLeftLineIcon />
                 </IconButton>
             )}
-            footer={`${index + 1} / ${images.length} · Page ${page} of ${totalPages}`}
+            footer={pending
+                ? `${index + 1} / ${totalCount} · loading…`
+                : `${index + 1} / ${totalCount}`}
             footerActions={(
                 <IconButton
                     name={index + 1}
@@ -199,8 +205,19 @@ function ImageComponent(props: ImageComponentProps) {
     );
 }
 
-function Photos(props: {albumId: string}) {
-    const { albumId } = props;
+interface Props {
+    albumId: string;
+    heading?: React.ReactNode;
+    description?: React.ReactNode;
+}
+
+function Photos(props: Props) {
+    const {
+        albumId,
+        heading,
+        description,
+    } = props;
+    // NOTE: This is the index within the whole album, not within the page.
     const [activeIndex, setActiveIndex] = useState<number>();
     const {
         limit,
@@ -209,7 +226,7 @@ function Photos(props: {albumId: string}) {
         offset,
     } = useFilterState({
         filter: {},
-        pageSize: 9,
+        pageSize: 12,
     });
 
     const [{ fetching: imageLoading, data: imageData }] = useGalleryQuery({
@@ -226,29 +243,60 @@ function Photos(props: {albumId: string}) {
     });
 
     const results = imageData?.galleryImages.results;
-    const images = results?.map((item) => toSafeSrc(item.image.url)) ?? [];
     const totalCount = imageData?.galleryImages?.totalCount ?? 0;
-    const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 
-    const activeSrc = isDefined(activeIndex) ? images[activeIndex] : undefined;
+    // NOTE: Prev/next has to walk the whole album, not just the visible page,
+    // so the full list of urls is fetched alongside the paginated grid.
+    const [{
+        fetching: allImagesLoading,
+        data: allImageData,
+    }] = useGalleryQuery({
+        variables: {
+            filters: {
+                albumId,
+            },
+            pagination: {
+                limit: totalCount,
+                offset: 0,
+            },
+        },
+        pause: !albumId || totalCount === 0,
+    });
 
-    const handleViewerClose = useCallback(() => {
-        setActiveIndex(undefined);
-    }, []);
+    const allImages = useMemo(
+        () => allImageData?.galleryImages.results.map((item) => toSafeSrc(item.image.url)),
+        [allImageData],
+    );
+
+    const handleView = useCallback(
+        (index: number) => {
+            setActiveIndex(offset + index);
+        },
+        [offset],
+    );
+
+    const handleViewerClose = useCallback(
+        () => {
+            setActiveIndex(undefined);
+        },
+        [],
+    );
 
     return (
         <>
-            {isDefined(activeIndex) && isDefined(activeSrc) && (
+            {isDefined(activeIndex) && (
                 <ImageViewer
-                    images={images}
+                    images={allImages}
                     index={activeIndex}
-                    page={page}
-                    totalPages={totalPages}
+                    totalCount={totalCount}
+                    pending={allImagesLoading || isNotDefined(allImages)}
                     onIndexChange={setActiveIndex}
                     onClose={handleViewerClose}
                 />
             )}
             <Container
+                heading={heading}
+                headerDescription={description}
                 pending={imageLoading}
                 footerActions={(
                     <Pager
@@ -267,11 +315,11 @@ function Photos(props: {albumId: string}) {
                 >
                     {results?.map((item, index) => (
                         <ImageComponent
-                            key={item.image.name}
+                            key={item.id}
                             src={item.image.url}
                             name={item.image.name}
                             index={index}
-                            onView={setActiveIndex}
+                            onView={handleView}
                         />
                     ))}
                 </ListView>

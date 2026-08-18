@@ -3,7 +3,6 @@ import {
     SocialInstagramIcon,
     SocialLinkedinIcon,
     SocialMediumIcon,
-    SocialTwitterIcon,
     SocialYoutubeIcon,
 } from '@ifrc-go/icons';
 import {
@@ -14,6 +13,7 @@ import {
 import { _cs } from '@togglecorp/fujs';
 
 import Link from '#components/Link';
+import XIcon from '#components/XIcon';
 
 import styles from './styles.module.css';
 
@@ -107,7 +107,7 @@ function GlobalFooter(props: Props) {
                         <Link
                             to="policies"
                         >
-                            Policy
+                            Policies
                         </Link>
                         <Link
                             to="guidelines"
@@ -173,8 +173,7 @@ function GlobalFooter(props: Props) {
                                 external
                                 colorVariant="text-on-dark"
                             >
-                                {/* TODO: change twitter icon in ifrc go icon to X */}
-                                <SocialTwitterIcon />
+                                <XIcon />
                             </Link>
                             <Link
                                 className={styles.socialIcon}

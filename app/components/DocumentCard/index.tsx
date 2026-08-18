@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
     Description,
     Heading,
@@ -19,10 +20,31 @@ interface DocumentCardProps {
 }
 
 function DocumentCard({ manual }: DocumentCardProps) {
+    const formattedDate = useMemo(
+        () => {
+            if (!isDefined(manual.date)) {
+                return undefined;
+            }
+
+            const date = new Date(manual.date);
+
+            if (Number.isNaN(date.getTime())) {
+                return undefined;
+            }
+
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            });
+        },
+        [manual.date],
+    );
+
     return (
         <ListView
             layout="block"
-            withCenteredContents={!manual.date}
+            withCenteredContents={!formattedDate}
             withPadding
         >
             <Image
@@ -31,16 +53,22 @@ function DocumentCard({ manual }: DocumentCardProps) {
                 size="lg"
                 className={styles.documentCover}
             />
-            <Heading
-                level={5}
+            <ListView
+                layout="block"
+                spacing="2xs"
             >
-                {manual.title}
-            </Heading>
-            {isDefined(manual.date) && (
-                <Description withLightText>
-                    {manual.date}
-                </Description>
-            )}
+
+                <Heading
+                    level={5}
+                >
+                    {manual.title}
+                </Heading>
+                {isDefined(formattedDate) && (
+                    <Description withLightText textSize="sm">
+                        {formattedDate}
+                    </Description>
+                )}
+            </ListView>
         </ListView>
     );
 }

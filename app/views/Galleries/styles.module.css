@@ -1,0 +1,41 @@
+.album-list {
+    position: relative;
+
+    .scroll-indicator {
+        display: flex;
+        position: absolute;
+        top: 0;
+        left: 0;
+        justify-content: center;
+        transition: opacity 0.2s ease-in-out;
+        opacity: 0;
+        z-index: 1;
+        background: linear-gradient(
+            to bottom,
+            var(--go-ui-color-white) 20%,
+            transparent 100%
+        );
+        padding: var(--go-ui-spacing-3xs) 0 var(--go-ui-spacing-sm) 0;
+        pointer-events: none;
+        width: 100%;
+        color: var(--go-ui-color-gray-60);
+
+        .scroll-to-top-button {
+            pointer-events: none;
+        }
+
+        &.visible {
+            opacity: 1;
+
+            .scroll-to-top-button {
+                pointer-events: auto;
+            }
+        }
+    }
+
+    .scrollable-content {
+        max-height: 48.5rem;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+}
