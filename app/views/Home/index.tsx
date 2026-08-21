@@ -98,6 +98,7 @@ function Home() {
     );
     return (
         <Page
+            title="Home"
             heading="ERCS Emergency Operations Centre"
             description="Real-time operational intelligence and situational awareness for emergency response"
             info={(

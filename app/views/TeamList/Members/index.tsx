@@ -232,6 +232,7 @@ function Members() {
 
     return (
         <Page
+            title="Team"
             heading={data?.team.name}
             description={(
                 <i>

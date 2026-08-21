@@ -18,6 +18,7 @@ import AllEmergency from './AllEmergencies';
 function Preparedness() {
     return (
         <Page
+            title="Preparedness"
             heading="Preparedness -  Emergency Alerts"
             description="Use data-driven forecasts and community-level indicators to plan, prepare, and minimize disaster impact."
         >

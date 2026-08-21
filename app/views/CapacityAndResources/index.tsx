@@ -107,6 +107,7 @@ function CapacityAndResourcesList() {
     ];
     return (
         <Page
+            title="Capacity and Resources"
             heading="Capacity and Resources"
             description="Monitor and allocate capacity and resources effectively to support humanitarian operations and response efforts."
         >

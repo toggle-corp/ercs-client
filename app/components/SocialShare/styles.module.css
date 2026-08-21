@@ -1,0 +1,14 @@
+.social-share {
+    align-items: center;
+
+    .label {
+        font-weight: var(--go-ui-font-weight-semibold);
+    }
+
+    .social-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: var(--go-ui-font-size-lg);
+    }
+}
