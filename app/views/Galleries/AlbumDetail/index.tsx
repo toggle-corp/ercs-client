@@ -5,7 +5,6 @@ import {
     useState,
 } from 'react';
 import { useParams } from 'react-router';
-import { ArrowLeftLineIcon } from '@ifrc-go/icons';
 import {
     Button,
     Container,
@@ -19,7 +18,6 @@ import {
 } from '@togglecorp/fujs';
 import { gql } from 'urql';
 
-import Link from '#components/Link';
 import Page from '#components/Page';
 import {
     type AlbumImagesQuery,
@@ -28,7 +26,6 @@ import {
     useGalleryAlbumQuery,
 } from '#generated/types/graphql';
 import useFilterState from '#hooks/useFilterState';
-import toSafeMediaUrl from '#utils/gallery';
 
 import PhotoTile from './PhotoTile';
 import PhotoViewer from './PhotoViewer';
@@ -156,7 +153,7 @@ function AlbumDetail() {
 
     const imageUrls = useMemo(
         () => allImagesResponse?.galleryImages.results.map(
-            (item) => toSafeMediaUrl(item.image.url),
+            (item) => (item.image.url),
         ),
         [allImagesResponse],
     );
@@ -189,15 +186,6 @@ function AlbumDetail() {
             )}
             <Page
                 title={album?.title}
-                breadCrumbs={(
-                    <Link
-                        to="galleries"
-                        before={<ArrowLeftLineIcon />}
-                        withUnderline
-                    >
-                        Back to Galleries
-                    </Link>
-                )}
                 heading={album?.title}
                 description={album?.description}
                 info={isDefined(images) ? (
@@ -238,7 +226,7 @@ function AlbumDetail() {
                             <PhotoTile
                                 key={item.id}
                                 index={index}
-                                url={toSafeMediaUrl(item.image.url)}
+                                url={item.image.url}
                                 name={item.image.name}
                                 caption={item.caption}
                                 totalCount={totalCount}

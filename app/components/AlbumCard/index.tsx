@@ -8,7 +8,6 @@ import {
 import { isTruthyString } from '@togglecorp/fujs';
 
 import Link from '#components/Link';
-import toSafeMediaUrl from '#utils/gallery';
 
 import styles from './styles.module.css';
 
@@ -42,7 +41,7 @@ function AlbumCard(props: Props) {
                 <div className={styles.cover}>
                     {isTruthyString(coverImageUrl) ? (
                         <Image
-                            src={toSafeMediaUrl(coverImageUrl)}
+                            src={(coverImageUrl)}
                             size="md"
                             withoutCaption
                         />
