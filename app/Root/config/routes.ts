@@ -95,7 +95,13 @@ const galleries: RouteConfig = {
     visibility: 'is-authenticated',
 };
 
-// TODO: add terms and conditions and cookie policy page
+const galleryAlbum: RouteConfig = {
+    index: true,
+    path: '/galleries/:id',
+    load: () => import('#views/Galleries/AlbumDetail'),
+    visibility: 'is-authenticated',
+};
+
 const termsAndConditions: RouteConfig = {
     index: true,
     path: '/terms-and-conditions',
@@ -180,6 +186,7 @@ const routes = {
     preparedness,
     dataAndReport,
     galleries,
+    galleryAlbum,
     capacityAndResources,
     termsAndConditions,
     cookie,

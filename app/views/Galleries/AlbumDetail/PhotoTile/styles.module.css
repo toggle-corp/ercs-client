@@ -1,0 +1,39 @@
+.photo-tile {
+    position: relative;
+
+    .view-button {
+        display: flex;
+        border-radius: var(--go-ui-border-radius-sm);
+        cursor: zoom-in;
+        width: 100%;
+        overflow: hidden;
+
+        .image-element {
+            transition: transform 0.2s ease-out;
+            aspect-ratio: 1 / 1;
+        }
+    }
+
+    .download-button {
+        position: absolute;
+        top: var(--go-ui-spacing-2xs);
+        right: var(--go-ui-spacing-2xs);
+        transition: opacity 0.2s ease-out;
+        opacity: 0;
+        z-index: 1;
+
+        &:focus-visible {
+            opacity: 1;
+        }
+    }
+
+    &:hover {
+        .image-element {
+            transform: scale(1.04);
+        }
+
+        .download-button {
+            opacity: 1;
+        }
+    }
+}

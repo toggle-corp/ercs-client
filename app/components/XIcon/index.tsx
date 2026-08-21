@@ -1,6 +1,3 @@
-// NOTE: @ifrc-go/icons still ships the legacy bird logo as SocialTwitterIcon,
-// so the X glyph lives here.
-// TODO: change twitter icon in ifrc go icon to X and use it from there instead.
 function XIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
         <svg

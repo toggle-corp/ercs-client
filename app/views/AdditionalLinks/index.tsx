@@ -15,6 +15,7 @@ function AdditionalLinks() {
 
     return (
         <Page
+            title="Additional Links"
             heading="Additional Links"
             description="Explore additional resources and important links"
         >

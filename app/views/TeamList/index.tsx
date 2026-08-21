@@ -104,6 +104,7 @@ function TeamList() {
     ];
     return (
         <Page
+            title="Teams"
             heading="Teams"
             description="A dedicated team committed to delivering impactful solutions."
         >

@@ -91,6 +91,7 @@ const keyFigures = (
 function OurWork() {
     return (
         <Page
+            title="Our Work"
             heading="National EOC Operations"
             description="Comprehensive operational intelligence and emergency coordination dashboards"
             info={(

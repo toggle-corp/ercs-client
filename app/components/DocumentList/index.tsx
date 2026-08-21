@@ -66,6 +66,7 @@ function DocumentList(props: Props) {
 
     return (
         <Page
+            title={heading}
             heading={heading}
             description={description}
             info={isOnlineInteractive ? <SocialShare title={heading} /> : undefined}

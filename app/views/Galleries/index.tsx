@@ -1,41 +1,31 @@
 import {
     useCallback,
     useEffect,
-    useRef,
     useState,
 } from 'react';
-import {
-    ChevronUpLineIcon,
-    SearchLineIcon,
-} from '@ifrc-go/icons';
+import { SearchLineIcon } from '@ifrc-go/icons';
 import {
     Button,
     Container,
-    Description,
-    Heading,
-    IconButton,
-    InlineView,
     ListView,
-    NavigationTabList,
     Spinner,
-    TabLayout,
     TextInput,
 } from '@ifrc-go/ui';
-import { _cs } from '@togglecorp/fujs';
+import { isNotDefined } from '@togglecorp/fujs';
 import { gql } from 'urql';
 
+import AlbumCard from '#components/AlbumCard';
 import Page from '#components/Page';
 import {
     type AlbumsQuery,
     useAlbumsQuery,
 } from '#generated/types/graphql';
 import useFilterState from '#hooks/useFilterState';
-import Photos from '#views/Galleries/Photos';
 
 import styles from './styles.module.css';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ALBUM_QUERY = gql`
+const ALBUMS_QUERY = gql`
     query Albums(
         $pagination: OffsetPaginationInput,
         $filters: GalleryAlbumFilter
@@ -44,45 +34,51 @@ const ALBUM_QUERY = gql`
             filters: $filters
             pagination: $pagination
         ) {
-            results {
-                title
-                updatedAt
-                id
-                description
-            }
             totalCount
+            results {
+                id
+                title
+                description
+                imagesCount
+                coverImage {
+                    id
+                    image {
+                        name
+                        url
+                    }
+                }
+            }
         }
     }
 `;
-type AlbumList = NonNullable<AlbumsQuery['galleryAlbums']['results']>[number];
+
+const PAGE_SIZE = 16;
+
+type Album = NonNullable<AlbumsQuery['galleryAlbums']['results']>[number];
 
 function Galleries() {
-    const [activeId, setActiveId] = useState('');
-    const [albumData, setAlbumData] = useState<AlbumList[]>([]);
-    // NOTE: The album list is scrollable, so an indicator is shown at the top
-    // whenever there are albums scrolled out of view above.
-    const [hasContentAbove, setHasContentAbove] = useState(false);
-    const albumListRef = useRef<HTMLDivElement>(null);
-    // NOTE: Set only when show more is clicked, so the list is scrolled down to
-    // the freshly appended albums, and not on the first load or on a search.
-    const shouldScrollToBottomRef = useRef(false);
-    const albumId = activeId || albumData[0]?.id || '';
     const {
         filter,
+        filtered,
         limit,
         page,
         rawFilter,
+        rawFiltered,
+        resetFilter,
         setFilterField,
         setPage,
         offset,
     } = useFilterState<{
-        searchText?: string
+        searchText?: string;
     }>({
         filter: {},
-        pageSize: 5,
+        pageSize: PAGE_SIZE,
     });
 
-    const [{ data, fetching }] = useAlbumsQuery(({
+    const [albums, setAlbums] = useState<Album[]>();
+    const [totalCount, setTotalCount] = useState(0);
+
+    const [{ data, fetching }] = useAlbumsQuery({
         variables: {
             filters: {
                 search: filter.searchText,
@@ -92,178 +88,104 @@ function Galleries() {
                 offset,
             },
         },
-    }));
+    });
 
-    // NOTE: Albums are accumulated across pages for the show more button. The
-    // page is reset to 1 on every filter change, so an offset of 0 always means
-    // a fresh list (first load, a new search, or the search being cleared) and
-    // has to replace what is there instead of appending to it.
     useEffect(() => {
         if (fetching) {
             return;
         }
         const results = data?.galleryAlbums.results ?? [];
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setAlbumData((prev) => {
-            if (offset === 0) {
+        setAlbums((prevAlbums) => {
+            if (offset === 0 || isNotDefined(prevAlbums)) {
                 return results;
             }
-            const existingIds = new Set(prev.map((item) => item.id));
-            const incoming = results.filter((item) => !existingIds.has(item.id));
-            return incoming.length > 0 ? [...prev, ...incoming] : prev;
+            const loadedIds = new Set(prevAlbums.map((item) => item.id));
+            const incoming = results.filter((item) => !loadedIds.has(item.id));
+            return incoming.length > 0 ? [...prevAlbums, ...incoming] : prevAlbums;
         });
-        if (offset === 0) {
-            albumListRef.current?.scrollTo({ top: 0 });
-        }
+        setTotalCount(data?.galleryAlbums.totalCount ?? 0);
     }, [data, fetching, offset]);
 
-    const handleAlbumListScroll = useCallback(
-        (event: React.UIEvent<HTMLDivElement>) => {
-            setHasContentAbove(event.currentTarget.scrollTop > 0);
-        },
-        [],
-    );
+    const hasMoreAlbums = (albums?.length ?? 0) < totalCount;
 
-    useEffect(() => {
-        if (!shouldScrollToBottomRef.current) {
-            return;
-        }
-        shouldScrollToBottomRef.current = false;
-        const element = albumListRef.current;
-        element?.scrollTo({
-            top: element.scrollHeight,
-            behavior: 'smooth',
-        });
-    }, [albumData]);
-
-    const handleShowMoreClick = useCallback(
+    const handleLoadMoreClick = useCallback(
         () => {
-            shouldScrollToBottomRef.current = true;
             setPage(page + 1);
         },
         [page, setPage],
     );
 
-    const handleScrollToTopClick = useCallback(
-        () => {
-            albumListRef.current?.scrollTo({
-                top: 0,
-                behavior: 'smooth',
-            });
-        },
-        [],
-    );
-
     return (
         <Page
+            title="Galleries"
             heading="Galleries"
             description="Capturing moments of service, resilience, and community impact."
-            info={(
-                <Description withCenteredContent>
-                    <i>
-                        {data?.galleryAlbums.totalCount}
-                        {' '}
-                        Events
-                    </i>
-                </Description>
-            )}
         >
-            <ListView
-                layout="block"
-                spacing="xs"
+            <Container
+                heading="Albums"
+                headingLevel={4}
+                withHeaderBorder
             >
-                <Heading
-                    level={4}
-                >
-                    Events
-                </Heading>
-                <ListView
-                    layout="grid"
-                    withSidebar
-                    sidebarPosition="start"
-                >
-                    <ListView
-                        layout="block"
-                    >
+                <ListView layout="block">
+                    <ListView className={styles.filters}>
                         <TextInput
+                            className={styles.searchInput}
                             name="searchText"
                             placeholder="Search"
                             value={rawFilter.searchText}
                             onChange={setFilterField}
                             icons={<SearchLineIcon />}
                         />
-                        <Container
-                            // NOTE: Only the very first load blanks out the list. Fetching
-                            // further pages is shown on the show more button instead, so
-                            // the list neither collapses nor loses its scroll position.
-                            pending={fetching && albumData.length === 0}
-                            empty={albumData.length === 0}
-                            emptyMessage="No events found"
+                        <Button
+                            name={undefined}
+                            onClick={resetFilter}
+                            disabled={!rawFiltered}
+                            styleVariant="outline"
+                            colorVariant="primary"
                         >
-
-                            <div className={styles.albumList}>
-                                <div
-                                    className={_cs(
-                                        styles.scrollIndicator,
-                                        hasContentAbove && styles.visible,
-                                    )}
-                                >
-                                    <IconButton
-                                        name="scroll-to-top"
-                                        ariaLabel="scroll to the top of the event list"
-                                        title="scroll to top"
-                                        variant="tertiary"
-                                        className={styles.scrollToTopButton}
-                                        onClick={handleScrollToTopClick}
-                                    >
-                                        <ChevronUpLineIcon />
-                                    </IconButton>
-                                </div>
-                                <div
-                                    className={styles.scrollableContent}
-                                    ref={albumListRef}
-                                    onScroll={handleAlbumListScroll}
-                                >
-                                    <NavigationTabList
-                                        styleVariant="vertical"
-                                    >
-                                        {albumData.map((item) => (
-                                            <TabLayout
-                                                key={item.id}
-                                                styleVariant="vertical"
-                                                active={albumId === item.id}
-                                                onClickCapture={() => setActiveId(item.id)}
-                                            >
-                                                {item.title}
-                                            </TabLayout>
-                                        ))}
-                                    </NavigationTabList>
-                                </div>
-                            </div>
-                        </Container>
-                        {(data?.galleryAlbums?.totalCount ?? 0)
-                        > albumData.length && (
-                            <InlineView
-                                after={(
-                                    <Button
-                                        name="show-more"
-                                        onClick={handleShowMoreClick}
-                                        disabled={fetching}
-                                        after={fetching ? <Spinner /> : undefined}
-                                        styleVariant="action"
-                                    >
-                                        show more
-                                    </Button>
-                                )}
-                            />
-                        )}
+                            Clear
+                        </Button>
                     </ListView>
-                    <Photos
-                        key={albumId}
-                        albumId={albumId}
-                    />
+                    <Container
+                        pending={fetching && isNotDefined(albums)}
+                        empty={albums?.length === 0}
+                        filtered={filtered}
+                        emptyMessage="No albums yet"
+                        filteredEmptyMessage="No albums match this search"
+                        footer={hasMoreAlbums ? (
+                            <ListView withCenteredContents>
+                                <Button
+                                    name={undefined}
+                                    onClick={handleLoadMoreClick}
+                                    disabled={fetching}
+                                    after={fetching ? <Spinner /> : undefined}
+                                    styleVariant="outline"
+                                    colorVariant="primary"
+                                >
+                                    Load More
+                                </Button>
+                            </ListView>
+                        ) : undefined}
+                    >
+                        <ListView
+                            layout="grid"
+                            numPreferredGridColumns={4}
+                            minGridColumnSize="11.25rem"
+                        >
+                            {albums?.map((album) => (
+                                <AlbumCard
+                                    key={album.id}
+                                    albumId={album.id}
+                                    title={album.title}
+                                    imagesCount={album.imagesCount}
+                                    coverImageUrl={album.coverImage?.image.url}
+                                />
+                            ))}
+                        </ListView>
+                    </Container>
                 </ListView>
-            </ListView>
+            </Container>
         </Page>
     );
 }

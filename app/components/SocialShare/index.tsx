@@ -28,7 +28,6 @@ const COPIED_FEEDBACK_DURATION = 2000;
 interface Props {
     className?: string;
     label?: React.ReactNode;
-    // NOTE: Defaults to the url of the current page.
     url?: string;
     title?: string;
 }

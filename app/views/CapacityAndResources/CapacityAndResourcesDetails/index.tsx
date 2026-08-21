@@ -70,6 +70,7 @@ export default function CapacityAndResourcesDetails() {
 
     return (
         <Page
+            title={resourceData?.title}
             heading={resourceData?.title}
             description={resourceData?.description}
             actions={(

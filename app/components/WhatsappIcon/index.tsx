@@ -1,5 +1,3 @@
-// NOTE: @ifrc-go/icons has no whatsapp icon yet, so the glyph lives here.
-// TODO: add whatsapp icon in ifrc go icon and use it from there instead.
 function WhatsappIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
         <svg

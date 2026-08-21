@@ -126,6 +126,7 @@ function DataAndReport() {
 
     return (
         <Page
+            title="Dataset Overview"
             actions={(
                 <RegionSelectInput
                     name="region"
