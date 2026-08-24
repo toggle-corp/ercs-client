@@ -69,10 +69,13 @@ const TEAM_MEMBERS_QUERY = gql`
 const TEAM_MEMBERS_EXPORT_QUERY = gql`
     query TeamMembersExport(
         $filters: TeamMemberFilter
+        $pagination: OffsetPaginationInput
     ) {
         teamMembers(
             filters: $filters
+            pagination: $pagination
         ) {
+            totalCount
             results {
                 id
                 name
@@ -150,10 +153,12 @@ function Members() {
 
     const {
         pending: exportPending,
+        progress: exportProgress,
         trigger: triggerExport,
     } = useGraphQLToCSV<TeamMembersExportQuery>({
         query: TEAM_MEMBERS_EXPORT_QUERY,
         filename: `team-${data?.team.id ? data?.team.name.toLowerCase() : id}-members.csv`,
+        fieldName: 'teamMembers',
         transform: (responseData) => (
             responseData.teamMembers.results ?? []
         ).map((member) => {
@@ -236,7 +241,7 @@ function Members() {
             heading={data?.team.name}
             description={(
                 <i>
-                    {members?.length}
+                    {data?.teamMembers.totalCount}
                     {' '}
                     Members
                 </i>
@@ -258,8 +263,9 @@ function Members() {
                     />
                     <ExportButton
                         pendingExport={exportPending}
+                        progress={exportProgress}
                         onClick={handleExport}
-                        totalCount={members.length}
+                        totalCount={data?.teamMembers.totalCount}
                     />
                 </ListView>
                 <Container
