@@ -128,7 +128,6 @@ function Members() {
         rawFilter,
     } = useFilterState<{
             searchText?: string,
-            sex?:string
         }>({
             filter: {},
             pageSize: 15,
@@ -192,7 +191,7 @@ function Members() {
         createStringColumn<MemberList, string | number>(
             'sn',
             'S.N.',
-            (member) => String(members.indexOf(member) + 1),
+            (member) => String(offset + members.indexOf(member) + 1),
             { columnWidth: 20 },
         ),
         createElementColumn<

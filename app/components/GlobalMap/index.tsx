@@ -2,6 +2,7 @@ import {
     useMemo,
     useState,
 } from 'react';
+import { isDefined } from '@togglecorp/fujs';
 import { MapLayer } from '@togglecorp/re-map';
 import {
     type Expression,
@@ -57,6 +58,7 @@ const adminZeroHighlightPaint: FillPaint = {
 
 interface Props extends BaseMapProps {
     adminZeroFillPaint?: mapboxgl.FillPaint,
+    restrictedCountryIso3?: string;
     onAdminZeroFillHover?: (
         hoveredFeatureProperties: AdminZeroFeatureProperties | undefined
     ) => void;
@@ -71,6 +73,7 @@ function GlobalMap(props: Props) {
         onAdminZeroFillHover: onHover,
         onAdminZeroFillClick: onClick,
         adminZeroFillPaint,
+        restrictedCountryIso3,
         baseLayers,
         ...baseMapProps
     } = props;
@@ -81,6 +84,19 @@ function GlobalMap(props: Props) {
         const hoveredFeatureProperties = feature.properties as (
             AdminZeroFeatureProperties | undefined
         );
+
+        if (
+            isDefined(restrictedCountryIso3)
+            && hoveredFeatureProperties?.iso3 !== restrictedCountryIso3
+        ) {
+            setHoveredCountryIso3(undefined);
+
+            if (onHover) {
+                onHover(undefined);
+            }
+
+            return;
+        }
 
         setHoveredCountryIso3(hoveredFeatureProperties?.iso3);
 
@@ -98,6 +114,17 @@ function GlobalMap(props: Props) {
     };
 
     const handleClick = (feature: MapboxGeoJSONFeature, lngLat: LngLatLike) => {
+        const clickedFeatureProperties = feature.properties as (
+            AdminZeroFeatureProperties | undefined
+        );
+
+        if (
+            isDefined(restrictedCountryIso3)
+            && clickedFeatureProperties?.iso3 !== restrictedCountryIso3
+        ) {
+            return false;
+        }
+
         if (onClick) {
             onClick(
                 feature.properties as AdminZeroFeatureProperties,
@@ -131,9 +158,11 @@ function GlobalMap(props: Props) {
                 'fill-sort-key': fillSortKey,
             },
             paint: adminZeroHighlightPaint,
-            filter: ['!=', ['get', 'iso3'], null],
+            filter: isDefined(restrictedCountryIso3)
+                ? ['==', ['get', 'iso3'], restrictedCountryIso3]
+                : ['!=', ['get', 'iso3'], null],
         }),
-        [fillSortKey],
+        [fillSortKey, restrictedCountryIso3],
     );
 
     const adminZeroBaseLayerOptions = useMemo<Omit<FillLayer, 'id'>>(
