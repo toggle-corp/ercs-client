@@ -85,7 +85,7 @@ function TeamList() {
         createStringColumn<TeamList, string | number>(
             'sn',
             'S.N.',
-            (item) => String(teams.indexOf(item) + 1),
+            (item) => String(offset + teams.indexOf(item) + 1),
             { columnWidth: 20 },
         ),
         createStringColumn<TeamList, string>(

@@ -1,9 +1,7 @@
 import React from 'react';
 import {
-    Button,
     Container,
     Description,
-    InlineLayout,
     KeyFigure,
     type KeyFigureProps,
     ListView,
@@ -32,10 +30,7 @@ function KeyCard(props : KeyCardProps) {
         icon,
         pillText,
         info,
-        withShadow,
         withIconBackground,
-        viewButton,
-        onViewClick,
         ...keyFigureProps
     } = props;
 
@@ -43,7 +38,6 @@ function KeyCard(props : KeyCardProps) {
         <Container
             withPadding
             withBackground
-            withShadow={withShadow}
             className={_cs(styles.keyCard, className)}
         >
             <ListView
@@ -51,32 +45,17 @@ function KeyCard(props : KeyCardProps) {
                 spacing="xs"
             >
                 {(isDefined(icon) || isDefined(pillText)) && (
-                    <ListView withSpaceBetweenContents>
-                        {icon && (
-                            <ListView
-                                withCenteredContents
-                                className={_cs(
-                                    styles.icon,
-                                    withIconBackground && styles.iconWithBackground,
-                                )}
-                            >
-                                {icon}
-                            </ListView>
-                        )}
-                        {pillText && (
-                            <ListView
-                                withDarkBackground
-                                withPadding
-                                spacing="3xs"
-                                className={styles.pill}
-                            >
-                                <Description textSize="md">
-                                    {pillText}
-                                </Description>
-                            </ListView>
-                        )}
+                    icon && (
+                        <ListView
+                            className={_cs(
+                                styles.icon,
+                                withIconBackground && styles.iconWithBackground,
+                            )}
+                        >
+                            {icon}
+                        </ListView>
+                    )
 
-                    </ListView>
                 )}
                 <ListView
                     layout="block"
@@ -100,18 +79,6 @@ function KeyCard(props : KeyCardProps) {
                             </Description>
                         )}
                     </ListView>
-                    {isDefined(viewButton)
-                        && (
-                            <InlineLayout after={(
-                                <Button
-                                    name="view"
-                                    onClick={onViewClick}
-                                >
-                                    View
-                                </Button>
-                            )}
-                            />
-                        )}
                 </ListView>
             </ListView>
         </Container>

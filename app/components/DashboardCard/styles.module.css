@@ -1,0 +1,40 @@
+.dashboard-card {
+    border: 1px solid var(--go-ui-color-gray-30);
+
+    .pill {
+        border-radius: var(--go-ui-border-radius-full);
+        padding: 0 var(--go-ui-spacing-xs);
+        width: max-content;
+        height: 1.5rem;
+        line-height: 1;
+        color: var(--go-ui-color-gray-80);
+        font-size: 0.625rem;
+        font-weight: var(--go-ui-font-weight-medium);
+    }
+
+    .text {
+        /* two 20px title lines and one 16px summary line */
+        height: 3.5rem;
+        overflow: hidden;
+
+        .title {
+            --line-height: 1.25rem;
+
+            display: -webkit-box;
+            overflow: hidden;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+
+        .summary {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1rem;
+            white-space: nowrap;
+        }
+    }
+
+    .view-button {
+        border-radius: var(--go-ui-border-radius-full);
+    }
+}

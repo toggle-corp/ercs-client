@@ -10,6 +10,7 @@ import {
     ListView,
 } from '@ifrc-go/ui';
 
+import DashboardCard from '#components/DashboardCard';
 import InfoCard from '#components/InfoCard';
 import KeyCard from '#components/KeyCard';
 import Page from '#components/Page';
@@ -128,16 +129,11 @@ function Home() {
                             numPreferredGridColumns={3}
                         >
                             {operationDashboards.map((res) => (
-                                <KeyCard
+                                <DashboardCard
                                     key={res.id}
-                                    value={res.title}
-                                    valueType="text"
-                                    size="sm"
-                                    info={res.description}
+                                    title={res.title}
+                                    summary={res.description}
                                     pillText={res.pageDisplay}
-                                    withIconBackground
-                                    withShadow
-                                    viewButton
                                     onViewClick={() => handleViewClick(res.page)}
                                 />
                             ))}

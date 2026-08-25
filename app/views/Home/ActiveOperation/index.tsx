@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import {
+    useMemo,
+    useState,
+} from 'react';
 import {
     Button,
     Container,
@@ -255,9 +258,14 @@ function ActiveOperation() {
         },
     ]);
 
-    const countryBounds :LngLatBoundsLike | undefined = (countryData && countryData.bbox)
-        ? getGeoJsonBounds(countryData.bbox)
-        : undefined;
+    const countryBounds: LngLatBoundsLike | undefined = useMemo(
+        () => (
+            (countryData && countryData.bbox)
+                ? getGeoJsonBounds(countryData.bbox)
+                : undefined
+        ),
+        [countryData],
+    );
     const heading = resolveToComponent(
         'Active Operations Map ({numAppeals})',
         { numAppeals: appealsResponse?.count ?? 0 },
@@ -405,6 +413,7 @@ function ActiveOperation() {
         >
             <GlobalMap
                 onAdminZeroFillClick={handleCountryClick}
+                restrictedCountryIso3={countryData?.iso3 ?? undefined}
             >
                 <GoMapContainer
                     title="Ethiopia Active Operation"

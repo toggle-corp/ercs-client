@@ -88,7 +88,7 @@ function CapacityAndResourcesList() {
         createStringColumn<CapacityAndResourcesList, string | number>(
             'sn',
             'S.N.',
-            (item) => String(capacityAndResourcesData.indexOf(item) + 1),
+            (item) => String(offset + capacityAndResourcesData.indexOf(item) + 1),
             { columnWidth: 20 },
         ),
         createStringColumn<CapacityAndResourcesList, string>(

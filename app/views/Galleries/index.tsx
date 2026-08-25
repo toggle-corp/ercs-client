@@ -108,6 +108,8 @@ function Galleries() {
     }, [data, fetching, offset]);
 
     const hasMoreAlbums = (albums?.length ?? 0) < totalCount;
+    const pendingPage = offset !== PAGE_SIZE * (page - 1);
+    const loadMorePending = fetching || pendingPage;
 
     const handleLoadMoreClick = useCallback(
         () => {
@@ -158,8 +160,8 @@ function Galleries() {
                                 <Button
                                     name={undefined}
                                     onClick={handleLoadMoreClick}
-                                    disabled={fetching}
-                                    after={fetching ? <Spinner /> : undefined}
+                                    disabled={loadMorePending}
+                                    after={loadMorePending ? <Spinner /> : undefined}
                                     styleVariant="outline"
                                     colorVariant="primary"
                                 >
