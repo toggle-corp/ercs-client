@@ -112,7 +112,7 @@ function OurWork() {
                             spacing="2xs"
                             withCenteredContents
                         >
-                            <InspectIcon fontSize={18} />
+                            <InspectIcon />
                             <span>
                                 Emergency Response
                             </span>
@@ -125,7 +125,7 @@ function OurWork() {
                             spacing="2xs"
                             withCenteredContents
                         >
-                            <MapIcon fontSize={18} />
+                            <MapIcon />
                             <span>
                                 Project Mapping
                             </span>

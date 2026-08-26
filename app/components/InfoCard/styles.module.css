@@ -1,6 +1,7 @@
 .icon {
     line-height: 1;
     color: var(--go-ui-color-primary-red);
+    font-size: 1.5rem;
 }
 
 .info-card {
