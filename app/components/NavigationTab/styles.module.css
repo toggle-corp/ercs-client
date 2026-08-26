@@ -1,3 +1,14 @@
-.navigation-tab {
-    display: contents;
+.link {
+    --nav-tab-icon-size: 1.4rem;
+    --nav-tab-label-height: calc(var(--go-ui-font-size-md) * var(--go-ui-line-height-sm));
+
+    svg {
+        margin-block: calc((var(--nav-tab-label-height) - var(--nav-tab-icon-size)) / 2);
+        width: var(--nav-tab-icon-size);
+        height: var(--nav-tab-icon-size);
+    }
+
+    .link-icon {
+        --nav-tab-icon-size: var(--go-ui-height-icon-multiplier);
+    }
 }

@@ -133,6 +133,8 @@ function AlbumDetail() {
 
     const album = albumResponse?.galleryAlbum;
     const hasMoreImages = (images?.length ?? 0) < totalCount;
+    const pendingPage = offset !== PAGE_SIZE * (page - 1);
+    const loadMorePending = imagesPending || pendingPage;
 
     const [{
         data: allImagesResponse,
@@ -197,7 +199,7 @@ function AlbumDetail() {
                 ) : undefined}
             >
                 <Container
-                    pending={albumPending || (imagesPending && isNotDefined(images))}
+                    pending={albumPending || (loadMorePending && isNotDefined(images))}
                     errored={isDefined(albumError)}
                     errorMessage="This album could not be loaded."
                     empty={images?.length === 0}
@@ -207,8 +209,8 @@ function AlbumDetail() {
                             <Button
                                 name={undefined}
                                 onClick={handleLoadMoreClick}
-                                disabled={imagesPending}
-                                after={imagesPending ? <Spinner /> : undefined}
+                                disabled={loadMorePending}
+                                after={loadMorePending ? <Spinner /> : undefined}
                                 styleVariant="outline"
                                 colorVariant="primary"
                             >

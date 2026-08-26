@@ -34,7 +34,7 @@ function Preparedness() {
                         <ListView
                             spacing="2xs"
                         >
-                            <AlertLineIcon fontSize={18} />
+                            <AlertLineIcon />
                             <span>
                                 Emergency Alert
                             </span>
@@ -46,7 +46,7 @@ function Preparedness() {
                         <ListView
                             spacing="2xs"
                         >
-                            <EmergencyResponseUnitIcon fontSize={18} />
+                            <EmergencyResponseUnitIcon />
                             <span>
                                 Disaster Response
                             </span>
@@ -58,7 +58,7 @@ function Preparedness() {
                         <ListView
                             spacing="2xs"
                         >
-                            <InspectIcon fontSize={18} />
+                            <InspectIcon />
                             <span>
                                 PMER
                             </span>
@@ -70,7 +70,7 @@ function Preparedness() {
                         <ListView
                             spacing="2xs"
                         >
-                            <AnalyzingIcon fontSize={18} />
+                            <AnalyzingIcon />
                             <span>
                                 Risk Analysis
                             </span>
