@@ -9,6 +9,7 @@ import {
     Container,
     ListView,
 } from '@ifrc-go/ui';
+import { gql } from 'urql';
 
 import DashboardCard from '#components/DashboardCard';
 import InfoCard from '#components/InfoCard';
@@ -17,10 +18,47 @@ import Page from '#components/Page';
 import {
     DashboardPage,
     useExternalDashboardsQuery,
+    useKoboStatsQuery,
 } from '#generated/types/graphql';
 import type { RouteKeys } from '#root/config/routes';
 import useRouting from '#root/hooks/useRouting';
 import ActiveOperation from '#views/Home/ActiveOperation';
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const KOBO_STATS_QUERY = gql`
+    query KoboStats {
+        koboStats {
+            alert {
+                totalEmergencies
+                peopleAffected
+                source {
+                    formLabel
+                    assetUid
+                    lastFetchedAt
+                    confirmedRecords
+                }
+            }
+            rapidNeeds {
+                peopleInNeed
+            }
+            field {
+                peopleReached
+            }
+        }
+    }
+`;
+
+function formatLastUpdated(value: string | null | undefined) {
+    if (!value) {
+        return undefined;
+    }
+    const date = new Date(value).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+    return `Updated ${date}`;
+}
 
 const DASHBOARD_PAGE_TO_ROUTE_KEY: Record<DashboardPage, RouteKeys> = {
     [DashboardPage.CapacityResources]: 'capacityAndResources',
@@ -47,6 +85,10 @@ function Home() {
         },
     });
 
+    const [{ data: koboData }] = useKoboStatsQuery();
+    const koboStats = koboData?.koboStats;
+    const lastUpdated = formatLastUpdated(koboStats?.alert.source.lastFetchedAt);
+
     const operationDashboards = data?.externalDashboards.results ?? [];
 
     const handleViewClick = (page: DashboardPage) => {
@@ -61,39 +103,38 @@ function Home() {
         >
             <KeyCard
                 icon={<AlarmWarningLineIcon />}
-                value={12}
+                value={koboStats?.alert.totalEmergencies ?? 0}
                 valueType="number"
                 size="lg"
                 label="Emergencies"
-                info="in last 30 days"
-
+                info={lastUpdated}
             />
             <KeyCard
                 icon={<HeartAddLineIcon />}
-                value={250}
-                valueType="number"
-                size="lg"
-                label="People reached"
-                info="in last 30 days"
-
-            />
-            <KeyCard
-                icon={<AlertLineIcon />}
-                value={18}
+                value={koboStats?.field.peopleReached ?? 0}
                 valueType="number"
                 size="lg"
                 valueOptions={{ compact: true }}
-                label="population Affected"
-                info="in last 30 days"
-
+                label="People reached"
+                info={lastUpdated}
+            />
+            <KeyCard
+                icon={<AlertLineIcon />}
+                value={koboStats?.alert.peopleAffected ?? 0}
+                valueType="number"
+                size="lg"
+                valueOptions={{ compact: true }}
+                label="Population affected"
+                info={lastUpdated}
             />
             <KeyCard
                 icon={<ShieldUserLineIcon />}
-                value={18}
+                value={koboStats?.rapidNeeds.peopleInNeed ?? 0}
                 valueType="number"
+                valueOptions={{ compact: true }}
                 label="People in Need"
                 size="lg"
-                info="in last 30 days"
+                info={lastUpdated}
             />
         </ListView>
     );
