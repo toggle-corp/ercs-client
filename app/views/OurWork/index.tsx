@@ -16,6 +16,7 @@ import { gql } from 'urql';
 import KeyCard from '#components/KeyCard';
 import NavigationTab from '#components/NavigationTab';
 import Page from '#components/Page';
+import { useKoboStatsQuery } from '#generated/types/graphql';
 
 // NOTE: There is limit of 20 dashboards for now, as we don't have more than that.
 // We can add pagination if needed in the future
@@ -53,42 +54,58 @@ const EXTERNAL_DASHBOARDS_QUERY = gql`
     }
 `;
 
-// TODO: Fetch real data for key figures and operations
-
-const keyFigures = (
-    <ListView
-        layout="grid"
-        numPreferredGridColumns={3}
-    >
-        <KeyCard
-            icon={<HeartAddLineIcon />}
-            value={250}
-            valueType="number"
-            size="lg"
-            label="People Reached"
-            info="in last 30 days"
-        />
-        <KeyCard
-            icon={<AlertLineIcon />}
-            value={18}
-            valueType="number"
-            size="lg"
-            valueOptions={{ compact: true }}
-            label="Population Affected"
-            info="in last 30 days"
-        />
-        <KeyCard
-            icon={<ShieldUserLineIcon />}
-            value={18}
-            valueType="number"
-            size="lg"
-            label="People in Need"
-            info="in last 30 days"
-        />
-    </ListView>
-);
+function formatLastUpdated(value: string | null | undefined) {
+    if (!value) {
+        return undefined;
+    }
+    const date = new Date(value).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+    return `Updated ${date}`;
+}
 
 function OurWork() {
+    const [{ data: koboData }] = useKoboStatsQuery();
+    const koboStats = koboData?.koboStats;
+    const lastUpdated = formatLastUpdated(koboStats?.alert.source.lastFetchedAt);
+
+    const keyFigures = (
+        <ListView
+            layout="grid"
+            numPreferredGridColumns={3}
+        >
+            <KeyCard
+                icon={<HeartAddLineIcon />}
+                value={koboStats?.field.peopleReached ?? 0}
+                valueType="number"
+                size="lg"
+                valueOptions={{ compact: true }}
+                label="People Reached"
+                info={lastUpdated}
+            />
+            <KeyCard
+                icon={<AlertLineIcon />}
+                value={koboStats?.alert.peopleAffected ?? 0}
+                valueType="number"
+                size="lg"
+                valueOptions={{ compact: true }}
+                label="Population Affected"
+                info={lastUpdated}
+            />
+            <KeyCard
+                icon={<ShieldUserLineIcon />}
+                value={koboStats?.rapidNeeds.peopleInNeed ?? 0}
+                valueType="number"
+                size="lg"
+                valueOptions={{ compact: true }}
+                label="People in Need"
+                info={lastUpdated}
+            />
+        </ListView>
+    );
+
     return (
         <Page
             title="Our Work"
