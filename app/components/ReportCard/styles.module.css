@@ -1,7 +1,7 @@
 .cover-image,
 .default-cover-image {
-    width: 8.75rem;
-    height: 8.75rem;
+    width: 7rem;
+    height: 7rem;
 }
 
 .default-cover-image {
@@ -19,7 +19,11 @@
     overflow: hidden;
     line-height: var(--go-ui-line-height-md);
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 5;
-    line-clamp: 5;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
 }
 
+.report-card {
+    padding: var(--go-ui-spacing-sm) var(--go-ui-spacing-sm);
+    text-align: left;
+}

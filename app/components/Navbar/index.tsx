@@ -119,6 +119,11 @@ function Navbar() {
                         Data & Report
                     </NavLink>
                     <NavLink
+                        to="pmer"
+                    >
+                        PMER
+                    </NavLink>
+                    <NavLink
                         to="capacityAndResources"
                     >
                         Capacity & Resources

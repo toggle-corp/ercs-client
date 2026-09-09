@@ -1,0 +1,17 @@
+.pmer-card {
+    padding: var(--go-ui-spacing-sm) var(--go-ui-spacing-sm);
+    text-align: left;
+}
+
+.cover {
+    border-radius: var(--go-ui-border-radius-md);
+    background-color: var(--go-ui-color-red-10);
+    width: 4rem;
+    height: 4rem;
+    color: var(--go-ui-color-primary-red);
+
+    .cover-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+}

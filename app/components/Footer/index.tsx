@@ -131,6 +131,11 @@ function GlobalFooter(props: Props) {
                             Dataset
                         </Link>
                         <Link
+                            to="pmer"
+                        >
+                            PMER
+                        </Link>
+                        <Link
                             to="projectMapping"
                         >
                             Project Mapping

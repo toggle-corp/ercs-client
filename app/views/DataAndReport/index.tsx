@@ -23,6 +23,8 @@ import {
 import useAuth from '#hooks/useAuth';
 import useFilterState from '#hooks/useFilterState';
 
+import styles from './styles.module.css';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ThematicAreas_QUERY = gql`
     query ThematicAreas {
@@ -184,18 +186,23 @@ function DataAndReport() {
                 >
                     <ListView
                         layout="block"
+                        className={styles.reportList}
                     >
                         {reportDetails.map((report) => (
-                            <Link
-                                to="reportDetail"
-                                withFullWidth
-                                attrs={{ id: report.id }}
+                            <div
+                                key={report.id}
+                                className={styles.reportListItem}
                             >
-                                <ReportCard
-                                    key={report.id}
-                                    report={report}
-                                />
-                            </Link>
+                                <Link
+                                    to="reportDetail"
+                                    withFullWidth
+                                    attrs={{ id: report.id }}
+                                >
+                                    <ReportCard
+                                        report={report}
+                                    />
+                                </Link>
+                            </div>
                         ))}
                     </ListView>
                 </Container>

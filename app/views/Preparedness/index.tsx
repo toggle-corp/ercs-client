@@ -3,7 +3,6 @@ import {
     AlertLineIcon,
     AnalyzingIcon,
     EmergencyResponseUnitIcon,
-    InspectIcon,
 } from '@ifrc-go/icons';
 import {
     ListView,
@@ -49,18 +48,6 @@ function Preparedness() {
                             <EmergencyResponseUnitIcon />
                             <span>
                                 Disaster Response
-                            </span>
-                        </ListView>
-                    </NavigationTab>
-                    <NavigationTab
-                        to="pmer"
-                    >
-                        <ListView
-                            spacing="2xs"
-                        >
-                            <InspectIcon />
-                            <span>
-                                PMER
                             </span>
                         </ListView>
                     </NavigationTab>

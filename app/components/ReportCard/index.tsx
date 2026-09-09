@@ -30,6 +30,7 @@ function ReportCard({ report }: ReportCardProps) {
 
     return (
         <InlineLayout
+            className={styles.reportCard}
             before={
                 isDefined(coverImage?.url) ? (
                     <Image
@@ -50,7 +51,7 @@ function ReportCard({ report }: ReportCardProps) {
                     </ListView>
                 )
             }
-            contentAlignment="start"
+            contentAlignment="center"
             spacing="lg"
         >
             <ListView
