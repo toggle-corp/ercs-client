@@ -32,11 +32,6 @@ const preparedness: RouteConfig = {
             visibility: 'is-anything',
         },
         {
-            path: 'pmer',
-            load: () => import('#views/Preparedness/Pmer'),
-            visibility: 'is-anything',
-        },
-        {
             path: 'risk-analysis',
             load: () => import('#views/Preparedness/RiskAnalysis'),
             visibility: 'is-anything',
@@ -57,6 +52,20 @@ const reportDetail: RouteConfig = {
     load: () => import('#views/DataAndReport/ReportDetail'),
     visibility: 'is-anything',
 };
+const pmer: RouteConfig = {
+    index: true,
+    path: '/pmer',
+    load: () => import('#views/Pmer'),
+    visibility: 'is-anything',
+};
+
+const pmerDetail: RouteConfig = {
+    index: true,
+    path: '/pmer/:id',
+    load: () => import('#views/Pmer/PmerDetail'),
+    visibility: 'is-anything',
+};
+
 const capacityAndResources: RouteConfig = {
     index: true,
     path: '/capacity-and-resources',
@@ -185,6 +194,8 @@ const routes = {
     ourWork,
     preparedness,
     dataAndReport,
+    pmer,
+    pmerDetail,
     galleries,
     galleryAlbum,
     capacityAndResources,
@@ -203,7 +214,6 @@ const routes = {
     // child routes
     emergencyAlert: child(preparedness, 'emergency-alert'),
     disasterResponse: child(preparedness, 'disaster-response'),
-    pmer: child(preparedness, 'pmer'),
     riskAnalysis: child(preparedness, 'risk-analysis'),
     emergencyResponse: child(ourWork, 'emergency-response'),
     projectMapping: child(ourWork, 'project-mapping'),

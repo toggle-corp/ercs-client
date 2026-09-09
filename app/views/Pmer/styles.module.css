@@ -1,0 +1,6 @@
+.report-list {
+    .report-list-item:not(:last-child) {
+        border-bottom: var(--go-ui-width-separator-thin) solid var(--go-ui-color-separator);
+        padding-bottom: var(--go-ui-spacing-sm);
+    }
+}
