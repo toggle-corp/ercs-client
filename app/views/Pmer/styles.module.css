@@ -4,3 +4,11 @@
         padding-bottom: var(--go-ui-spacing-sm);
     }
 }
+
+.search-input {
+    grid-column: span 2;
+
+    @media screen and (width <= 40rem) {
+        grid-column: unset;
+    }
+}

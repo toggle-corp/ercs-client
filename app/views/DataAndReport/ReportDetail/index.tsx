@@ -1,14 +1,11 @@
 import {
-    useCallback,
     useEffect,
     useMemo,
     useRef,
     useState,
 } from 'react';
 import { useParams } from 'react-router';
-import { DownloadTwoFillIcon } from '@ifrc-go/icons';
 import {
-    Button,
     Container,
     Description,
     Heading,
@@ -21,10 +18,10 @@ import {
     isDefined,
     isNotDefined,
 } from '@togglecorp/fujs';
-import { saveAs } from 'file-saver';
 import { gql } from 'urql';
 
 import DocumentViewer from '#components/DocumentViewer';
+import FileDownloadButton from '#components/FileDownloadButton';
 import PowerBIEmbed from '#components/PowerBiEmbed';
 import PreloadMessage from '#components/PreloadMessage';
 import {
@@ -34,7 +31,6 @@ import {
     useReportQuery,
     useReportSummaryQuery,
 } from '#generated/types/graphql';
-import useAuth from '#hooks/useAuth';
 import AIsummary from '#views/DataAndReport/AIsummary';
 
 import styles from './styles.module.css';
@@ -91,7 +87,6 @@ interface Props {
 
 function ReportDetailContent(props: Props) {
     const { id: reportId } = props;
-    const { isAuthenticated } = useAuth();
     const summaryPollCountRef = useRef(0);
     const [summaryPollTimedOut, setSummaryPollTimedOut] = useState(false);
 
@@ -135,14 +130,6 @@ function ReportDetailContent(props: Props) {
 
     const fileUrl = reportData?.file?.url;
     const fileName = reportData?.file?.name;
-
-    const handleDownloadClick = useCallback(() => {
-        if (isNotDefined(fileUrl)) {
-            return;
-        }
-        const urlName = fileUrl.split('/').pop()?.split('?')[0]?.replace(/\.[^/.]+$/, '');
-        saveAs(fileUrl, fileName ?? urlName);
-    }, [fileUrl, fileName]);
 
     useEffect(() => {
         if (
@@ -226,16 +213,10 @@ function ReportDetailContent(props: Props) {
                                     >
                                         {reportData?.title}
                                     </Heading>
-                                    {isAuthenticated && (
-                                        <Button
-                                            name="download"
-                                            title="download"
-                                            onClick={handleDownloadClick}
-                                            styleVariant="action"
-                                        >
-                                            <DownloadTwoFillIcon />
-                                        </Button>
-                                    )}
+                                    <FileDownloadButton
+                                        fileUrl={fileUrl}
+                                        fileName={fileName}
+                                    />
                                 </ListView>
                                 <Description>
                                     {reportData?.description}
