@@ -1,4 +1,7 @@
-import { useMemo } from 'react';
+import {
+    useEffect,
+    useMemo,
+} from 'react';
 import {
     Container,
     DateInput,
@@ -32,6 +35,7 @@ import {
 } from '#generated/types/graphql';
 import useAlert from '#hooks/useAlert';
 import useFilterState from '#hooks/useFilterState';
+import useGraphQLToCSV from '#hooks/useGraphqlToCsv';
 import useRecursiveCSVRequest from '#hooks/useRecursiveCsvRequest';
 import useUrlSearchState from '#hooks/useUrlSearchState';
 import {
@@ -54,7 +58,6 @@ function getMostRecentAffectedValue(fieldReport: EventListItem['field_reports'])
 
 const eventKeySelector = (item: EventListItem) => item.id;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const KOBO_EMERGENCIES_QUERY = gql`
     query KoboEmergencies($pagination: OffsetPaginationInput) {
         koboEmergencies(pagination: $pagination, order: { submissionTime: DESC }) {
@@ -257,6 +260,45 @@ function AllEmergency() {
     const koboEmergencies = koboData?.koboEmergencies.results;
     const koboCount = koboData?.koboEmergencies.totalCount ?? 0;
 
+    const {
+        pending: koboExportPending,
+        progress: koboExportProgress,
+        error: koboExportError,
+        trigger: triggerKoboExport,
+    } = useGraphQLToCSV<KoboEmergenciesQuery>({
+        query: KOBO_EMERGENCIES_QUERY,
+        filename: 'ercs-field-alerts.csv',
+        fieldName: 'koboEmergencies',
+        transform: (responseData) => (
+            responseData.koboEmergencies.results ?? []
+        ).map((item) => ({
+            'Start Date': item.startDate,
+            'Emergency Code': item.emergencyCode,
+            'Disaster Type': item.hazard,
+            Region: item.region,
+            'Alert Type': item.alertType,
+            '# Affected': item.peopleAffected,
+            '# Displaced': item.peopleDisplaced,
+        })),
+    });
+
+    // query variables
+    const handleKoboExportClick = () => {
+        triggerKoboExport();
+    };
+
+    useEffect(
+        () => {
+            if (isDefined(koboExportError)) {
+                alert.show(
+                    'Failed to generate export.',
+                    { variant: 'danger' },
+                );
+            }
+        },
+        [koboExportError, alert],
+    );
+
     const koboColumns = [
         createDateColumn<KoboEmergency, string>(
             'startDate',
@@ -310,8 +352,8 @@ function AllEmergency() {
                 headingLevel={2}
                 headerDescription={(
                     <Description withLightText>
-                        Explore historical data, research findings and
-                        operational reports to support informed decision-making and planning.
+                        Historical emergency records, appeals and field reports for Ethiopia,
+                        sourced from IFRC GO.
                     </Description>
                 )}
                 headerActions={(
@@ -373,6 +415,14 @@ function AllEmergency() {
                     <Description withLightText>
                         Emergency alerts reported by ERCS regional branches, sourced from Kobo.
                     </Description>
+                )}
+                headerActions={(
+                    <ExportButton
+                        onClick={handleKoboExportClick}
+                        progress={koboExportProgress}
+                        pendingExport={koboExportPending}
+                        totalCount={koboCount}
+                    />
                 )}
                 footerActions={(
                     <Pager
