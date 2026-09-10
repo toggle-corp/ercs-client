@@ -119,9 +119,8 @@ function Pmer() {
             filters: {
                 category: rawFilter.category,
                 reportType: rawFilter.reportType,
-                title: isTruthyString(filter.searchText)
-                    ? { iContains: filter.searchText }
-                    : undefined,
+                search: isTruthyString(rawFilter.searchText)
+                    ? rawFilter.searchText : undefined,
                 regionId: rawFilter.regionId,
                 visibility: isAuthenticated ? undefined : ReportVisibility.Public,
             },
@@ -151,8 +150,9 @@ function Pmer() {
                 filters={(
                     <>
                         <TextInput
+                            className={styles.searchInput}
                             name="searchText"
-                            placeholder="Search by title"
+                            placeholder="Search by title, department or project"
                             value={rawFilter.searchText}
                             onChange={setFilterField}
                             icons={<SearchLineIcon />}

@@ -6,7 +6,7 @@ import {
     InlineLayout,
     ListView,
 } from '@ifrc-go/ui';
-import { isDefined } from '@togglecorp/fujs';
+import { isTruthyString } from '@togglecorp/fujs';
 
 import { type PmerReportsQuery } from '#generated/types/graphql';
 
@@ -21,15 +21,20 @@ type PmerCardProps = {
 function PmerCard({ report }: PmerCardProps) {
     const {
         title,
+        description,
         reportTypeDisplay,
         region,
+        department,
+        project,
         createdAt,
     } = report;
 
     const meta = [
         region?.name ?? 'National',
         reportTypeDisplay,
-    ].filter(isDefined);
+        department,
+        project,
+    ].filter(isTruthyString);
 
     return (
         <InlineLayout
@@ -56,6 +61,15 @@ function PmerCard({ report }: PmerCardProps) {
                 >
                     {title}
                 </Heading>
+                {isTruthyString(description) && (
+                    <Description
+                        withLightText
+                        textSize="sm"
+                        className={styles.description}
+                    >
+                        {description}
+                    </Description>
+                )}
                 <Description
                     withLightText
                     textSize="sm"

@@ -1,8 +1,5 @@
-import { useCallback } from 'react';
 import { useParams } from 'react-router';
-import { DownloadTwoFillIcon } from '@ifrc-go/icons';
 import {
-    Button,
     Container,
     Description,
     Heading,
@@ -16,13 +13,12 @@ import {
     isNotDefined,
     isTruthyString,
 } from '@togglecorp/fujs';
-import { saveAs } from 'file-saver';
 import { gql } from 'urql';
 
 import DocumentViewer from '#components/DocumentViewer';
+import FileDownloadButton from '#components/FileDownloadButton';
 import PreloadMessage from '#components/PreloadMessage';
 import { usePmerReportQuery } from '#generated/types/graphql';
-import useAuth from '#hooks/useAuth';
 
 import styles from './styles.module.css';
 
@@ -64,7 +60,6 @@ interface Props {
 
 function PmerDetailContent(props: Props) {
     const { id: pmerReportId } = props;
-    const { isAuthenticated } = useAuth();
 
     const [{ fetching, data, error }] = usePmerReportQuery({
         variables: { id: pmerReportId },
@@ -79,14 +74,6 @@ function PmerDetailContent(props: Props) {
 
     const fileUrl = pmerReport?.file?.url;
     const fileName = pmerReport?.file?.name;
-
-    const handleDownloadClick = useCallback(() => {
-        if (isNotDefined(fileUrl)) {
-            return;
-        }
-        const urlName = fileUrl.split('/').pop()?.split('?')[0]?.replace(/\.[^/.]+$/, '');
-        saveAs(fileUrl, fileName ?? urlName);
-    }, [fileUrl, fileName]);
 
     return (
         <PageContainer>
@@ -145,16 +132,10 @@ function PmerDetailContent(props: Props) {
                                     >
                                         {pmerReport?.title}
                                     </Heading>
-                                    {isAuthenticated && (
-                                        <Button
-                                            name="download"
-                                            title="download"
-                                            onClick={handleDownloadClick}
-                                            styleVariant="action"
-                                        >
-                                            <DownloadTwoFillIcon />
-                                        </Button>
-                                    )}
+                                    <FileDownloadButton
+                                        fileUrl={fileUrl}
+                                        fileName={fileName}
+                                    />
                                 </ListView>
                                 <Description
                                     withLightText
