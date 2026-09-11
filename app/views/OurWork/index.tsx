@@ -44,6 +44,7 @@ const EXTERNAL_DASHBOARDS_QUERY = gql`
                 showOnHome
                 pageDisplay
                 url
+                capacityAndResourceId
             }
             pageInfo {
                 limit

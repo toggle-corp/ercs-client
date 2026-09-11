@@ -191,7 +191,7 @@ function Login() {
                                 >
                                     <TextInput
                                         name="email"
-                                        label="Email/Username"
+                                        label="Email"
                                         value={formValue.email}
                                         onChange={setFieldValue}
                                         error={fieldError?.email}
