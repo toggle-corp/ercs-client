@@ -9,6 +9,7 @@ import {
     Container,
     ListView,
 } from '@ifrc-go/ui';
+import { isDefined } from '@togglecorp/fujs';
 import { gql } from 'urql';
 
 import DashboardCard from '#components/DashboardCard';
@@ -17,6 +18,7 @@ import KeyCard from '#components/KeyCard';
 import Page from '#components/Page';
 import {
     DashboardPage,
+    type ExternalDashboardsQuery,
     useExternalDashboardsQuery,
     useKoboStatsQuery,
 } from '#generated/types/graphql';
@@ -47,6 +49,8 @@ const KOBO_STATS_QUERY = gql`
         }
     }
 `;
+
+type ExternalDashboard = ExternalDashboardsQuery['externalDashboards']['results'][number];
 
 function formatLastUpdated(value: string | null | undefined) {
     if (!value) {
@@ -91,7 +95,14 @@ function Home() {
 
     const operationDashboards = data?.externalDashboards.results ?? [];
 
-    const handleViewClick = (page: DashboardPage) => {
+    const handleViewClick = (dashboard: ExternalDashboard) => {
+        const { page, capacityAndResourceId } = dashboard;
+
+        if (page === DashboardPage.CapacityResources && isDefined(capacityAndResourceId)) {
+            routeTo('capacityAndResourcesDetails', { id: capacityAndResourceId });
+            return;
+        }
+
         const routeKey = DASHBOARD_PAGE_TO_ROUTE_KEY[page];
         routeTo(routeKey);
     };
@@ -175,7 +186,7 @@ function Home() {
                                     title={res.title}
                                     summary={res.description}
                                     pillText={res.pageDisplay}
-                                    onViewClick={() => handleViewClick(res.page)}
+                                    onViewClick={() => handleViewClick(res)}
                                 />
                             ))}
                         </ListView>
