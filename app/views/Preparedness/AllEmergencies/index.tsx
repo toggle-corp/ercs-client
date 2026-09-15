@@ -1,7 +1,4 @@
-import {
-    useEffect,
-    useMemo,
-} from 'react';
+import { useMemo } from 'react';
 import {
     Container,
     DateInput,
@@ -24,18 +21,12 @@ import {
 } from '@togglecorp/fujs';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
-import { gql } from 'urql';
 
 import DisasterTypeSelectInput from '#components/DisasterTypeSelectInput';
 import ExportButton from '#components/ExportButton';
 import { goUrl } from '#config';
-import {
-    type KoboEmergenciesQuery,
-    useKoboEmergenciesQuery,
-} from '#generated/types/graphql';
 import useAlert from '#hooks/useAlert';
 import useFilterState from '#hooks/useFilterState';
-import useGraphQLToCSV from '#hooks/useGraphqlToCsv';
 import useRecursiveCSVRequest from '#hooks/useRecursiveCsvRequest';
 import useUrlSearchState from '#hooks/useUrlSearchState';
 import {
@@ -57,32 +48,6 @@ function getMostRecentAffectedValue(fieldReport: EventListItem['field_reports'])
 }
 
 const eventKeySelector = (item: EventListItem) => item.id;
-
-const KOBO_EMERGENCIES_QUERY = gql`
-    query KoboEmergencies($pagination: OffsetPaginationInput) {
-        koboEmergencies(pagination: $pagination, order: { submissionTime: DESC }) {
-            totalCount
-            results {
-                id
-                koboId
-                emergencyCode
-                hazard
-                alertType
-                region
-                startDate
-                peopleAffected
-                peopleDisplaced
-                submissionTime
-            }
-        }
-    }
-`;
-
-type KoboEmergency = NonNullable<
-    KoboEmergenciesQuery['koboEmergencies']['results']
->[number];
-
-const koboEmergencyKeySelector = (item: KoboEmergency) => item.id;
 
 function AllEmergency() {
     const {
@@ -241,208 +206,68 @@ function AllEmergency() {
 
     const isFiltered = isDefined(filterDisasterType) || filtered;
 
-    // --- ERCS Kobo emergency alerts (separate paginated list) ---
-    const {
-        page: koboPage,
-        setPage: setKoboPage,
-        limit: koboLimit,
-        offset: koboOffset,
-    } = useFilterState({
-        filter: {},
-        pageSize: 10,
-    });
-
-    const [{ data: koboData, fetching: koboPending }] = useKoboEmergenciesQuery({
-        variables: {
-            pagination: { limit: koboLimit, offset: koboOffset },
-        },
-    });
-    const koboEmergencies = koboData?.koboEmergencies.results;
-    const koboCount = koboData?.koboEmergencies.totalCount ?? 0;
-
-    const {
-        pending: koboExportPending,
-        progress: koboExportProgress,
-        error: koboExportError,
-        trigger: triggerKoboExport,
-    } = useGraphQLToCSV<KoboEmergenciesQuery>({
-        query: KOBO_EMERGENCIES_QUERY,
-        filename: 'ercs-field-alerts.csv',
-        fieldName: 'koboEmergencies',
-        transform: (responseData) => (
-            responseData.koboEmergencies.results ?? []
-        ).map((item) => ({
-            'Start Date': item.startDate,
-            'Emergency Code': item.emergencyCode,
-            'Disaster Type': item.hazard,
-            Region: item.region,
-            'Alert Type': item.alertType,
-            '# Affected': item.peopleAffected,
-            '# Displaced': item.peopleDisplaced,
-        })),
-    });
-
-    // query variables
-    const handleKoboExportClick = () => {
-        triggerKoboExport();
-    };
-
-    useEffect(
-        () => {
-            if (isDefined(koboExportError)) {
-                alert.show(
-                    'Failed to generate export.',
-                    { variant: 'danger' },
-                );
-            }
-        },
-        [koboExportError, alert],
-    );
-
-    const koboColumns = [
-        createDateColumn<KoboEmergency, string>(
-            'startDate',
-            'Start Date',
-            (item) => item.startDate,
-        ),
-        createStringColumn<KoboEmergency, string>(
-            'emergencyCode',
-            'Emergency Code',
-            (item) => item.emergencyCode,
-        ),
-        createStringColumn<KoboEmergency, string>(
-            'hazard',
-            'Disaster Type',
-            (item) => item.hazard,
-        ),
-        createStringColumn<KoboEmergency, string>(
-            'region',
-            'Region',
-            (item) => item.region,
-        ),
-        createStringColumn<KoboEmergency, string>(
-            'alertType',
-            'Alert Type',
-            (item) => item.alertType,
-        ),
-        createNumberColumn<KoboEmergency, string>(
-            'peopleAffected',
-            '# Affected',
-            (item) => item.peopleAffected,
-        ),
-        createNumberColumn<KoboEmergency, string>(
-            'peopleDisplaced',
-            '# Displaced',
-            (item) => item.peopleDisplaced,
-        ),
-    ];
-
-    const koboHeading = resolveToComponent(
-        'ERCS Field Alerts ({numAlerts})',
-        {
-            numAlerts: <NumberOutput value={koboCount} />,
-        },
-    );
-
     return (
-        <>
-            <Container
-                className={styles.allEmergencies}
-                heading={heading}
-                headingLevel={2}
-                headerDescription={(
-                    <Description withLightText>
-                        Historical emergency records, appeals and field reports for Ethiopia,
-                        sourced from IFRC GO.
-                    </Description>
-                )}
-                headerActions={(
-                    <ExportButton
-                        onClick={handleExportClick}
-                        progress={progress}
-                        pendingExport={pendingExport}
-                        totalCount={eventResponse?.count}
-                    />
-                )}
-                filters={(
-                    <>
-                        <DateInput
-                            name="startDateAfter"
-                            label="Start After"
-                            onChange={setFilterField}
-                            value={rawFilter.startDateAfter}
-                        />
-                        <DateInput
-                            name="startDateBefore"
-                            label="Start Before"
-                            onChange={setFilterField}
-                            value={rawFilter.startDateBefore}
-                        />
-                        <DisasterTypeSelectInput
-                            placeholder="All Disaster Types"
-                            name="disaster-type"
-                            label="Disaster Type"
-                            value={filterDisasterType}
-                            onChange={setFilterDisasterType}
-                        />
-                    </>
-                )}
-                footerActions={(
-                    <Pager
-                        activePage={page}
-                        itemsCount={eventResponse?.count ?? 0}
-                        maxItemsPerPage={limit}
-                        onActivePageChange={setPage}
-                    />
-                )}
-            >
-                <SortContext.Provider value={sortState}>
-                    <Table
-                        pending={eventPending}
-                        className={styles.table}
-                        columns={columns}
-                        keySelector={eventKeySelector}
-                        data={eventResponse?.results}
-                        filtered={isFiltered}
-                    />
-                </SortContext.Provider>
-            </Container>
-            <Container
-                className={styles.allEmergencies}
-                heading={koboHeading}
-                headingLevel={2}
-                headerDescription={(
-                    <Description withLightText>
-                        Emergency alerts reported by ERCS regional branches, sourced from Kobo.
-                    </Description>
-                )}
-                headerActions={(
-                    <ExportButton
-                        onClick={handleKoboExportClick}
-                        progress={koboExportProgress}
-                        pendingExport={koboExportPending}
-                        totalCount={koboCount}
-                    />
-                )}
-                footerActions={(
-                    <Pager
-                        activePage={koboPage}
-                        itemsCount={koboCount}
-                        maxItemsPerPage={koboLimit}
-                        onActivePageChange={setKoboPage}
-                    />
-                )}
-            >
-                <Table
-                    pending={koboPending}
-                    className={styles.table}
-                    columns={koboColumns}
-                    keySelector={koboEmergencyKeySelector}
-                    data={koboEmergencies}
-                    filtered={false}
+        <Container
+            className={styles.allEmergencies}
+            heading={heading}
+            headingLevel={2}
+            headerDescription={(
+                <Description withLightText>
+                    Historical emergency records, appeals and field reports for Ethiopia,
+                    sourced from IFRC GO.
+                </Description>
+            )}
+            headerActions={(
+                <ExportButton
+                    onClick={handleExportClick}
+                    progress={progress}
+                    pendingExport={pendingExport}
+                    totalCount={eventResponse?.count}
                 />
-            </Container>
-        </>
+            )}
+            filters={(
+                <>
+                    <DateInput
+                        name="startDateAfter"
+                        label="Start After"
+                        onChange={setFilterField}
+                        value={rawFilter.startDateAfter}
+                    />
+                    <DateInput
+                        name="startDateBefore"
+                        label="Start Before"
+                        onChange={setFilterField}
+                        value={rawFilter.startDateBefore}
+                    />
+                    <DisasterTypeSelectInput
+                        placeholder="All Disaster Types"
+                        name="disaster-type"
+                        label="Disaster Type"
+                        value={filterDisasterType}
+                        onChange={setFilterDisasterType}
+                    />
+                </>
+            )}
+            footerActions={(
+                <Pager
+                    activePage={page}
+                    itemsCount={eventResponse?.count ?? 0}
+                    maxItemsPerPage={limit}
+                    onActivePageChange={setPage}
+                />
+            )}
+        >
+            <SortContext.Provider value={sortState}>
+                <Table
+                    pending={eventPending}
+                    className={styles.table}
+                    columns={columns}
+                    keySelector={eventKeySelector}
+                    data={eventResponse?.results}
+                    filtered={isFiltered}
+                />
+            </SortContext.Provider>
+        </Container>
     );
 }
 
