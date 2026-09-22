@@ -1,4 +1,5 @@
 import {
+    useCallback,
     useMemo,
     useState,
 } from 'react';
@@ -36,7 +37,10 @@ import {
     MapLayer,
     MapSource,
 } from '@togglecorp/re-map';
-import type { LngLatBoundsLike } from 'mapbox-gl';
+import type {
+    CircleLayer,
+    LngLatBoundsLike,
+} from 'mapbox-gl';
 
 import DisasterTypeSelectInput from '#components/DisasterTypeSelectInput';
 import GlobalMap, { type AdminZeroFeatureProperties } from '#components/GlobalMap';
@@ -45,6 +49,7 @@ import Link from '#components/Link';
 import MapPopup from '#components/MapPopup';
 import { goUrl } from '#config';
 import type { GlobalEnums } from '#contexts/GoContext';
+import { useKoboEmergenciesQuery } from '#generated/types/graphql';
 import useFilterState from '#hooks/useFilterState';
 import useGoContext from '#hooks/useGoContext';
 import useInputState from '#hooks/useInputState';
@@ -83,6 +88,7 @@ import {
     outerCircleLayerOptionsForPeopleTargeted,
     type ScaleOption,
 } from '#utils/utils';
+import EmergencyDetailModal from '#views/Home/EmergencyDetailModal';
 
 type AppealTypeOption = NonNullable<GlobalEnums['api_appeal_type']>[number];
 
@@ -97,6 +103,28 @@ const sourceOptions: mapboxgl.GeoJSONSourceRaw = {
 };
 
 const now = new Date().toISOString();
+
+const COLOR_FIELD_ALERT = '#cc2b2b';
+
+const alertPointLayerOptions: Omit<CircleLayer, 'id'> = {
+    type: 'circle',
+    paint: {
+        'circle-radius': 5,
+        'circle-color': COLOR_FIELD_ALERT,
+        'circle-opacity': 0.9,
+        'circle-stroke-width': 1,
+        'circle-stroke-color': '#ffffff',
+    },
+};
+
+interface AlertPointProperties {
+    id: string;
+    title: string;
+    hazard: string;
+    emergencyCode: string;
+    region: string;
+    peopleAffected: number;
+}
 
 function ActiveOperation() {
     const {
@@ -156,6 +184,71 @@ function ActiveOperation() {
         preserveResponse: true,
         query: queryParams,
     });
+
+    // ERCS Kobo field alerts, plotted on the same map as the GO operations.
+    const [{ data: alertsData }] = useKoboEmergenciesQuery({
+        variables: { pagination: { limit: 1000, offset: 0 } },
+    });
+    const [clickedAlert, setClickedAlert] = useState<{
+        properties: AlertPointProperties,
+        lngLat: mapboxgl.LngLatLike,
+    } | undefined>();
+    const [activeAlertId, setActiveAlertId] = useState<string | undefined>();
+
+    const alertPointFeatureCollection = useMemo<
+        GeoJSON.FeatureCollection<GeoJSON.Point, AlertPointProperties>
+    >(
+        () => ({
+            type: 'FeatureCollection' as const,
+            features: (alertsData?.koboEmergencies.results ?? [])
+                .map((item) => {
+                    if (!isDefined(item.latitude) || !isDefined(item.longitude)) {
+                        return undefined;
+                    }
+                    return {
+                        type: 'Feature' as const,
+                        geometry: {
+                            type: 'Point' as const,
+                            coordinates: [item.longitude, item.latitude],
+                        },
+                        properties: {
+                            id: item.id,
+                            title: item.title,
+                            hazard: item.hazard ?? '',
+                            emergencyCode: item.emergencyCode ?? '',
+                            region: item.region ?? '',
+                            peopleAffected: item.peopleAffected ?? 0,
+                        },
+                    };
+                })
+                .filter(isDefined),
+        }),
+        [alertsData],
+    );
+
+    const handleAlertClick = useCallback(
+        (feature: mapboxgl.MapboxGeoJSONFeature, lngLat: mapboxgl.LngLat) => {
+            setClickedAlert({
+                properties: feature.properties as AlertPointProperties,
+                lngLat,
+            });
+            return true;
+        },
+        [],
+    );
+
+    const handleAlertPopupClose = useCallback(() => {
+        setClickedAlert(undefined);
+    }, []);
+
+    const handleViewDetailsClick = useCallback((alertId: string) => {
+        setActiveAlertId(alertId);
+        setClickedAlert(undefined);
+    }, []);
+
+    const handleDetailModalClose = useCallback(() => {
+        setActiveAlertId(undefined);
+    }, []);
 
     const countryGroupedAppeal = listToGroupList(
         appealsResponse?.results ?? [],
@@ -256,6 +349,11 @@ function ActiveOperation() {
             label: 'Multiple Types',
             color: COLOR_MULTIPLE_TYPES,
         },
+        {
+            value: 'fieldAlert',
+            label: 'ERCS Field Alert',
+            color: COLOR_FIELD_ALERT,
+        },
     ]);
 
     const countryBounds: LngLatBoundsLike | undefined = useMemo(
@@ -348,194 +446,259 @@ function ActiveOperation() {
         setFilter({});
     });
     return (
-        <Container
-            overlayPending
-            heading={!presentationMode && heading}
-            withHeaderBorder={!presentationMode}
-            headerActions={!presentationMode && (
-                <Link
-                    to="emergencyAlert"
-                    withLinkIcon
-                    withUnderline
-                    spacing="4xs"
-                >
-                    View all Emergencies
-                </Link>
-            )}
-            filters={(
-                <>
-                    <DateInput
-                        name="startDateAfter"
-                        label="Start After"
-                        onChange={setFilterField}
-                        value={rawFilter.startDateAfter}
-                    />
-                    <DateInput
-                        name="startDateBefore"
-                        label="Start Before"
-                        onChange={setFilterField}
-                        value={rawFilter.startDateBefore}
-                    />
-                    <SelectInput
-                        placeholder="All Appeal Types"
-                        label="Appeal"
-                        name="appeal"
-                        value={rawFilter.appeal}
-                        onChange={setFilterField}
-                        keySelector={appealTypeKeySelector}
-                        labelSelector={appealTypeLabelSelector}
-                        options={globalEnums?.api_appeal_type}
-                    />
-                    <DisasterTypeSelectInput
-                        placeholder="All Disaster Types"
-                        label="Disaster Type"
-                        name="displacement"
-                        value={rawFilter.displacement}
-                        onChange={setFilterField}
-                    />
-                    <Button
-                        name={undefined}
-                        onClick={handleClearFiltersButtonClick}
-                        disabled={!filtered}
+        <>
+            <Container
+                overlayPending
+                heading={!presentationMode && heading}
+                withHeaderBorder={!presentationMode}
+                headerActions={!presentationMode && (
+                    <Link
+                        to="emergencyAlert"
+                        withLinkIcon
+                        withUnderline
+                        spacing="4xs"
                     >
-                        Clear
-                    </Button>
-                </>
-            )}
-            footerActions={(
-                <Pager
-                    activePage={page}
-                    itemsCount={appealsResponse?.count ?? 0}
-                    maxItemsPerPage={limit}
-                    onActivePageChange={setPage}
-                />
-            )}
-        >
-            <GlobalMap
-                onAdminZeroFillClick={handleCountryClick}
-                restrictedCountryIso3={countryData?.iso3 ?? undefined}
-            >
-                <GoMapContainer
-                    title="Ethiopia Active Operation"
-                    withPresentationMode
-                    onPresentationModeChange={setPresentationMode}
-                    footer={(
-                        <>
-                            <RadioInput
-                                label="Scale points by"
-                                name={undefined}
-                                options={scaleOptions}
-                                keySelector={optionKeySelector}
-                                labelSelector={optionLabelSelector}
-                                value={scaleBy}
-                                onChange={setScaleBy}
-                            />
-                            <ListView
-                                withWrap
-                                withSpacingOpticalCorrection
-                                spacing="sm"
-                            >
-                                {legendOptions.map((legendItem) => (
-                                    <LegendItem
-                                        key={legendItem.value}
-                                        color={legendItem.color}
-                                        label={legendItem.label}
-                                    />
-                                ))}
-                            </ListView>
-                        </>
-                    )}
-                />
-                <MapSource
-                    sourceKey="points"
-                    sourceOptions={sourceOptions}
-                    geoJson={countryCentroidGeoJson()}
-                >
-                    <MapLayer
-                        layerKey="point-circle"
-                        layerOptions={basePointLayerOptions}
-                    />
-                    <MapLayer
-                        key={scaleBy}
-                        layerKey="point-outer-circle"
-                        layerOptions={
-                            scaleBy === 'peopleTargeted'
-                                ? outerCircleLayerOptionsForPeopleTargeted
-                                : outerCircleLayerOptionsForFinancialRequirements
-                        }
-                    />
-                </MapSource>
-                {clickedPoint?.lngLat && (
-                    <MapPopup
-                        onCloseButtonClick={handlePointClose}
-                        coordinates={clickedPoint.lngLat}
-                        heading={clickedPoint.featureProperties.name}
-                        withPadding
-                        empty={isNotDefined(popupDetails) || popupDetails.length === 0}
-                        emptyMessage="Details not available"
-                    >
-                        <ListView
-                            layout="block"
-                            spacing="sm"
-                            withSpacingOpticalCorrection
+                        View all Emergencies
+                    </Link>
+                )}
+                filters={(
+                    <>
+                        <DateInput
+                            name="startDateAfter"
+                            label="Start After"
+                            onChange={setFilterField}
+                            value={rawFilter.startDateAfter}
+                        />
+                        <DateInput
+                            name="startDateBefore"
+                            label="Start Before"
+                            onChange={setFilterField}
+                            value={rawFilter.startDateBefore}
+                        />
+                        <SelectInput
+                            placeholder="All Appeal Types"
+                            label="Appeal"
+                            name="appeal"
+                            value={rawFilter.appeal}
+                            onChange={setFilterField}
+                            keySelector={appealTypeKeySelector}
+                            labelSelector={appealTypeLabelSelector}
+                            options={globalEnums?.api_appeal_type}
+                        />
+                        <DisasterTypeSelectInput
+                            placeholder="All Disaster Types"
+                            label="Disaster Type"
+                            name="displacement"
+                            value={rawFilter.displacement}
+                            onChange={setFilterField}
+                        />
+                        <Button
+                            name={undefined}
+                            onClick={handleClearFiltersButtonClick}
+                            disabled={!filtered}
                         >
-                            {popupDetails?.map(
-                                (appeal) => (
-                                    <Container
-                                        key={appeal.id}
-                                        heading={appeal.name}
-                                        headingLevel={6}
-                                        spacing="xs"
-                                    >
-                                        <ListView
-                                            layout="block"
-                                            spacing="2xs"
-                                            withSpacingOpticalCorrection
-                                        >
-                                            <TextOutput
-                                                value={appeal.num_beneficiaries}
-                                                description="People Targeted"
-                                                valueType="number"
-                                                textSize="sm"
-                                            />
-                                            <TextOutput
-                                                value={appeal.amount_requested}
-                                                description="Amount Requested (CHF)"
-                                                valueType="number"
-                                                textSize="sm"
-                                            />
-                                            <TextOutput
-                                                value={appeal.amount_funded}
-                                                description="Amount Funded (CHF)"
-                                                valueType="number"
-                                                textSize="sm"
-                                            />
-                                        </ListView>
-                                    </Container>
-                                ),
-                            )}
-                        </ListView>
-                    </MapPopup>
+                            Clear
+                        </Button>
+                    </>
                 )}
-                {isDefined(countryBounds) && (
-                    <MapBounds
-                        duration={DURATION_MAP_ZOOM}
-                        bounds={countryBounds}
-                        padding={DEFAULT_MAP_PADDING}
+                footerActions={(
+                    <Pager
+                        activePage={page}
+                        itemsCount={appealsResponse?.count ?? 0}
+                        maxItemsPerPage={limit}
+                        onActivePageChange={setPage}
                     />
                 )}
-            </GlobalMap>
-            <SortContext.Provider value={sortState}>
-                <Table
-                    pending={appealsPending}
-                    filtered={isFiltered}
-                    columns={columns}
-                    keySelector={appealKeySelector}
-                    data={appealsResponse?.results}
-                    errored={isDefined(appealsResponseError)}
+            >
+                <GlobalMap
+                    onAdminZeroFillClick={handleCountryClick}
+                    restrictedCountryIso3={countryData?.iso3 ?? undefined}
+                >
+                    <GoMapContainer
+                        title="Ethiopia Active Operation"
+                        withPresentationMode
+                        onPresentationModeChange={setPresentationMode}
+                        footer={(
+                            <>
+                                <RadioInput
+                                    label="Scale points by"
+                                    name={undefined}
+                                    options={scaleOptions}
+                                    keySelector={optionKeySelector}
+                                    labelSelector={optionLabelSelector}
+                                    value={scaleBy}
+                                    onChange={setScaleBy}
+                                />
+                                <ListView
+                                    withWrap
+                                    withSpacingOpticalCorrection
+                                    spacing="sm"
+                                >
+                                    {legendOptions.map((legendItem) => (
+                                        <LegendItem
+                                            key={legendItem.value}
+                                            color={legendItem.color}
+                                            label={legendItem.label}
+                                        />
+                                    ))}
+                                </ListView>
+                            </>
+                        )}
+                    />
+                    <MapSource
+                        sourceKey="points"
+                        sourceOptions={sourceOptions}
+                        geoJson={countryCentroidGeoJson()}
+                    >
+                        <MapLayer
+                            layerKey="point-circle"
+                            layerOptions={basePointLayerOptions}
+                        />
+                        <MapLayer
+                            key={scaleBy}
+                            layerKey="point-outer-circle"
+                            layerOptions={
+                                scaleBy === 'peopleTargeted'
+                                    ? outerCircleLayerOptionsForPeopleTargeted
+                                    : outerCircleLayerOptionsForFinancialRequirements
+                            }
+                        />
+                    </MapSource>
+                    <MapSource
+                        sourceKey="alert-points"
+                        sourceOptions={sourceOptions}
+                        geoJson={alertPointFeatureCollection}
+                    >
+                        <MapLayer
+                            layerKey="alert-point-circle"
+                            layerOptions={alertPointLayerOptions}
+                            onClick={handleAlertClick}
+                        />
+                    </MapSource>
+                    {clickedAlert && (
+                        <MapPopup
+                            onCloseButtonClick={handleAlertPopupClose}
+                            coordinates={clickedAlert.lngLat}
+                            heading={clickedAlert.properties.title}
+                            withPadding
+                        >
+                            <ListView
+                                layout="block"
+                                spacing="xs"
+                            >
+                                <TextOutput
+                                    label="Disaster type"
+                                    value={clickedAlert.properties.hazard}
+                                    valueType="text"
+                                    textSize="sm"
+                                />
+                                <TextOutput
+                                    label="Emergency code"
+                                    value={clickedAlert.properties.emergencyCode}
+                                    valueType="text"
+                                    textSize="sm"
+                                />
+                                <TextOutput
+                                    label="Region"
+                                    value={clickedAlert.properties.region}
+                                    valueType="text"
+                                    textSize="sm"
+                                />
+                                <TextOutput
+                                    label="Affected population"
+                                    value={clickedAlert.properties.peopleAffected}
+                                    valueType="number"
+                                    textSize="sm"
+                                />
+                                <Button
+                                    name={clickedAlert.properties.id}
+                                    onClick={handleViewDetailsClick}
+                                    styleVariant="filled"
+                                    spacing="xs"
+                                >
+                                    View details
+                                </Button>
+                            </ListView>
+                        </MapPopup>
+                    )}
+                    {clickedPoint?.lngLat && (
+                        <MapPopup
+                            onCloseButtonClick={handlePointClose}
+                            coordinates={clickedPoint.lngLat}
+                            heading={clickedPoint.featureProperties.name}
+                            withPadding
+                            empty={isNotDefined(popupDetails) || popupDetails.length === 0}
+                            emptyMessage="Details not available"
+                        >
+                            <ListView
+                                layout="block"
+                                spacing="sm"
+                                withSpacingOpticalCorrection
+                            >
+                                {popupDetails?.map(
+                                    (appeal) => (
+                                        <Container
+                                            key={appeal.id}
+                                            heading={appeal.name}
+                                            headingLevel={6}
+                                            spacing="xs"
+                                        >
+                                            <ListView
+                                                layout="block"
+                                                spacing="2xs"
+                                                withSpacingOpticalCorrection
+                                            >
+                                                <TextOutput
+                                                    value={appeal.num_beneficiaries}
+                                                    description="People Targeted"
+                                                    valueType="number"
+                                                    textSize="sm"
+                                                />
+                                                <TextOutput
+                                                    value={appeal.amount_requested}
+                                                    description="Amount Requested (CHF)"
+                                                    valueType="number"
+                                                    textSize="sm"
+                                                />
+                                                <TextOutput
+                                                    value={appeal.amount_funded}
+                                                    description="Amount Funded (CHF)"
+                                                    valueType="number"
+                                                    textSize="sm"
+                                                />
+                                            </ListView>
+                                        </Container>
+                                    ),
+                                )}
+                            </ListView>
+                        </MapPopup>
+                    )}
+                    {isDefined(countryBounds) && (
+                        <MapBounds
+                            duration={DURATION_MAP_ZOOM}
+                            bounds={countryBounds}
+                            padding={DEFAULT_MAP_PADDING}
+                        />
+                    )}
+                </GlobalMap>
+                <SortContext.Provider value={sortState}>
+                    <Table
+                        pending={appealsPending}
+                        filtered={isFiltered}
+                        columns={columns}
+                        keySelector={appealKeySelector}
+                        data={appealsResponse?.results}
+                        errored={isDefined(appealsResponseError)}
+                    />
+                </SortContext.Provider>
+            </Container>
+            {isDefined(activeAlertId) && (
+                <EmergencyDetailModal
+                    id={activeAlertId}
+                    onClose={handleDetailModalClose}
                 />
-            </SortContext.Provider>
-        </Container>
+            )}
+        </>
     );
 }
 

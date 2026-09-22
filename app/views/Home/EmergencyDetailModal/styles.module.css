@@ -1,0 +1,27 @@
+.hazard-badge {
+    border-radius: var(--go-ui-border-radius-sm);
+    background-color: var(--go-ui-color-primary-red);
+    padding: var(--go-ui-spacing-3xs) var(--go-ui-spacing-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--go-ui-color-white);
+    font-size: var(--go-ui-font-size-sm);
+    font-weight: var(--go-ui-font-weight-bold);
+}
+
+.code {
+    align-self: center;
+    color: var(--go-ui-color-text-light);
+    font-size: var(--go-ui-font-size-sm);
+}
+
+.submitted {
+    color: var(--go-ui-color-text-light);
+    font-size: var(--go-ui-font-size-sm);
+}
+
+.description {
+    line-height: 1.5;
+    white-space: pre-line;
+    color: var(--go-ui-color-text);
+}

@@ -25,6 +25,7 @@ import {
 import type { RouteKeys } from '#root/config/routes';
 import useRouting from '#root/hooks/useRouting';
 import ActiveOperation from '#views/Home/ActiveOperation';
+import FieldAlerts from '#views/Home/FieldAlerts';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const KOBO_STATS_QUERY = gql`
@@ -164,6 +165,7 @@ function Home() {
                 layout="block"
             >
                 <ActiveOperation />
+                <FieldAlerts />
                 <Container
                     pending={fetching}
                 >
