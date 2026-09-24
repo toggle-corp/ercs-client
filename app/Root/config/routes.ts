@@ -126,7 +126,7 @@ const cookie: RouteConfig = {
 
 const team: RouteConfig = {
     index: true,
-    path: '/team/:id',
+    path: '/teams/:id',
     load: () => import('#views/TeamList/Members'),
     visibility: 'is-authenticated',
 };
